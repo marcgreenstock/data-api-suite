@@ -1,0 +1,23 @@
+service: serverless-data-api-local-plugin-postgres-example
+
+plugins:
+  - serverless-data-api-local-plugin
+  - serverless-offline
+
+custom:
+  DataAPILocal:
+    port: 8080
+    engine: pg
+    dbUrl: postgresql://user:secret@localhost:5432/example
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: '/'
+          method: get

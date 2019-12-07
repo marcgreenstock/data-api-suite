@@ -1,0 +1,33 @@
+{
+  "name": "data-api-local",
+  "version": "1.0.0",
+  "description": "AWS Aurora Serverless Data API emulator for local development.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf ./dist && tsc && chmod +x ./dist/cli.js"
+  },
+  "bin": {
+    "data-api-local": "./dist/cli.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "yargs": "^15.0.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.2",
+    "@types/mysql": "^2.15.8",
+    "@types/node": "^12.12.14",
+    "@types/pg": "^7.11.2",
+    "jest": "^24.9.0",
+    "mysql": "^2.17.1",
+    "pg": "^7.14.0",
+    "typescript": "^3.7.3"
+  },
+  "peerDependencies": {
+    "mysql": "^2.17.1",
+    "pg": "^7.14.0"
+  }
+}
