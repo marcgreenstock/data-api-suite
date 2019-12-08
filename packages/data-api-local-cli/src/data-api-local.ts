@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as yargs from 'yargs'
-import * as DataAPILocal from './DataAPILocal'
+import * as DataAPILocal from 'data-api-local'
 
 yargs
   .scriptName('data-api-local')

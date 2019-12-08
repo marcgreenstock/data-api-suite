@@ -1,6 +1,7 @@
 import * as Serverless from 'serverless'
 import * as Plugin from 'serverless/classes/Plugin'
 import * as express from 'express'
+import * as DataAPILocal from 'data-api-local'
 
 interface ExecuteSqlRequest {
   awsSecretStoreArn: string
@@ -57,10 +58,7 @@ class ServerlessDataAPILocal {
     const client = new Client()
     client.connect()
     app.post('/ExecuteSql', async (req, res) => {
-      const sqlRes = await client.query(req.sqlStatements)
-      res.json({
-        sqlStatementResults: sqlRes
-      })
+      res.json({hello: 'world'})
     })
     app.listen(port, () => {
       this.serverless.cli.log(`serverless-data-api-local-plugin listening on port ${port}`)

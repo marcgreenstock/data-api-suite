@@ -1,0 +1,23 @@
+{
+  "name": "data-api-local-cli",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "prepublish": "rm -rf ./lib && tsc && chmod +x ./lib/data-api-local.js"
+  },
+  "files": [
+    "lib"
+  ],
+  "license": "MIT",
+  "bin": {
+    "data-api-local": "./lib/data-api-local.js"
+  },
+  "dependencies": {
+    "yargs": "^15.0.2"
+  },
+  "devDependencies": {
+    "@types/yargs": "^13.0.3",
+    "data-api-local": "1.0.0",
+    "typescript": "^3.7.3"
+  }
+}

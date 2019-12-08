@@ -7,6 +7,7 @@ import {
   Connection as MySQLConnection
 } from 'mysql'
 import * as express from 'express'
+import * as bodyParser from 'body-parser'
 import * as URL from 'url'
 
 const DEFAULT_PORT = 8080
@@ -51,11 +52,13 @@ namespace DataAPILocal {
     protected client: PostgresClient | MySQLConnection
     protected app: express.Express
     protected logger: Console
+    protected engine: 'mysql' | 'postgres'
 
     constructor ({ logger = console }: { logger?: Console }) {
       this.logger = logger
       this.app = express()
-      this.app.get('/foobar', this.handleStatement.bind(this))
+      this.app.use(bodyParser.json())
+      this.app.get('/ExecuteSql', this.handleStatement.bind(this))
     }
 
     async connect (options: ConnectionOptions): Promise<void> {
@@ -91,6 +94,7 @@ namespace DataAPILocal {
     async connectMySQL (config: string | MySQLConnectionConfig): Promise<MySQLConnection> {
       const { createConnection } = await import('mysql')
       this.client = createConnection(config)
+      this.engine = 'mysql'
       await new Promise((resolve, reject) => {
         this.client.connect((error) => {
           if (error) { reject(error) }
@@ -103,6 +107,7 @@ namespace DataAPILocal {
     async connectPostgreSQL (config: string | PostgresClientConfig): Promise<PostgresClient> {
       const { Client } = await import('pg')
       this.client = new Client(config)
+      this.engine = 'postgres'
       await this.client.connect()
       return this.client
     }
@@ -122,8 +127,22 @@ namespace DataAPILocal {
       await this.client.end()
     }
 
-    handleStatement (req: express.Request, res: express.Response) {
-      res.status(200).json({hello: 'world'})
+    async handleStatement (req: express.Request, res: express.Response): Promise<void> {
+      if (this.engine === 'mysql') {
+        const client = this.client as MySQLConnection
+        client.query({ sql: req.body.sqlStatements }, (error, results) => {
+          if (error) { throw error }
+          res.json({
+            sqlStatementResults: results
+          })
+        })
+      } else if (this.engine === 'postgres') {
+        const client = this.client as PostgresClient
+        const results = await client.query(req.body.sqlStatements)
+        res.json({
+          sqlStatementResults: results
+        })
+      }
     }
   }
 

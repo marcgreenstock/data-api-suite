@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "rootDir": ".",
-    "target": "es6",
+    "module": "CommonJS",
+    "target": "ES6",
     "sourceMap": true,
-    "outDir": "dist",
-    "sourceRoot": "src"
+    "declaration": true,
+    "preserveSymlinks": true,
+    "lib": [
+      "ES6"
+    ]
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "lib",
+    "**/*.test.ts"
   ]
 }
