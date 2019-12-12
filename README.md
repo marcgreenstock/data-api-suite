@@ -18,7 +18,7 @@ This repository is a mono-repo consisting of 3 packages, documentation for each 
 
 data-api-local is a node.js emulator for the AWS RDS Aurora Serverless Data API.
 
-## [data-api-local-serverless](packages/data-api-local)
+## [data-api-local-serverless](packages/data-api-local-serverless)
 
 data-api-local-serverless is a [serverless](https://serverless.com/) plugin that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline).
 
