@@ -21,7 +21,11 @@ describe('dataApiLocal', () => {
     })
     client = new RDSDataService({
       endpoint: 'http://localhost:8080',
-      region: 'us-east-1'
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'example',
+        secretAccessKey: 'example'
+      }
     })
   })
 

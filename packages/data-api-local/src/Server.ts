@@ -106,10 +106,14 @@ export class Server {
     return this
   }
 
-  public async stop (): Promise<Server> {
+  public async stop (): Promise<void> {
     await Promise.all(Object.values(this.pool).map((client) => client.disconnect()))
-    this.httpServer.close()
-    return this
+    return new Promise((resolve, reject) => {
+      this.httpServer.close((error) => {
+        if (error) { return reject(error) }
+        resolve()
+      })
+    })
   }
 
   private log (message: string): void {

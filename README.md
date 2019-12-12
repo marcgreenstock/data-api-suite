@@ -1,5 +1,7 @@
 # Data API Local
 
+![](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)
+
 Data API Local is a [Aurora Serverless Data API](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) emulator, its main purpose is to simplify the development of applications using the Data API by making it available offline and local, similar to [dynamodb-local](https://github.com/rynop/dynamodb-local) but for MySQL and PostgreSQL.
 
 ## BYO Database
