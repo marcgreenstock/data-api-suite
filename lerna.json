@@ -1,6 +1,7 @@
 {
   "packages": [
-    "packages/*"
+    "packages/data-api-local",
+    "packages/data-api-local-cli"
   ],
   "version": "1.0.0"
 }

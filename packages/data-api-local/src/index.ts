@@ -1,3 +1,9 @@
-import * as DataAPILocal from './DataAPILocal'
+import { Server, ServerOptions } from './Server'
+export * from './Server'
+export * from './Client'
 
-export = DataAPILocal
+export const dataApiLocal = async (
+  options: ServerOptions
+): Promise<Server> => {
+  return new Server(options).start()
+}

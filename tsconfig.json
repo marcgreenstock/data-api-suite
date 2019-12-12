@@ -4,7 +4,6 @@
     "target": "ES6",
     "sourceMap": true,
     "declaration": true,
-    "preserveSymlinks": true,
     "lib": [
       "ES6"
     ]

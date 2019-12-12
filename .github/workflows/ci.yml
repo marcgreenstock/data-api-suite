@@ -1,0 +1,30 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 10.x
+      - name: Install Dependencies
+        run: npm install
+      - name: Build the docker-compose stack
+        run: docker-compose up --build -d
+      - name: Sleep
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '30s'
+      - name: Check running containers
+        run: docker ps -a
+      - name: Execute test
+        run: npm run test
+      - name: Upload coverage
+        uses: actions/upload-artifact@master
+        with:
+          name: coverage
+          path: coverage
