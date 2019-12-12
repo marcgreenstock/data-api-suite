@@ -2,7 +2,7 @@ import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import { dataApiLocal, Server } from '.'
 
 describe('dataApiLocal', () => {
-  const database = 'postgres'
+  const database = 'test'
   const secretArn = 'arn:aws:secretsmanager:us-east-1:123456789012:secret:dummy'
   const resourceArn = 'arn:aws:rds:us-east-1:123456789012:cluster:dummy'
   let server: Server
@@ -12,7 +12,7 @@ describe('dataApiLocal', () => {
     server = await dataApiLocal({
       engine: 'postgres',
       port: 54320,
-      user: 'postgres',
+      user: 'test',
       password: 'test',
       server: {
         hostname: 'localhost',
