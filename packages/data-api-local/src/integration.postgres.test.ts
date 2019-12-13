@@ -53,7 +53,7 @@ describe('dataApiLocal', () => {
         secretArn,
         resourceArn
       }).promise()
-      const result = await client.executeStatement({
+      await client.executeStatement({
         transactionId,
         sql: 'INSERT INTO "test" ("nonNullString", "integer") VALUES (:nonNullString, :integer) RETURNING id',
         database,
@@ -71,13 +71,12 @@ describe('dataApiLocal', () => {
           }
         }]
       }).promise()
-      console.log(result)
-      const commit = await client.commitTransaction({
+      const { transactionStatus } = await client.commitTransaction({
         transactionId,
         secretArn,
         resourceArn
       }).promise()
-      console.log(commit)
+      expect(transactionStatus).toEqual('Transaction Committed')
     })
   })
 })

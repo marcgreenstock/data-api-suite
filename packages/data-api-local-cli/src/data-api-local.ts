@@ -7,7 +7,7 @@ import { PostgreSQLCommand } from './commands/PostgreSQLCommand'
 
 yargs
   .scriptName('data-api-local')
-  .usage("Usage: $0 <command> [options]")
+  .usage('Usage: $0 <command> [options]')
   .option('host', {
     describe: 'Host name to serve the local Data API on',
     default: 'localhost',
@@ -32,9 +32,9 @@ yargs
     alias: 'v',
     type: 'boolean'
   })
-  .command(new ServeCommand)
-  .command(new MySQLCommand)
-  .command(new PostgreSQLCommand)
+  .command(new ServeCommand())
+  .command(new MySQLCommand())
+  .command(new PostgreSQLCommand())
   .demandCommand()
   .epilogue('for more information please visit https://github.com/marcgreenstock/data-api-local')
   .help()

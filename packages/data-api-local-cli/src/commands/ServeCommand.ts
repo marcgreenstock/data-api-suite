@@ -6,19 +6,19 @@ export class ServeCommand implements yargs.CommandModule {
   describe = `Starts a local MySQL or PostgreSQL Data API
   Default local Data API: http://localhost:8080`
 
-  async handler (args: yargs.Arguments) {
-    dataApiLocal({
+  async handler (args: yargs.Arguments): Promise<void> {
+    await dataApiLocal({
       logger: args.quiet ? undefined : console,
       logLevel: args.verbose ? 'INFO' : 'DEBUG',
-      url: args['url'] as string,
+      url: args.url as string,
       server: {
-        hostname: args['host'] as string,
-        port: args['port'] as number
+        hostname: args.host as string,
+        port: args.port as number
       }
     })
   }
 
-  builder (_args: yargs.Argv) {
+  builder (): yargs.Argv {
     return yargs
       .positional('url', {
         type: 'string',

@@ -1,39 +1,28 @@
-import {
-  Client,
-  MySQLClient,
-  PostgresClient,
-  MysqlClientConfig,
-  PostgresClientConfig,
-} from './Client'
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
-import * as URL from 'url'
 import * as http from 'http'
 import * as uuid from 'uuid/v4'
+import * as yup from 'yup'
+import {
+  Client,
+  QueryError
+} from './Client'
+import {
+  MySQLClient,
+  MysqlClientConfig
+} from './MySQLClient'
+import {
+  PostgresClient,
+  PostgresClientConfig
+} from './PostgresClient'
+import { parseUrl } from './utils/parseUrl'
+import * as schemas from './schemas'
 
 const DEFAULT_PORT = 8080
 const DEFAULT_HOSTNAME = 'localhost'
 
-const parseUrl = (urlString: string): MySQLConnectionOptions | PostgresConnectionOptions => {
-  const url = URL.parse(urlString)
-  let engine: engines
-  if (/mysql:$/.test(url.protocol)) {
-    engine = 'mysql'
-  } else if (/postgres:$/.test(url.protocol)) {
-    engine = 'postgres'
-  }
-  const host = url.hostname !== null ? url.hostname : undefined
-  const port = url.port !== null ? parseInt(url.port) : undefined
-  const [user, password] = url.auth !== null ? url.auth.split(':') : [undefined, undefined]
-  const database = url.path !== null ? url.path : undefined
-  return {
-    engine,
-    port,
-    host,
-    user,
-    password,
-    database
-  }
+class NotFoundException extends Error {
+
 }
 
 export type engines = 'mysql' | 'postgres'
@@ -41,28 +30,28 @@ export type engines = 'mysql' | 'postgres'
 export type Url = string
 
 export interface ServerConfig {
-  hostname?: string
-  port?: number
+  hostname?: string;
+  port?: number;
 }
 
 export interface MySQLConnectionOptions extends MysqlClientConfig {
-  engine: 'mysql'
+  engine: 'mysql';
 }
 
 export interface PostgresConnectionOptions extends PostgresClientConfig {
-  engine: 'postgres'
+  engine: 'postgres';
 }
 
 export interface UrlConnectionOptions {
-  url: Url
+  url: Url;
 }
 
 export type DbConfig = UrlConnectionOptions | MySQLConnectionOptions | PostgresConnectionOptions
 
 export type ServerOptions = DbConfig & {
-  server?: ServerConfig
-  logger?: Console,
-  logLevel?: 'INFO' | 'DEBUG' | 'WARN'
+  server?: ServerConfig;
+  logger?: Console;
+  logLevel?: 'INFO' | 'DEBUG' | 'WARN';
 }
 
 export class Server {
@@ -71,9 +60,10 @@ export class Server {
   protected port: number
   protected hostname: string
   protected logger: Console
+  protected logLevel: string
   protected engine: engines
   protected dbConfig: MySQLConnectionOptions | PostgresConnectionOptions
-  protected pool: {[transactionId: string]: Client}
+  protected pool: { [transactionIdOrDatabase: string]: Client }
 
   constructor ({
     logger = console,
@@ -82,13 +72,14 @@ export class Server {
     ...dbConfig
   }: ServerOptions) {
     this.logger = logger
+    this.logLevel = logLevel
     this.port = server.port || DEFAULT_PORT
     this.hostname = server.hostname || DEFAULT_HOSTNAME
     this.dbConfig = 'url' in dbConfig ? parseUrl(dbConfig.url) : dbConfig
     this.pool = {}
     this.app = express()
     this.app.use(bodyParser.json())
-    this.app.post('/Execute', this.execute.bind(this))
+    this.app.post('/Execute', this.executeStatement.bind(this))
     // this.app.post('/BatchExecute', this.batchExecute.bind(this))
     // this.app.post('/ExecuteSql', this.executeSql.bind(this))
     this.app.post('/BeginTransaction', this.beginTransaction.bind(this))
@@ -122,27 +113,23 @@ export class Server {
     }
   }
 
-  private getClient ({
-    transactionId
-  }: {
-    transactionId: string
-  }): Client | undefined {
-    return this.pool[transactionId]
+  private getClient (id: string): Client | undefined {
+    return this.pool[id]
   }
 
   private async createClient ({
     database = this.dbConfig.database,
     transactionId
   }: {
-    database?: string,
-    transactionId?: string
+    database?: string;
+    transactionId?: string;
   }): Promise<Client> {
     const { engine, ...config } = this.dbConfig
     let client: Client
     if (engine === 'mysql') {
       client = await new MySQLClient({ ...config as MysqlClientConfig, database }).connect()
     } else if (engine === 'postgres') {
-      client = await new PostgresClient({...config as PostgresClientConfig, database }).connect()
+      client = await new PostgresClient({ ...config as PostgresClientConfig, database }).connect()
     }
     if (transactionId !== undefined) {
       this.pool[transactionId] = client
@@ -154,8 +141,8 @@ export class Server {
     transactionId,
     client
   }: {
-    transactionId: string,
-    client: Client
+    transactionId: string;
+    client: Client;
   }): Promise<void> {
     await client.disconnect()
     if (transactionId) {
@@ -163,25 +150,45 @@ export class Server {
     }
   }
 
-  private async execute (
+  private async executeStatement (
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    let client: Client
-    const { transactionId, sql, parameters, database } = req.body
-    if (transactionId !== undefined) {
-      client = this.getClient({ transactionId })
-    } else {
-      client = await this.createClient({ database })
-    }
     try {
+      const {
+        sql,
+        database,
+        parameters,
+        transactionId
+      } = await schemas.executeStatementSchema.validate(req.body)
+      let client: Client
+      if (transactionId !== undefined) {
+        if (transactionId in this.pool) {
+          client = this.pool[transactionId]
+        } else {
+          throw new NotFoundException('transactionId not found')
+        }
+      } else {
+        if (database in this.pool) {
+          client = this.pool[database]
+        } else {
+          client = this.pool[database] = await this.createClient({ database })
+        }
+      }
       const result = await client.query({ sql, parameters })
+      if (transactionId === undefined) {
+        await this.destroyClient({ client, transactionId })
+      }
       res.status(200).json(result)
     } catch (error) {
-      res.status(400).json(error)
-    }
-    if (transactionId === undefined) {
-      await this.destroyClient({ client, transactionId })
+      console.error(error)
+      if (error instanceof yup.ValidationError || error instanceof QueryError) {
+        res.status(400).json({ message: error.message })
+      } else if (error instanceof NotFoundException) {
+        res.status(404).json({ message: error.message })
+      } else {
+        res.status(500).json({ message: error.message })
+      }
     }
   }
 
@@ -189,25 +196,45 @@ export class Server {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    const transactionId = Buffer.from(uuid()).toString('base64')
-    const { database } = req.body
-    const client = await this.createClient({ database, transactionId })
-    await client.beginTransaction()
-    res.status(200).json({ transactionId })
+    try {
+      const { database } = await schemas.beginTransactionSchema.validate(req.body)
+      const transactionId = Buffer.from(uuid()).toString('base64')
+      const client = await this.createClient({ database, transactionId })
+      await client.beginTransaction()
+      res.status(200).json({ transactionId })
+    } catch (error) {
+      console.error(error)
+      if (error instanceof yup.ValidationError || error instanceof QueryError) {
+        res.status(400).json({ message: error.message })
+      } else {
+        res.status(500).json({ message: error.message })
+      }
+    }
   }
 
   private async commitTransaction (
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    const { transactionId } = req.body
-    const client = this.getClient({ transactionId })
-    if (client === undefined) {
-      res.send(404)
-    } else {
-      await client.commitTransaction()
-      res.status(200).json({ transactionStatus: 'Transaction Committed' })
-      await this.destroyClient({ client, transactionId })
+    try {
+      const { transactionId } = await schemas.commitTransactionSchema.validate(req.body)
+      const client = this.getClient(transactionId)
+      if (client === undefined) {
+        res.send(404)
+      } else {
+        await client.commitTransaction()
+        res.status(200).json({ transactionStatus: 'Transaction Committed' })
+        await this.destroyClient({ client, transactionId })
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof yup.ValidationError || error instanceof QueryError) {
+        res.status(400).json({ message: error.message })
+      } else if (error instanceof NotFoundException) {
+        res.status(404).json({ message: error.message })
+      } else {
+        res.status(500).json({ message: error.message })
+      }
     }
   }
 
@@ -215,14 +242,23 @@ export class Server {
     req: express.Request,
     res: express.Response
   ): Promise<void> {
-    const { transactionId } = req.body
-    const client = this.getClient({ transactionId })
-    if (client === undefined) {
-      res.send(404)
-    } else {
-      await client.rollbackTransaction()
-      res.status(200).json({ transactionStatus: 'Transaction Rolledback' })
-      await this.destroyClient({ client, transactionId })
+    try {
+      const { transactionId } = await schemas.rollbackTransactionSchema.validate(req.body)
+      const client = this.getClient(transactionId)
+      if (client === undefined) {
+        res.send(404)
+      } else {
+        await client.rollbackTransaction()
+        res.status(200).json({ transactionStatus: 'Transaction Rolledback' })
+        await this.destroyClient({ client, transactionId })
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof yup.ValidationError || error instanceof QueryError) {
+        res.status(400).json({ message: error.message })
+      } else {
+        res.status(500).json({ message: error.message })
+      }
     }
   }
 }

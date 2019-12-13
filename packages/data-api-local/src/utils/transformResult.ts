@@ -29,7 +29,7 @@ export const transformResult = (result: QueryResult): RDSDataService.Types.Execu
   })
 
   const records = result.rows.map((row) => {
-    return Object.entries(row).map(([name, value]) => {
+    return Object.entries(row).map(([, value]) => {
       if (value === null) {
         return {
           isNull: true

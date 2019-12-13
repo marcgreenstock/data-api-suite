@@ -75,22 +75,33 @@ functions:
 ```ts
 // handler.ts
 
-import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda'
+import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
+import {
+  APIGatewayProxyEvent,
+  Context,
+  APIGatewayProxyResult
+} from 'aws-lambda'
 
 export const example = async (
   event: APIGatewayProxyEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
+  // Create a RDSDataService client see https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html
+  // The `endpoint` property is used here to set to the local server if `event.isOffline` is truthy.
   const client = new RDSDataService({
     endpoint: event.isOffline ? 'http://localhost:8080' : undefined,
     region: process.env.AWS_REGION
   })
+
+  // Execute your SQL
   const result = await client.executeStatement({
     sql: 'SELECT * FROM "myTable";',
     database: process.env.DATABASE_NAME,
     secretArn: process.env.DATA_API_SECRET_ARN,
     resourceArn: process.env.DATA_API_RESOURCE_ARN
   }).promise()
+
+  // Return the result
   return {
     statusCode: 200,
     body: JSON.stringify(result)

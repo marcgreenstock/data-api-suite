@@ -1,8 +1,10 @@
+/* eslint-env jest */
+
 import { transformQuery } from './transformQuery'
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 
 test('transformQuery', () => {
-  const query = `:a :b :c :d :e :f :a :g :h :i :j :k :l`
+  const query = ':a :b :c :d :e :f :a :g :h :i :j :k :l'
   const properties: RDSDataService.Types.SqlParametersList = [{
     name: 'a',
     value: {
@@ -80,7 +82,7 @@ test('transformQuery', () => {
   }]
   const result = transformQuery(query, properties)
   expect(result).toStrictEqual({
-    query: `$1 $2 $3 $4 $5 $6 $1 $7 $8 $9 $10 $11 $12`,
+    query: '$1 $2 $3 $4 $5 $6 $1 $7 $8 $9 $10 $11 $12',
     values: [
       'example',
       true,

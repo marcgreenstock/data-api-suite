@@ -1,6 +1,6 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 
-const getId = (index: number, typeHint?: RDSDataService.Types.TypeHint) => {
+const getId = (index: number, typeHint?: RDSDataService.Types.TypeHint): string => {
   const pos = index + 1
   switch (typeHint) {
     case 'DATE':
@@ -16,7 +16,7 @@ const getId = (index: number, typeHint?: RDSDataService.Types.TypeHint) => {
   }
 }
 
-const getValueFromArrayValue = (value: RDSDataService.Types.ArrayValue): any => {
+const getValueFromArrayValue = (value: RDSDataService.Types.ArrayValue): unknown => {
   if ('arrayValues' in value) {
     return value.arrayValues.map(getValueFromArrayValue)
   }
@@ -34,7 +34,7 @@ const getValueFromArrayValue = (value: RDSDataService.Types.ArrayValue): any => 
   }
 }
 
-const getValueFromParameter = (parameter: RDSDataService.Types.SqlParameter): any => {
+const getValueFromParameter = (parameter: RDSDataService.Types.SqlParameter): unknown => {
   const { value } = parameter
   if ('arrayValue' in value) {
     return getValueFromArrayValue(value.arrayValue)
@@ -60,8 +60,8 @@ const getValueFromParameter = (parameter: RDSDataService.Types.SqlParameter): an
 }
 
 export interface TransformedQuery {
-  query: string
-  values?: any[]
+  query: string;
+  values?: unknown[];
 }
 
 export const transformQuery = (

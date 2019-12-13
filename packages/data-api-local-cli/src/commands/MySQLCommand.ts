@@ -8,13 +8,13 @@ export class MySQLCommand implements yargs.CommandModule {
   Default local Data API: http://localhost:8080
   Default MySQL server:   mysql://localhost:3306`
 
-  async handler (args: yargs.Arguments) {
-    dataApiLocal({
+  async handler (args: yargs.Arguments): Promise<void> {
+    await dataApiLocal({
       engine: 'mysql',
       logger: args.quiet ? undefined : console,
       server: {
-        hostname: args['host'] as string,
-        port: args['port'] as number
+        hostname: args.host as string,
+        port: args.port as number
       },
       host: args['db-host'] as string,
       port: args['db-port'] as number,
@@ -23,7 +23,7 @@ export class MySQLCommand implements yargs.CommandModule {
     })
   }
 
-  builder (_args: yargs.Argv) {
+  builder (): yargs.Argv {
     return yargs
       .option('db-host', {
         describe: 'The local MySQL server host name',

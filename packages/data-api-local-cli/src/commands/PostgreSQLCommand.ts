@@ -8,13 +8,13 @@ export class PostgreSQLCommand implements yargs.CommandModule {
   Default local Data API:    http://localhost:8080
   Default PostgreSQL server: postgres://localhost:5432`
 
-  async handler (args: yargs.Arguments) {
-    dataApiLocal({
+  async handler (args: yargs.Arguments): Promise<void> {
+    await dataApiLocal({
       engine: 'postgres',
       logger: args.quiet ? undefined : console,
       server: {
-        hostname: args['host'] as string,
-        port: args['port'] as number
+        hostname: args.host as string,
+        port: args.port as number
       },
       host: args['db-host'] as string,
       port: args['db-port'] as number,
@@ -23,7 +23,7 @@ export class PostgreSQLCommand implements yargs.CommandModule {
     })
   }
 
-  builder (_args: yargs.Argv) {
+  builder (): yargs.Argv {
     return yargs
       .option('db-host', {
         describe: 'The local PostgreSQL server host name',
