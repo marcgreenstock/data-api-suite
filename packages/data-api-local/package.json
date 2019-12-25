@@ -1,6 +1,6 @@
 {
   "name": "data-api-local",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "AWS Aurora Serverless Data API emulator for local development.",
   "main": "lib/index.js",
   "types": "lib/index",
