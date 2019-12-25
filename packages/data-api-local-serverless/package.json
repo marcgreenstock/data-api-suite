@@ -3,12 +3,13 @@
   "version": "1.0.2-alpha.0",
   "description": "",
   "main": "lib/index.js",
+  "types": "lib/index",
   "files": [
     "lib"
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./lib",
+    "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
     "compile": "tsc -p tsconfig.build.json",
     "prepublish": "npm run build"
   },
@@ -25,5 +26,6 @@
   },
   "dependencies": {
     "data-api-local": "^1.0.2-alpha.0"
-  }
+  },
+  "gitHead": "f3f058ddf9166d4ac330b97b043197535e3a2384"
 }

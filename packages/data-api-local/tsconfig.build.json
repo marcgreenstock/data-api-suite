@@ -5,6 +5,9 @@
     "outDir": "./lib",
     "rootDir": "./src"
   },
+  "references": [{
+    "path": "../data-api-local-serverless/tsconfig.build.json"
+  }],
   "include": [
     "src/**/*.ts"
   ],
