@@ -33,15 +33,15 @@ export const parameterSchema = yup.object({
 export const executeStatementSchema = yup.object({
   resourceArn: yup.string().required(),
   secretArn: yup.string().required(),
-  sql: yup.string().required(),
+  sql: yup.string().required('SQL is empty'),
   continueAfterTimeout: yup.boolean().default(false),
-  database: yup.string().default(''),
+  database: yup.string(),
   includeResultMetadata: yup.boolean().default(false),
   parameters: yup.array(parameterSchema),
   resultSetOptions: yup.object({
     decimalReturnType: yup.string().oneOf(['DOUBLE_OR_LONG', 'STRING'])
   }),
-  schema: yup.string().default(''),
+  schema: yup.string(),
   transactionId: yup.string()
 })
 
@@ -49,22 +49,17 @@ export const batchExecuteStatementSchema = yup.object({
   resourceArn: yup.string().required(),
   secretArn: yup.string().required(),
   sql: yup.string().required(),
-  continueAfterTimeout: yup.boolean().default(false),
-  database: yup.string().default(''),
-  includeResultMetadata: yup.boolean().default(false),
+  database: yup.string(),
   parameterSets: yup.array(yup.array(parameterSchema)),
-  resultSetOptions: yup.object({
-    decimalReturnType: yup.string().oneOf(['DOUBLE_OR_LONG', 'STRING'])
-  }),
-  schema: yup.string().default(''),
+  schema: yup.string(),
   transactionId: yup.string()
 })
 
 export const beginTransactionSchema = yup.object({
   resourceArn: yup.string().required(),
   secretArn: yup.string().required(),
-  database: yup.string().default(''),
-  schema: yup.string().default('')
+  database: yup.string(),
+  schema: yup.string()
 })
 
 export const commitTransactionSchema = yup.object({

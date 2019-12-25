@@ -59,9 +59,12 @@ plugins:
 
 custom:
   data-api-local:
-    port: 8080
-    hostname: localhost
-    database: postgresql://user:secret@localhost:5432
+    server:
+      port: 8080 # default
+      hostname: localhost # default
+    database:
+      engine: postgresql
+      connectionString: postgresql://user:secret@localhost:5432
 
 functions:
   example:
@@ -95,10 +98,16 @@ export const example = async (
 
   // Execute your SQL
   const result = await client.executeStatement({
-    sql: 'SELECT * FROM "myTable";',
+    sql: 'SELECT * FROM "myTable" WHERE "id" = :id;',
     database: process.env.DATABASE_NAME,
     secretArn: process.env.DATA_API_SECRET_ARN,
-    resourceArn: process.env.DATA_API_RESOURCE_ARN
+    resourceArn: process.env.DATA_API_RESOURCE_ARN,
+    parameters: [{
+      name: 'id',
+      value: {
+        longValue: 42
+      }
+    }]
   }).promise()
 
   // Return the result
@@ -107,6 +116,14 @@ export const example = async (
     body: JSON.stringify(result)
   }
 }
+```
+
+**Important:** [data-api-local-serverless](packages/data-api-local-serverless) convieniently binds to the `offline` lifecycle hooks builtin to [serverless-ofline](https://github.com/dherault/serverless-offline). To start  your data-api server and serverless-offline run:
+
+```sh
+$ sls offline
+# or
+$ serverless offline
 ```
 
 For more information and examples, see the [data-api-local-serverless README](packages/data-api-local-serverless).
