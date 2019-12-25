@@ -43,8 +43,8 @@ jobs:
       - name: Execute lint
         run: npm run lint
 
-  release:
-    name: Release
+  publish:
+    name: Publish
     needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
@@ -52,6 +52,8 @@ jobs:
       - uses: actions/setup-node@master
         with:
           node-version: 10.x
-      - uses: cycjimmy/semantic-release-action@v2
+      - name: Publish
+        run: npx lerna publish from-git --yes --canary --no-verify-access
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
