@@ -1,10 +1,9 @@
-# Serverless Data API Local
+# Data API Local Serverless Plugin
 
-[Serverless](https://serverless.com/) plugin that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline).
+Data API Local Serverless Plugin is a [Aurora Serverless Data API](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) emulator, its main purpose is to simplify the development of applications using the Data API by making it available offline and local, similar to [dynamodb-local](https://github.com/rynop/dynamodb-local) but for PostgreSQL (MySQL coming soon).
 
 ```yml
 # serverless.yml
-
 service: myApp
 
 provider:
@@ -19,12 +18,12 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - secretsmanager:GetSecretValue
+        - "secretsmanager:GetSecretValue"
       Resource:
         - ${self:provider.environment.DATA_API_SECRET_ARN}
     - Effect: Allow
       Action:
-        - rds-data:*
+        - "rds-data:*"
       Resource:
         - ${self:provider.environment.DATA_API_RESOURCE_ARN}
 
@@ -52,17 +51,11 @@ functions:
 
 ```ts
 // handler.ts
-
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
-import {
-  APIGatewayProxyEvent,
-  Context,
-  APIGatewayProxyResult
-} from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 export const example = async (
-  event: APIGatewayProxyEvent,
-  context: Context
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   // Create a RDSDataService client see https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html
   // The `endpoint` property is used here to set to the local server if `event.isOffline` is truthy.

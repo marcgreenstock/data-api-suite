@@ -1,7 +1,25 @@
 {
   "name": "data-api-local-serverless",
   "version": "0.0.2-alpha.0",
-  "description": "",
+  "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
+  "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-local-serverless",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcgreenstock/data-api-local.git",
+    "directory": "packages/data-api-local-serverless"
+  },
+  "bugs": {
+    "url": "https://github.com/marcgreenstock/data-api-local/issues"
+  },
+  "keywords": [
+    "AWS Aurora Serverless Data API",
+    "Serverless",
+    "Plugin",
+    "Local",
+    "Offline",
+    "Postgres",
+    "PostgreSQL"
+  ],
   "main": "lib/index.js",
   "types": "lib/index",
   "files": [
@@ -11,7 +29,7 @@
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
     "compile": "tsc -p tsconfig.build.json",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "license": "MIT",
   "devDependencies": {
@@ -22,5 +40,8 @@
   },
   "dependencies": {
     "data-api-local": "^0.0.2-alpha.0"
+  },
+  "peerDependencies": {
+    "serverless-offline": "^5.x"
   }
 }

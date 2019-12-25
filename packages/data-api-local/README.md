@@ -34,7 +34,7 @@ const client = new RDSDataService({
   }
 })
 
-const result = client.executeStatement({
+const result = await client.executeStatement({
   sql: 'SELECT * FROM "users" WHERE id = :id',
   parameters: [{
     name: 'id',
@@ -46,5 +46,5 @@ const result = client.executeStatement({
   // secretArn and resourceArn are not used but are required for the AWS SDK
   secretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:dummy',
   resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:dummy'
-})
+}).promise()
 ```

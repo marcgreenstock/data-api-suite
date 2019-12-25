@@ -12,7 +12,7 @@ With Data API Local, you bring your own database. This library does not have any
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
-This repository is a mono-repo consisting of 3 packages, documentation for each is contained in their respective package folder.
+This repository is a mono-repo consisting of 2 packages, documentation for each is contained in their respective package folder.
 
 ## [data-api-local](packages/data-api-local)
 
@@ -27,7 +27,6 @@ The **data-api-local-serverless** is a [serverless](https://serverless.com/) plu
 
 ```yml
 # serverless.yml
-
 service: myApp
 
 provider:
@@ -42,12 +41,12 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - secretsmanager:GetSecretValue
+        - "secretsmanager:GetSecretValue"
       Resource:
         - ${self:provider.environment.DATA_API_SECRET_ARN}
     - Effect: Allow
       Action:
-        - rds-data:*
+        - "rds-data:*"
       Resource:
         - ${self:provider.environment.DATA_API_RESOURCE_ARN}
 
@@ -75,17 +74,11 @@ functions:
 
 ```ts
 // handler.ts
-
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
-import {
-  APIGatewayProxyEvent,
-  Context,
-  APIGatewayProxyResult
-} from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 export const example = async (
-  event: APIGatewayProxyEvent,
-  context: Context
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   // Create a RDSDataService client see https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html
   // The `endpoint` property is used here to set to the local server if `event.isOffline` is truthy.
