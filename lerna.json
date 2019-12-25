@@ -1,7 +1,6 @@
 {
   "packages": [
     "packages/data-api-local",
-    "packages/data-api-local-cli",
     "packages/data-api-local-serverless"
   ],
   "version": "1.0.0"

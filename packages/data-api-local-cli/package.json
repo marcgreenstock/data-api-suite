@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "prepublish": "rm -rf ./lib && tsc && chmod +x ./lib/data-api-local.js"
+    "prepublish": "rm -rf ./lib && tsc -p tsconfig.build.json && chmod +x ./lib/data-api-local.js"
   },
   "files": [
     "lib"

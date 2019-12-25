@@ -6,11 +6,14 @@
     "declaration": true,
     "lib": [
       "ES6"
-    ]
+    ],
+    "baseUrl": "./packages",
+    "paths": {
+      "data-api-local": ["data-api-local/src"]
+    }
   },
   "exclude": [
     "node_modules",
-    "lib",
-    "**/*.test.ts"
+    "lib"
   ]
 }

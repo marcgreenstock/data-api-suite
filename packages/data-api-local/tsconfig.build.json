@@ -1,13 +1,14 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "outDir": "./lib",
-    "baseUrl": "src",
-    "paths": {
-      "data-api-local": ["../data-api-local/src"]
-    },
+    "rootDir": "./src"
   },
   "include": [
-    "./src"
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
   ]
 }

@@ -4,7 +4,10 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "rm -rf ./lib && tsc"
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./lib && rm tsconfig.build.tsbuildinfo",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepublish": "npm run build"
   },
   "license": "MIT",
   "devDependencies": {
