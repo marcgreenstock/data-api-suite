@@ -8,12 +8,13 @@
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./lib && rm tsconfig.build.tsbuildinfo",
+    "clean": "rm -rf ./lib",
     "compile": "tsc -p tsconfig.build.json",
     "prepublish": "npm run build"
   },
   "license": "MIT",
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com/"
   },
   "devDependencies": {
