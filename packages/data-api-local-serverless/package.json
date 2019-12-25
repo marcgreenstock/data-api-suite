@@ -1,6 +1,6 @@
 {
   "name": "data-api-local-serverless",
-  "version": "1.0.2-alpha.0",
+  "version": "1.0.3-alpha.0",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index",
@@ -25,7 +25,7 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "data-api-local": "^1.0.2-alpha.0"
+    "data-api-local": "^1.0.3-alpha.0"
   },
   "gitHead": "f3f058ddf9166d4ac330b97b043197535e3a2384"
 }
