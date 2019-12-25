@@ -128,10 +128,6 @@ $ serverless offline
 
 For more information and examples, see the [data-api-local-serverless README](packages/data-api-local-serverless).
 
-## [data-api-local-cli](packages/data-api-local-cli)
-
-The **data-api-local-cli** is a convenient command line interface.
-
 # Contributing
 
 ## Installing
