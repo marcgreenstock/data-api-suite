@@ -1,14 +1,12 @@
 # Data API Local
 
-![](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)
+[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions)
 
-Data API Local is a [Aurora Serverless Data API](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) emulator, its main purpose is to simplify the development of applications using the Data API by making it available offline and local, similar to [dynamodb-local](https://github.com/rynop/dynamodb-local) but for MySQL and PostgreSQL.
+Data API Local is a [Aurora Serverless Data API](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) emulator, its main purpose is to simplify the development of applications using the Data API by making it available offline and local, similar to [dynamodb-local](https://github.com/rynop/dynamodb-local) but for PostgreSQL (MySQL coming soon).
 
 ## BYO Database
 
-With Data API Local, you bring your own database, it works with MySQL and PostgreSQL.
-
-This library does not have any constraints on the supported versions of MySQL and PostgreSQL in Aurora Serverless, therefore, one should take care to locally install only database versions that are supported by Aurora Serverless.
+With Data API Local, you bring your own database. This library does not have any constraints on the supported versions of PostgreSQL in Aurora Serverless, therefore, one should take care to locally install only database versions that are supported by Aurora Serverless.
 
 # Packages
 
@@ -18,7 +16,7 @@ This repository is a mono-repo consisting of 3 packages, documentation for each 
 
 ## [data-api-local](packages/data-api-local)
 
-The **data-api-local** is a node.js emulator for the AWS RDS Aurora Serverless Data API. Use this libary if you need to programatically start an emulator in your node.js application, otherwise consider using [data-api-local-serverless](packages/data-api-local-serverless) or [data-api-local-cli](packages/data-api-local-cli).
+The **data-api-local** is a node.js emulator for the AWS RDS Aurora Serverless Data API. Use this libary if you need to programatically start an emulator in your node.js application, otherwise consider using [data-api-local-serverless](packages/data-api-local-serverless).
 
 ## [data-api-local-serverless](packages/data-api-local-serverless)
 

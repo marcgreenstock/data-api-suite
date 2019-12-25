@@ -2,50 +2,49 @@
 
 AWS Aurora Serverless Data API emulator for local development.
 
-## CLI
+**Note:** Currently only supports PostgreSQL - MySQL is on the roadmap.
 
-dataApiLocal mysql --host localhost --port 3336 --user marc --password foobar
-
-## Programatic usage
-
-### PostgreSQL
+## Example:
 
 ```ts
+import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import { dataApiLocal } from './data-api-local'
 
-DataAPILocal.dataApiLocal({
-  engine: 'postgres',
-  logger: console,
-  connection: {
-    host: 'localhost',
-    port: 3336,
-    user: 'marc',
-    password: 'foobar'
+// assuming your in an async function
+await dataApiLocal({
+  server: {
+    hostname: 'localhost',
+    port: 8080
   },
-  host: {
-    port: 8080,
-    hostname: 'localhost'
+  database: {
+    engine: 'postgresql',
+    port: 54320,
+    user: 'test',
+    password: 'test'
   }
 })
-```
 
-### MySQL
-
-```ts
-import { dataApiLocal } from './data-api-local'
-
-DataAPILocal.dataApiLocal({
-  engine: 'mysql',
-  logger: console,
-  connection: {
-    host: 'localhost',
-    port: 3336,
-    user: 'marc',
-    password: 'foobar'
-  },
-  host: {
-    port: 8080,
-    hostname: 'localhost'
+const client = new RDSDataService({
+  endpoint: 'http://localhost:8080',
+  region: 'us-east-1',
+  // If you have an AWS profile or running this in a role, this isn't required
+  credentials: {
+    accessKeyId: 'SECRET_ID',
+    secretAccessKey: 'SECRET_KEY'
   }
+})
+
+const result = client.executeStatement({
+  sql: 'SELECT * FROM "users" WHERE id = :id',
+  parameters: [{
+    name: 'id',
+    value: {
+      longValue: 42
+    }
+  }],
+  database: 'example'
+  // secretArn and resourceArn are not used but are required for the AWS SDK
+  secretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:dummy',
+  resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:dummy'
 })
 ```

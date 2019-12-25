@@ -1,68 +1,102 @@
 # Serverless Data API Local
 
-## Installation
-
-Install serverless-local and serverless-data-api-local
-
-```sh
-npm i --save-dev serverless-local serverless-data-api-local
-```
-
-Add it to your serverless.yml:
+[Serverless](https://serverless.com/) plugin that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline).
 
 ```yml
-service: serverless-data-api-local-plugin-postgres-example
+# serverless.yml
+
+service: myApp
 
 provider:
   name: aws
   runtime: nodejs10.x
+  region: us-east-1
+  environment:
+    AWS_REGION: ${self:provider.region}
+    DATA_API_SECRET_ARN: arn:aws:secretsmanager:us-east-1:123456789012:secret:myApp
+    DATA_API_RESOURCE_ARN: arn:aws:rds:us-east-1:123456789012:cluster:myApp
+    DATABASE_NAME: myApp
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetSecretValue
+      Resource:
+        - ${self:provider.environment.DATA_API_SECRET_ARN}
+    - Effect: Allow
+      Action:
+        - rds-data:*
+      Resource:
+        - ${self:provider.environment.DATA_API_RESOURCE_ARN}
 
 plugins:
-  - serverless-data-api-local-plugin
-  - serverless-offline # ensure this is added last
+  - data-api-local-serverless
+  - serverless-offline # ensure this is added after data-api-local-serverless
 
 custom:
-  DataAPILocal:
-    port: 8080
-    engine: pg
-    dbUrl: postgresql://user:secret@localhost:5432/example
+  data-api-local:
+    server:
+      port: 8080 # default
+      hostname: localhost # default
+    database:
+      engine: postgresql
+      connectionString: postgresql://user:secret@localhost:5432
 
 functions:
-  hello:
-    handler: handler.hello
+  example:
+    handler: handler.example
     events:
       - http:
           path: '/'
           method: get
 ```
 
-## Usage
-
 ```ts
-import RDSDataService from 'aws-sdk/clients/RDSDataService'
+// handler.ts
 
-export const hello = async (event, context) => {
+import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
+import {
+  APIGatewayProxyEvent,
+  Context,
+  APIGatewayProxyResult
+} from 'aws-lambda'
+
+export const example = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise<APIGatewayProxyResult> => {
+  // Create a RDSDataService client see https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html
+  // The `endpoint` property is used here to set to the local server if `event.isOffline` is truthy.
   const client = new RDSDataService({
-    region: 'us-east-1',
-    endpoint: event.offline ? 'http://localhost:8080' : undefined
+    endpoint: event.isOffline ? 'http://localhost:8080' : undefined,
+    region: process.env.AWS_REGION
   })
+
+  // Execute your SQL
   const result = await client.executeStatement({
-    resourceArn: process.env.DATA_API_RESOURCE_ARN,
+    sql: 'SELECT * FROM "myTable" WHERE "id" = :id;',
+    database: process.env.DATABASE_NAME,
     secretArn: process.env.DATA_API_SECRET_ARN,
-    sql: 'SELECT * FROM users where users.id = :id;',
-    includeResultMetadata: true,
-    parameters: [
-      name: 'id,
-      typeHint: 'DECIMAL',
+    resourceArn: process.env.DATA_API_RESOURCE_ARN,
+    parameters: [{
+      name: 'id',
       value: {
         longValue: 42
       }
-    ]
-  })
+    }]
+  }).promise()
+
+  // Return the result
   return {
     statusCode: 200,
-    body: JSON.stringify({
-      result
-    })
+    body: JSON.stringify(result)
   }
 }
+```
+
+**Important:** [data-api-local-serverless](packages/data-api-local-serverless) convieniently binds to the `offline` lifecycle hooks builtin to [serverless-ofline](https://github.com/dherault/serverless-offline). To start  your data-api server and serverless-offline run:
+
+```sh
+$ sls offline
+# or
+$ serverless offline
+```
