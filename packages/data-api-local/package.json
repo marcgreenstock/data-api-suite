@@ -1,6 +1,6 @@
 {
   "name": "data-api-local",
-  "version": "1.0.4-alpha.0",
+  "version": "0.0.0",
   "description": "AWS Aurora Serverless Data API emulator for local development.",
   "main": "lib/index.js",
   "types": "lib/index",
@@ -14,9 +14,6 @@
     "prepublish": "npm run build"
   },
   "license": "MIT",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
@@ -42,6 +39,5 @@
   "peerDependencies": {
     "mysql": "^2.17.1",
     "pg": "^7.14.0"
-  },
-  "gitHead": "1c95debaf07e39991e890059365b5ac347b2ef12"
+  }
 }

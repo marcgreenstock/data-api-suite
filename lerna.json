@@ -3,10 +3,5 @@
     "packages/data-api-local",
     "packages/data-api-local-serverless"
   ],
-  "version": "1.0.4-alpha.0",
-  "command": {
-    "publish": {
-      "registry": "https://npm.pkg.github.com"
-    }
-  }
+  "version": "0.0.0"
 }

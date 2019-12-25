@@ -1,6 +1,6 @@
 {
   "name": "data-api-local-serverless",
-  "version": "1.0.4-alpha.0",
+  "version": "0.0.0",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index",
@@ -14,9 +14,6 @@
     "prepublish": "npm run build"
   },
   "license": "MIT",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "devDependencies": {
     "@types/node": "^12.12.14",
     "@types/serverless": "^1.18.4",
@@ -24,7 +21,6 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "data-api-local": "^1.0.4-alpha.0"
-  },
-  "gitHead": "1c95debaf07e39991e890059365b5ac347b2ef12"
+    "data-api-local": "^0.0.0"
+  }
 }
