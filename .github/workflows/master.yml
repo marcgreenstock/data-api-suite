@@ -42,18 +42,3 @@ jobs:
         run: npm install
       - name: Execute lint
         run: npm run lint
-
-  publish:
-    name: Publish
-    needs: [test, lint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: 10.x
-      - name: Publish
-        run: npx lerna publish from-git --yes --canary --no-verify-access
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
