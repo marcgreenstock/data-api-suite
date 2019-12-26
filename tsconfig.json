@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
     "module": "CommonJS",
+    "moduleResolution": "Node",
     "target": "ES6",
     "sourceMap": true,
     "declaration": true,
-    "lib": [
-      "ES6"
-    ],
     "baseUrl": "./packages",
     "paths": {
       "data-api-local": ["data-api-local/src"]
