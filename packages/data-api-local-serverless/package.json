@@ -43,5 +43,6 @@
   },
   "peerDependencies": {
     "serverless-offline": "^5.x"
-  }
+  },
+  "gitHead": "d5943d370a3f57b140ea9870ac58436b9f3ae4d2"
 }
