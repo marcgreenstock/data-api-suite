@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.2-alpha.7](https://github.com/marcgreenstock/data-api-local/compare/v0.0.2-alpha.6...v0.0.2-alpha.7) (2019-12-26)
+
+**Note:** Version bump only for package data-api-local
+
+
+
+
+
 ## [0.0.2-alpha.6](https://github.com/marcgreenstock/data-api-local/compare/v0.0.2-alpha.5...v0.0.2-alpha.6) (2019-12-26)
 
 **Note:** Version bump only for package data-api-local
