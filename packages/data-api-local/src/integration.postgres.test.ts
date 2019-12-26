@@ -103,6 +103,7 @@ const rollbackTransaction = async (
 
 beforeAll(async () => {
   server = await dataApiLocal({
+    logger: () => undefined,
     server: {
       hostname: 'localhost',
       port: 8080

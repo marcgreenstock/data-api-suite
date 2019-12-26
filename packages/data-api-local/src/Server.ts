@@ -28,8 +28,7 @@ export type DbConfig = PostgresConnectionOptions
 export interface ServerOptions {
   database: DbConfig;
   server?: ServerConfig;
-  logger?: Console;
-  logLevel?: 'INFO' | 'DEBUG' | 'WARN';
+  logger?: Function;
 }
 
 export class Server {
@@ -37,20 +36,18 @@ export class Server {
   protected httpServer: http.Server
   protected port: number
   protected hostname: string
-  protected logger: Console
+  protected logger: Function
   protected logLevel: string
   protected engine: engines
   protected dbConfig: PostgresConnectionOptions
   protected pool: { [id: string]: Client }
 
   constructor ({
-    logger = console,
-    logLevel = 'INFO',
+    logger = console.info,
     server,
     database
   }: ServerOptions) {
     this.logger = logger
-    this.logLevel = logLevel
     this.port = server.port || DEFAULT_PORT
     this.hostname = server.hostname || DEFAULT_HOSTNAME
     this.dbConfig = database
@@ -70,7 +67,7 @@ export class Server {
   public async start (): Promise<Server> {
     await new Promise((resolve) => {
       this.httpServer = this.app.listen(this.port, this.hostname, () => {
-        this.log(`DataAPILocal listening on http://${this.hostname}:${this.port}`)
+        this.log(`listening on http://${this.hostname}:${this.port}`)
         resolve()
       })
     })
@@ -84,12 +81,6 @@ export class Server {
         resolve()
       })
     })
-  }
-
-  private log (message: string): void {
-    if (this.logger !== undefined) {
-      this.logger.info(message)
-    }
   }
 
   private async createClient ({
@@ -143,6 +134,7 @@ export class Server {
       const client = await this.createClient({ database })
       try {
         const result = await client.executeSql({ sqlStatements })
+        this.log(`[executeSql] ${sqlStatements}`)
         res.status(200).send(result)
       } finally {
         await client.disconnect()
@@ -170,6 +162,7 @@ export class Server {
       const client = await this.getClient({ database, transactionId })
       try {
         const result = await client.executeStatement({ sql, ...rest })
+        this.log(`[executeStatement] ${sql}`)
         res.status(200).json(result)
       } finally {
         if (transactionId === undefined) {
@@ -199,6 +192,7 @@ export class Server {
       const client = await this.getClient({ database, transactionId })
       try {
         const result = await client.batchExecuteStatement({ sql, ...rest })
+        this.log(`[batchExecuteStatement] ${sql}`)
         res.status(200).send(result)
       } finally {
         if (transactionId === undefined) {
@@ -221,6 +215,7 @@ export class Server {
       const client = await this.createClient({ database, transactionId })
       try {
         await client.beginTransaction()
+        this.log(`[beginTransaction] transactionId: ${transactionId}`)
         res.status(200).json({ transactionId })
       } catch (error) {
         await this.pool[transactionId].disconnect()
@@ -245,6 +240,7 @@ export class Server {
       const client = await this.getClient({ transactionId })
       try {
         await client.commitTransaction()
+        this.log(`[commitTransaction] transactionId: ${transactionId}`)
         res.status(200).json({ transactionStatus: 'Transaction Committed' })
       } finally {
         await this.pool[transactionId].disconnect()
@@ -268,6 +264,7 @@ export class Server {
       const client = await this.getClient({ transactionId })
       try {
         await client.rollbackTransaction()
+        this.log(`[rollbackTransaction] transactionId: ${transactionId}`)
         res.status(200).json({ transactionStatus: 'Transaction Rolledback' })
       } finally {
         await this.pool[transactionId].disconnect()
@@ -279,11 +276,13 @@ export class Server {
   }
 
   private setRequestId (
-    _req: express.Request,
+    req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ): void {
-    res.setHeader('x-amzn-RequestId', uuid())
+    const id = uuid()
+    this.log(`[request] ${req.method} ${req.path} - requestId: ${id}`)
+    res.setHeader('x-amzn-RequestId', id)
     next()
   }
 
@@ -308,5 +307,11 @@ export class Server {
     }
     res.setHeader('x-amzn-ErrorType', errorTypes[statusCode])
     res.status(statusCode).json({ message: error.message })
+  }
+
+  private log (message: string): void {
+    if (typeof this.logger === 'function') {
+      this.logger(`DataAPILocal [HTTP] ${message}`)
+    }
   }
 }
