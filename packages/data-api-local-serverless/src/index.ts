@@ -2,7 +2,7 @@ import * as Serverless from 'serverless'
 import * as Plugin from 'serverless/classes/Plugin'
 import { dataApiLocal, Server, ServerOptions } from 'data-api-local'
 
-export default class DataAPILocalServerless implements Plugin {
+class DataAPILocalServerless implements Plugin {
   public hooks: Plugin.Hooks
   protected serverless: Serverless
   protected server: Server
@@ -28,3 +28,5 @@ export default class DataAPILocalServerless implements Plugin {
     await this.server.stop()
   }
 }
+
+export = DataAPILocalServerless

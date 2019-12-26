@@ -1,5 +1,5 @@
 import * as Serverless from 'serverless'
-import DataAPILocalServerless from '.'
+import DataAPILocalServerless = require('.')
 import { dataApiLocal } from 'data-api-local'
 
 const mockedServerInstance = {
