@@ -133,8 +133,8 @@ export class Server {
       }
       const client = await this.createClient({ database })
       try {
-        const result = await client.executeSql({ sqlStatements })
         this.log(`[executeSql] ${sqlStatements}`)
+        const result = await client.executeSql({ sqlStatements })
         res.status(200).send(result)
       } finally {
         await client.disconnect()
@@ -161,8 +161,8 @@ export class Server {
       }
       const client = await this.getClient({ database, transactionId })
       try {
-        const result = await client.executeStatement({ sql, ...rest })
         this.log(`[executeStatement] ${sql}`)
+        const result = await client.executeStatement({ sql, ...rest })
         res.status(200).json(result)
       } finally {
         if (transactionId === undefined) {
@@ -191,8 +191,8 @@ export class Server {
       }
       const client = await this.getClient({ database, transactionId })
       try {
-        const result = await client.batchExecuteStatement({ sql, ...rest })
         this.log(`[batchExecuteStatement] ${sql}`)
+        const result = await client.batchExecuteStatement({ sql, ...rest })
         res.status(200).send(result)
       } finally {
         if (transactionId === undefined) {
@@ -214,8 +214,8 @@ export class Server {
     try {
       const client = await this.createClient({ database, transactionId })
       try {
-        await client.beginTransaction()
         this.log(`[beginTransaction] transactionId: ${transactionId}`)
+        await client.beginTransaction()
         res.status(200).json({ transactionId })
       } catch (error) {
         await this.pool[transactionId].disconnect()
@@ -239,8 +239,8 @@ export class Server {
       }
       const client = await this.getClient({ transactionId })
       try {
-        await client.commitTransaction()
         this.log(`[commitTransaction] transactionId: ${transactionId}`)
+        await client.commitTransaction()
         res.status(200).json({ transactionStatus: 'Transaction Committed' })
       } finally {
         await this.pool[transactionId].disconnect()
@@ -263,8 +263,8 @@ export class Server {
       }
       const client = await this.getClient({ transactionId })
       try {
-        await client.rollbackTransaction()
         this.log(`[rollbackTransaction] transactionId: ${transactionId}`)
+        await client.rollbackTransaction()
         res.status(200).json({ transactionStatus: 'Transaction Rolledback' })
       } finally {
         await this.pool[transactionId].disconnect()
