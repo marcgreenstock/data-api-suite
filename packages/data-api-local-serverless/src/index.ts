@@ -6,9 +6,11 @@ class DataAPILocalServerless implements Plugin {
   public hooks: Plugin.Hooks
   protected serverless: Serverless
   protected server: Server
+  protected logger: Function
 
   constructor (serverless: Serverless) {
     this.serverless = serverless
+    this.logger = serverless.cli.log.bind(serverless.cli)
 
     this.hooks = {
       'before:offline:start:init': this.startHandler.bind(this),
@@ -17,7 +19,10 @@ class DataAPILocalServerless implements Plugin {
   }
 
   private get config (): ServerOptions {
-    return this.serverless.service.custom['data-api-local'] || {}
+    return {
+      ...this.serverless.service.custom['data-api-local'],
+      logger: this.logger
+    }
   }
 
   private async startHandler (): Promise<void> {

@@ -89,7 +89,7 @@ export const example = async (
 **Important:** [data-api-local-serverless](packages/data-api-local-serverless) convieniently binds to the `offline` lifecycle hooks builtin to [serverless-ofline](https://github.com/dherault/serverless-offline). To start  your data-api server and serverless-offline run:
 
 ```sh
-$ sls offline
+$ sls offline start
 # or
-$ serverless offline
+$ serverless offline start
 ```

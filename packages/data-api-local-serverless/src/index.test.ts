@@ -12,14 +12,20 @@ jest.mock('data-api-local', () => ({
 }))
 
 const serverless = new Serverless()
+serverless.cli = new class CLI {
+  log (): null {
+    return null
+  }
+}
+
 const config = serverless.service.custom['data-api-local'] = {
   server: {
     hostname: 'localhost',
-    port: 8081
+    port: 8080
   },
   database: {
     engine: 'postgresql',
-    port: 54320,
+    port: 5432,
     user: 'test',
     password: 'test'
   }
@@ -31,7 +37,7 @@ describe('hooks', () => {
     await plugin.hooks['before:offline:start:init']()
   })
   test('before:offline:start:init', async () => {
-    expect(dataApiLocal).toHaveBeenCalledWith(config)
+    expect(dataApiLocal).toHaveBeenCalledWith({ ...config, logger: expect.any(Function) })
   })
 
   test('before:offline:start:end', async () => {
