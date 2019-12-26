@@ -1,6 +1,6 @@
 {
   "name": "data-api-local-serverless",
-  "version": "0.0.2-alpha.3",
+  "version": "0.0.2-alpha.4",
   "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
   "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-local-serverless",
   "repository": {
