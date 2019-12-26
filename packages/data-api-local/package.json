@@ -1,6 +1,6 @@
 {
   "name": "data-api-local",
-  "version": "0.0.2-alpha.3",
+  "version": "0.0.2-alpha.6",
   "description": "AWS Aurora Serverless Data API emulator for local development.",
   "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-local",
   "repository": {
