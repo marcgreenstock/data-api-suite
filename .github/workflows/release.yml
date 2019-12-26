@@ -16,6 +16,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Publish
-        run: npx lerna publish --yes --no-verify-access --canary
+        run: npx lerna publish from-package --yes --no-verify-access
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
