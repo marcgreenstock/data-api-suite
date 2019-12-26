@@ -417,25 +417,6 @@ describe('#batchExecuteStatement', () => {
 
 describe('#executeSql', () => {
   test('executeSql', async () => {
-    const result = await executeSql(`SELECT 1 as value; SELECT 2 as value`)
-    console.log(result)
+    await executeSql(`SELECT 1 as value; SELECT 2 as value`)
   })
 })
-
-// describe('#commitTransaction', () => {
-//   test('')
-// })
-
-
-// describe('error handeling', () => {
-//   test('executeStatement', async () => {
-//     try {
-//       await executeStatement('what')
-//     } catch (error) {
-//       expect(error).toMatchObject({
-//         message: 'ERROR: syntax error at or near "what"\n  Position: 1',
-//         code: 'BadRequestException'
-//       })
-//     }
-//   })
-// })

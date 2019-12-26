@@ -15,7 +15,7 @@ jobs:
           node-version: 10.x
       - name: Install Dependencies
         run: npm install
-      - name: Publish
+      - name: Lerna Publish
         run: npx lerna publish from-package --yes --no-verify-access
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

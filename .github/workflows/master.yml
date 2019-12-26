@@ -42,3 +42,19 @@ jobs:
         run: npm install
       - name: Execute lint
         run: npm run lint
+
+  release:
+    name: Create Release
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 10.x
+      - name: Install Dependencies
+        run: npm install
+      - name: Lerna version
+        run: npx lerna version --yes --conventional-commits
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
