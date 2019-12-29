@@ -197,7 +197,8 @@ describe('#executeStatement', () => {
         '12345.67'::float4 AS "float4Value",
         '12345.67'::float8 AS "float8Value",
         '12345.67'::numeric(10, 2) AS "numericValue",
-        'helloWorld'::varchar AS "varcharValue"
+        'helloWorld'::varchar AS "varcharValue",
+        json_build_object('foo', 1, 'bar', 2) as "jsonValue"
     `)
     expect(result).toMatchObject({
       numberOfRecordsUpdated: 0,
@@ -209,7 +210,8 @@ describe('#executeStatement', () => {
         { doubleValue: 12345.7 },
         { doubleValue: 12345.67 },
         { stringValue: '12345.67' },
-        { stringValue: 'helloWorld' }
+        { stringValue: 'helloWorld' },
+        { stringValue: '{"foo":1,"bar":2}' }
       ]],
       columnMetadata: [{
         ...metadataDefaults,
@@ -278,6 +280,14 @@ describe('#executeStatement', () => {
         name: 'varcharValue',
         label: 'varcharValue',
         typeName: 'varchar'
+      }, {
+        ...metadataDefaults,
+        precision: 2147483647,
+        scale: 0,
+        type: 114,
+        name: 'jsonValue',
+        label: 'jsonValue',
+        typeName: 'json'
       }]
     })
   })

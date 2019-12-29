@@ -2,6 +2,14 @@ import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import { QueryResult, types, FieldDef } from 'pg'
 import { TypeId } from 'pg-types'
 
+const transformStringValue = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value
+  } else {
+    return JSON.stringify(value)
+  }
+}
+
 const parseTimestamp = (value: string): string => {
   return new Date(value).toISOString()
 }
@@ -25,7 +33,7 @@ const transformArray = (typeId: TypeId, array: unknown[]): RDSDataService.Types.
     case 1022:
       return { doubleValues: array as number[] }
     default:
-      return { stringValues: array.map((value) => value.toString()) }
+      return { stringValues: array.map((value) => transformStringValue(value)) }
   }
 }
 
@@ -52,7 +60,7 @@ const transformValue = (field: FieldDef, value: unknown): RDSDataService.Types.F
       case types.builtins.TIMESTAMPTZ:
         return { stringValue: parseTimestamp(value.toString()) }
       default:
-        return { stringValue: value.toString() }
+        return { stringValue: transformStringValue(value) }
     }
   }
 }
