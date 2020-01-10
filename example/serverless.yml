@@ -1,0 +1,67 @@
+service: myApp
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: us-east-1
+  environment:
+    AWS_REGION: ${self:provider.region}
+    DATA_API_SECRET_ARN: arn:aws:secretsmanager:us-east-1:123456789012:secret:my-app
+    DATA_API_RESOURCE_ARN: arn:aws:rds:us-east-1:123456789012:cluster:my-app
+    DATABASE_NAME: my-app
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "secretsmanager:GetSecretValue"
+      Resource:
+        - ${self:provider.environment.DATA_API_SECRET_ARN}
+    - Effect: Allow
+      Action:
+        - "rds-data:*"
+      Resource:
+        - ${self:provider.environment.DATA_API_RESOURCE_ARN}
+
+plugins:
+  - serverless-plugin-typescript
+  - data-api-migrations-serverless
+  - data-api-local-serverless
+  - serverless-offline
+
+custom:
+  data-api-local:
+    server:
+      port: 8080
+      hostname: localhost
+    database:
+      engine: postgresql
+      connectionString: postgresql://localhost:5432/my-app
+  data-api-migrations:
+    destFolder: ./migrations
+    typescript: true
+    local:
+      clientConfig:
+        region: ${self:provider.region}
+        endpoint: http://localhost:8080
+        maxRetries: 0
+        credentials:
+          accessKeyId: example
+          secretAccessKey: example
+      methodConfig:
+        secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+        resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+        database: my-app
+    prod:
+      clientConfig:
+        region: ${self:provider.region}
+      methodConfig:
+        secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+        resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+        database: ${self:provider.environment.DATABASE_NAME}
+    
+functions:
+  example:
+    handler: handler.example
+    events:
+      - http:
+          path: '/'
+          method: get

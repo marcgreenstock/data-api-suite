@@ -1,0 +1,22 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^13.1.6",
+    "data-api-local": "file:../packages/data-api-local",
+    "data-api-local-serverless": "file:../packages/data-api-local-serverless",
+    "data-api-migrations": "file:../packages/data-api-migrations",
+    "data-api-migrations-serverless": "file:../packages/data-api-migrations-serverless",
+    "serverless": "^1.60.5",
+    "serverless-offline": "^5.12.1",
+    "serverless-plugin-typescript": "^1.1.9",
+    "typescript": "^3.7.4"
+  }
+}

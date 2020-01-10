@@ -14,6 +14,14 @@ const parseTimestamp = (value: string): string => {
   return new Date(value).toISOString()
 }
 
+const parseLongValue = (value: unknown): number => {
+  if (typeof value === 'string') {
+    return parseInt(value)
+  } else {
+    return value as number
+  }
+}
+
 const transformArray = (typeId: TypeId, array: unknown[]): RDSDataService.Types.ArrayValue => {
   if (Array.isArray(array[0])) {
     return { arrayValues: array.map((value) => transformArray(typeId, value as unknown[])) }
@@ -28,7 +36,7 @@ const transformArray = (typeId: TypeId, array: unknown[]): RDSDataService.Types.
     case 1005:
     case 1007:
     case 1028:
-      return { longValues: array as number[] }
+      return { longValues: array.map((value) => parseLongValue(value)) }
     case 1021:
     case 1022:
       return { doubleValues: array as number[] }
@@ -52,7 +60,7 @@ const transformValue = (field: FieldDef, value: unknown): RDSDataService.Types.F
       case types.builtins.INT2:
       case types.builtins.INT4:
       case types.builtins.INT8:
-        return { longValue: value as number }
+        return { longValue: parseLongValue(value) }
       case types.builtins.FLOAT4:
       case types.builtins.FLOAT8:
         return { doubleValue: value as number }

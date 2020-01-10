@@ -10,20 +10,25 @@ With Data API Local, you bring your own database. This library does not have any
 
 # Packages
 
+This repository is a mono-repo consisting of 4 packages, documentation for each is contained in their respective package folder.
+
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
-This repository is a mono-repo consisting of 2 packages, documentation for each is contained in their respective package folder.
+## [Serverless](https://serverless.com/) plugins
 
-## [data-api-local](packages/data-api-local)
+| Name | Description | Version |
+| ---- | ----------- | ------- |
+| [data-api-local-serverless](packages/data-api-local-serverless) | Serverless plugin to start a local Aurora Serverless Data API server for offline development that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline). | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)
+| [data-api-migrations-serverless](packages/data-api-migrations-serverless) | Serverless plugin to generate, apply and rollback migrations on the AWS RDS Aurora Serverless Data API. Plays nice with data-api-local-serverless. | [![NPM](https://img.shields.io/npm/v/data-api-migrations-serverless.svg)](https://www.npmjs.com/package/data-api-migrations-serverless) |
 
-The **data-api-local** is a node.js emulator for the AWS RDS Aurora Serverless Data API. Use this libary if you need to programatically start an emulator in your node.js application, otherwise consider using [data-api-local-serverless](packages/data-api-local-serverless).
+## Node.js libaries
 
-## [data-api-local-serverless](packages/data-api-local-serverless)
+| Name | Description | Version |
+| ---- | ----------- | ------- |
+| [data-api-local](packages/data-api-local)| This is the foundation library for data-api-local-serverless. Use this libary if you're not using Serverless and need to programatically start an emulator in your node.js application. | [![NPM](https://img.shields.io/npm/v/data-api-local.svg)](https://www.npmjs.com/package/data-api-local) |
+| [data-api-migrations](packages/data-api-migrations) | This is the foundation library for data-api-migrations-serverless. Use this library if you're not using Serverless. | [![NPM](https://img.shields.io/npm/v/data-api-migrations.svg)](https://www.npmjs.com/package/data-api-migrations) |
 
-The **data-api-local-serverless** is a [serverless](https://serverless.com/) plugin that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline).
-
-
-### Example usage:
+# Example usage of data-api-local-serverless and data-api-migrations together
 
 ```yml
 # serverless.yml
@@ -35,9 +40,9 @@ provider:
   region: us-east-1
   environment:
     AWS_REGION: ${self:provider.region}
-    DATA_API_SECRET_ARN: arn:aws:secretsmanager:us-east-1:123456789012:secret:myApp
-    DATA_API_RESOURCE_ARN: arn:aws:rds:us-east-1:123456789012:cluster:myApp
-    DATABASE_NAME: myApp
+    DATA_API_SECRET_ARN: arn:aws:secretsmanager:us-east-1:123456789012:secret:my-app
+    DATA_API_RESOURCE_ARN: arn:aws:rds:us-east-1:123456789012:cluster:my-app
+    DATABASE_NAME: my-app
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -51,7 +56,9 @@ provider:
         - ${self:provider.environment.DATA_API_RESOURCE_ARN}
 
 plugins:
+  - serverless-typescript
   - data-api-local-serverless
+  - data-api-local-migrations
   - serverless-offline # ensure this is added after data-api-local-serverless
 
 custom:
@@ -62,6 +69,15 @@ custom:
     database:
       engine: postgresql
       connectionString: postgresql://user:secret@localhost:5432
+  data-api-migrations:
+    destFolder: ./migrations
+    typescript: true
+    clientConfig:
+      region: ${self:provider.region}
+    methodConfig:
+      secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+      resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+      database: ${self:provider.environment.DATABASE_NAME}
 
 functions:
   example:

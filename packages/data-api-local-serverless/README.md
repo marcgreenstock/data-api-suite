@@ -39,6 +39,12 @@ custom:
     database:
       engine: postgresql
       connectionString: postgresql://user:secret@localhost:5432
+  data-api-migrations:
+    migrationsPath: src/migrations
+    region: ${self:provider.environment.AWS_REGION}
+    secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+    resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+    databaseName: ${self:provider.environment.DATABASE_NAME}
 
 functions:
   example:

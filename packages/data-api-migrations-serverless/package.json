@@ -1,12 +1,12 @@
 {
-  "name": "data-api-local-serverless",
-  "version": "0.0.2-alpha.8",
+  "name": "data-api-migrations-serverless",
+  "version": "1.0.0",
   "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
-  "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-local-serverless",
+  "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-migrations-serverless",
   "repository": {
     "type": "git",
     "url": "https://github.com/marcgreenstock/data-api-local.git",
-    "directory": "packages/data-api-local-serverless"
+    "directory": "packages/data-api-migrations-serverless"
   },
   "bugs": {
     "url": "https://github.com/marcgreenstock/data-api-local/issues"
@@ -32,18 +32,13 @@
     "prepare": "npm run build"
   },
   "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^12.12.14",
-    "@types/serverless": "^1.18.4",
-    "serverless": "^1.60.4",
-    "typescript": "^3.7.3"
-  },
   "dependencies": {
     "chalk": "^3.0.0",
-    "data-api-local": "^0.0.2-alpha.8"
+    "data-api-migrations": "0.0.0"
   },
-  "peerDependencies": {
-    "serverless-offline": "^5.x"
-  },
-  "gitHead": "d5943d370a3f57b140ea9870ac58436b9f3ae4d2"
+  "devDependencies": {
+    "@types/serverless": "^1.18.4",
+    "serverless": "^1.60.5",
+    "typescript": "^3.7.4"
+  }
 }
