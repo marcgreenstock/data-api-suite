@@ -20,8 +20,8 @@ The following libraries are designed to work with the [Serverless](https://serve
 
 | Name | Description |
 | ---- | ----------- |
-| [data-api-local-serverless](packages/data-api-local-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)<br />Serverless plugin to start a local Aurora Serverless Data API server for offline development that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline). | 
-| [data-api-migrations-serverless](packages/data-api-migrations-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-migrations-serverless.svg)](https://www.npmjs.com/package/data-api-migrations-serverless)<br />Serverless plugin to generate, apply and rollback migrations on the AWS RDS Aurora Serverless Data API. Plays nice with data-api-local-serverless. |
+| [`data-api-local-serverless`](packages/data-api-local-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)<br />Serverless plugin to start a local Aurora Serverless Data API server for offline development that plays nice with [serverless-ofline](https://github.com/dherault/serverless-offline). | 
+| [`data-api-migrations-serverless`](packages/data-api-migrations-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-migrations-serverless.svg)](https://www.npmjs.com/package/data-api-migrations-serverless)<br />Serverless plugin to generate, apply and rollback migrations on the AWS RDS Aurora Serverless Data API. Plays nice with data-api-local-serverless. |
 
 ## Node.js libaries
 
@@ -29,8 +29,8 @@ The following libraries are designed to be used in a node.js environment.
 
 | Package Name | Description |
 | ---- | ----------- |
-| [data-api-local](packages/data-api-local)| [![NPM](https://img.shields.io/npm/v/data-api-local.svg)](https://www.npmjs.com/package/data-api-local)<br />This is the foundation library for data-api-local-serverless. Use this libary if you're not using Serverless and need to programatically start an emulator in your node.js application. |
-| [data-api-migrations](packages/data-api-migrations) | [![NPM](https://img.shields.io/npm/v/data-api-migrations.svg)](https://www.npmjs.com/package/data-api-migrations)<br />This is the foundation library for data-api-migrations-serverless. Use this library if you're not using Serverless. |
+| [`data-api-local`](packages/data-api-local)| [![NPM](https://img.shields.io/npm/v/data-api-local.svg)](https://www.npmjs.com/package/data-api-local)<br />This is the foundation library for data-api-local-serverless. Use this libary if you're not using Serverless and need to programatically start an emulator in your node.js application. |
+| [`data-api-migrations`](packages/data-api-migrations) | [![NPM](https://img.shields.io/npm/v/data-api-migrations.svg)](https://www.npmjs.com/package/data-api-migrations)<br />This is the foundation library for data-api-migrations-serverless. Use this library if you're not using Serverless. |
 
 # Example usage of data-api-local-serverless and data-api-migrations together
 
