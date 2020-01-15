@@ -1,5 +1,7 @@
 # AuroraDataAPI
 
+[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions)
+
 **AuroraDataAPI** is an abstraction of the [RDSDataService](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) that implements the [Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html).
 
 Query requests are simplified; instead of expecting clunky query params it expects only a JSON object:
@@ -131,7 +133,7 @@ Constructs a new instance of `AuroraDataAPI`.
 
 **Note**: The `RDSDataService` can be constructed without any properties, for instance when the [Global Configuration Object](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/global-config-object.html) is set.
 
-### Class Properties
+#### Class Properties
 
 | Name | Description | 
 | ---- | ----------- |

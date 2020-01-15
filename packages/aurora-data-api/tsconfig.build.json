@@ -1,10 +1,18 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.build.json",
   "compilerOptions": {
-    "composite": true,
     "outDir": "./lib",
     "rootDir": "./src"
   },
+  "references": [{
+    "path": "../data-api-local/tsconfig.build.json"
+  }, {
+    "path": "../data-api-local-serverless/tsconfig.build.json"
+  }, {
+    "path": "../data-api-migrations/tsconfig.build.json"
+  }, {
+    "path": "../data-api-migrations-serverless/tsconfig.build.json"
+  }],
   "include": [
     "src/**/*.ts"
   ],

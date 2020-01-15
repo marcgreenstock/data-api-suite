@@ -16,8 +16,11 @@
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "publish": "lerna publish",
+    "publish": "lerna publish --exact",
+    "lint": "eslint **/*.ts",
     "test": "jest",
-    "lint": "eslint **/*.ts"
+    "ci": "npm run start:test:db && jest && stop:test:db",
+    "start:test:db": "docker-compose up --build -d",
+    "stop:test:db": "docker-compose down"
   }
 }
