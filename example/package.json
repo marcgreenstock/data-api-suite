@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.39",
     "@types/node": "^13.1.6",
     "data-api-local": "file:../packages/data-api-local",
     "data-api-local-serverless": "file:../packages/data-api-local-serverless",

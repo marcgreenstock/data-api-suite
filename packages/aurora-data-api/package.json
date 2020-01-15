@@ -1,0 +1,26 @@
+{
+  "name": "aurora-data-api",
+  "version": "0.0.0",
+  "description": "Aurora Serverless Data API Client that simplifies the request and response - 100% TypeScript",
+  "main": "lib/index.js",
+  "types": "lib/index",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
+    "compile": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.601.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "@types/node": "^13.1.6",
+    "ts-jsdoc": "^3.1.1",
+    "typescript": "^3.7.4"
+  }
+}
