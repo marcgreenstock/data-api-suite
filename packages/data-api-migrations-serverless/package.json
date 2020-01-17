@@ -27,8 +27,8 @@
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
-    "compile": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf ./lib",
+    "compile": "tsc -b tsconfig.build.json",
     "prepare": "npm run build"
   },
   "license": "MIT",
@@ -37,7 +37,9 @@
     "data-api-migrations": "0.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^24.9.0",
     "@types/serverless": "^1.18.4",
+    "jest": "^24.9.0",
     "serverless": "^1.60.5",
     "typescript": "^3.7.4"
   }

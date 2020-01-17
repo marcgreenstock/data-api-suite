@@ -1,24 +1,12 @@
 import * as Serverless from 'serverless'
 import * as Plugin from 'serverless/classes/Plugin'
 import * as chalk from 'chalk'
-import {
-  MigrationManager, 
-  MigrationManagerClientConfig, 
-  MigrationManagerMethodConfig 
+import DataAPIMigrations, {
+  DataAPIMigrationsConfig
 } from 'data-api-migrations'
-
-interface Config {
-  destName?: string;
-  typescript?: boolean;
-  clientConfig?: MigrationManagerClientConfig;
-  methodConfig?: MigrationManagerMethodConfig;
-}
 
 interface Options extends Serverless.Options {
   name?: string;
-  limit?: string;
-  id?: string;
-  toId?: string;
 }
 
 class DataAPIMigrationsServerless implements Plugin {
@@ -85,31 +73,25 @@ class DataAPIMigrationsServerless implements Plugin {
     }
 
     this.hooks = {
-      // 'migration:help': (): Promise<void> => {
-      //   this.serverless.cli.generateCommandsHelp(['migration'])
-      //   return Promise.resolve()
-      // },
       'migrations:create:generate': this.generateMigrationFile.bind(this),
       'migrations:apply:exec': this.applyMigrations.bind(this),
       'migrations:rollback:exec': this.rollbackMigrations.bind(this),
-      'migrations:status:exec':this.fetchMigrationStatus.bind(this)
+      'migrations:status:exec': this.fetchMigrationStatus.bind(this)
     }
   }
 
-  private manager (): MigrationManager {    
-    return new MigrationManager({
+  private manager (): DataAPIMigrations {    
+    return new DataAPIMigrations({
       isLocal: this.stage === 'local',
       cwd: this.serverless.config.servicePath,
       logger: this.log.bind(this),
-      destName: this.config.destName,
-      typescript: this.config.typescript,
-      clientConfig: this.config.clientConfig,
-      methodConfig: this.config.methodConfig
+      ...this.config
     })
   }
 
   private async generateMigrationFile (): Promise<void> {
-    this.manager().generateMigration(this.options.name)
+    const fileName = await this.manager().generateMigration(this.options.name)
+    this.log(`${chalk.greenBright(fileName)} created.`)
   }
 
   private async applyMigrations (): Promise<void> {
@@ -127,19 +109,23 @@ class DataAPIMigrationsServerless implements Plugin {
     ids.forEach((id) => this.log(`${chalk.greenBright(id)} is applied.`))
   }
 
-  private get config (): Config {
-    const baseConfig = this.serverless.service.custom['data-api-migrations']
+  private get config (): DataAPIMigrationsConfig {
+    const baseConfig = this.serverless.service.custom['DataAPIMigrations']
     if (baseConfig === undefined) {
-      throw new Error('"custom"."data-api-migrations" is missing from serverless.yml')
+      throw new Error('"custom"."DataAPIMigrations" is missing from serverless.yml')
     }
-    const stageConfig = baseConfig[this.stage]
-    if (stageConfig === undefined) {
-      throw new Error(`"custom"."data-api-migrations"."${this.stage}" is missing from serverless.yml`)
+    const {
+      migrationsFolder = './migrations',
+      typescript = true,
+      [this.stage]: dataAPI
+    } = baseConfig
+    if (dataAPI === undefined) {
+      throw new Error(`"custom"."DataAPIMigrations"."${this.stage}" is missing from serverless.yml`)
     }
     return {
-      destName: './migrations',
-      typescript: true,
-      ...stageConfig
+      migrationsFolder,
+      typescript,
+      dataAPI
     }
   }
 

@@ -18,13 +18,12 @@
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
-    "compile": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf ./lib",
+    "compile": "tsc -b tsconfig.build.json",
     "prepare": "npm run build"
   },
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.596.0",
     "date-fns": "^2.8.1",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
@@ -33,6 +32,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
+    "@types/jest": "^24.9.0",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.1.2"
   }

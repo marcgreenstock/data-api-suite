@@ -1,23 +1,18 @@
 {
-  "extends": "../../tsconfig.build.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "outDir": "./lib",
     "rootDir": "./src"
   },
   "references": [{
     "path": "../aurora-data-api/tsconfig.build.json"
-  }, {
-    "path": "../data-api-local/tsconfig.build.json"
-  }, {
-    "path": "../data-api-local-serverless/tsconfig.build.json"
-  }, {
-    "path": "../data-api-migrations-serverless/tsconfig.build.json"
   }],
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",
-    "src/**/__fixtures__"
+    "src/__fixtures__/**/*"
   ]
 }

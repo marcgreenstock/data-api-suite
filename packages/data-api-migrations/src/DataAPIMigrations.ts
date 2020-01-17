@@ -1,61 +1,52 @@
 import * as path from 'path'
 import * as fs from 'fs-extra'
 import * as _ from 'lodash'
-import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
+import * as AuroraDataAPI from 'aurora-data-api'
 import { format as formatDate } from 'date-fns'
 import { jsTemplate, tsTemplate } from './templates'
 import { Migration } from './Migration'
-import { TsCompiler } from './TsCompiler'
+import { TypeScriptCompiler } from './TypeScriptCompiler'
 import { Compiler, CompilerDerived } from './Compiler'
-import { QueryHelper, QueryHelperMethodConfig } from './QueryHelper'
 
 const ID_FORMAT = 'yyyyMMddHHmmss'
 
-export type MigrationManagerClientConfig = RDSDataService.ClientConfiguration
-export type MigrationManagerMethodConfig = QueryHelperMethodConfig
-export interface MigrationManagerOptions {
+export interface DataAPIMigrationsConfig {
   cwd?: string;
-  destName?: string;
+  migrationsFolder?: string;
   typescript?: boolean;
   logger?: Function;
   compiler?: CompilerDerived;
-  isLocal: boolean;
-  clientConfig?: MigrationManagerClientConfig;
-  methodConfig?: MigrationManagerMethodConfig;
+  isLocal?: boolean;
+  dataAPI: AuroraDataAPI.AuroraDataAPIConfig;
 }
 
-export class MigrationManager {
+export class DataAPIMigrations {
   public readonly cwd: string
   public readonly typescript: boolean
   public readonly isLocal: boolean
+  public readonly dataAPI: AuroraDataAPI
   protected logger: Function
   protected compiler: CompilerDerived
   protected migrationsPath: string
   protected buildPath: string
-  protected queryHelper: QueryHelper
 
   constructor ({
     cwd,
-    destName,
+    migrationsFolder,
     typescript,
     logger,
     compiler,
     isLocal,
-    clientConfig,
-    methodConfig
-  }: MigrationManagerOptions) {
+    dataAPI
+  }: DataAPIMigrationsConfig) {
     this.logger = logger
-    this.cwd = cwd = cwd === undefined ? process.cwd() : cwd
+    this.cwd = cwd = cwd || process.cwd()
     this.typescript = typescript === undefined ? true : typescript
-    this.compiler = compiler === undefined ? TsCompiler : compiler
+    this.compiler = compiler || TypeScriptCompiler
     this.isLocal = isLocal === undefined ? false : isLocal
-    this.migrationsPath = path.join(this.cwd, destName)
+    this.migrationsPath = path.join(this.cwd, migrationsFolder || 'migrations')
     this.buildPath = path.join(this.cwd, '.migrations_build')
-    this.queryHelper = new QueryHelper({
-      clientConfig,
-      methodConfig,
-      logger: this.log.bind(this)
-    })
+    this.dataAPI = new AuroraDataAPI(dataAPI)
   }
 
   public async generateMigration (name: string): Promise<string> {
@@ -71,12 +62,8 @@ export class MigrationManager {
 
   public async getAppliedMigrationIds (): Promise<number[]> {
     await this.ensureMigrationTable()
-    const result = await this.queryHelper.executeStatement({
-      sql: 'SELECT id FROM __migrations__',
-    })
-    return result.records.map((record) => {
-      return record[0].longValue
-    })
+    const result = await this.dataAPI.query<{id: number}>('SELECT id FROM __migrations__')
+    return result.rows.map((row) => row.id)
   }
 
   public async applyMigrations (): Promise<number[]> {
@@ -134,7 +121,7 @@ export class MigrationManager {
       .map(({ id, ...data }) => new Migration({ 
         id,
         ...data,
-        queryHelper: this.queryHelper, 
+        dataAPI: this.dataAPI, 
         isLocal: this.isLocal,
         isApplied: appliedMigrationIds.includes(id)
       }))
@@ -142,9 +129,11 @@ export class MigrationManager {
   }
 
   private async ensureMigrationTable (): Promise<void> {
-    await this.queryHelper.executeStatement({
-      sql: 'CREATE TABLE IF NOT EXISTS __migrations__ (id bigint NOT NULL UNIQUE)'
-    })
+    await this.dataAPI.query(
+      'CREATE TABLE IF NOT EXISTS __migrations__ (id bigint NOT NULL UNIQUE)',
+      undefined,
+      { includeResultMetadata: false }
+    )
   }
 
   private log (message: string): void {
@@ -153,3 +142,5 @@ export class MigrationManager {
     }
   }
 }
+
+export default DataAPIMigrations

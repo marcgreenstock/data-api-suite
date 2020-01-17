@@ -7,7 +7,9 @@
     "declaration": true,
     "baseUrl": "./packages",
     "paths": {
-      "data-api-local": ["data-api-local/src"]
+      "aurora-data-api": ["aurora-data-api/src"],
+      "data-api-local": ["data-api-local/src"],
+      "data-api-migrations": ["data-api-migrations/src"]
     }
   },
   "exclude": [

@@ -3,7 +3,7 @@ import * as fs from 'fs-extra'
 import * as path from 'path'
 import { Compiler } from './Compiler'
 
-export class TsCompiler extends Compiler {
+export class TypeScriptCompiler extends Compiler {
   public async compile (): Promise<string[]> {
     this.logger('Compiling with TypeScript...')
     const tsConfig = await this.getTypescriptCompilerOptions()
@@ -21,7 +21,6 @@ export class TsCompiler extends Compiler {
   }
 
   public async cleanup (): Promise<void> {
-    return Promise.resolve()
     this.logger('Cleaning up...')
     await fs.remove(this.buildPath)
   }

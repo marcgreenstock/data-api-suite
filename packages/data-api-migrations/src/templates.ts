@@ -1,6 +1,6 @@
 export const jsTemplate = (): string => 
-`exports.up = async (helper, migration) => {
-  const transaction = await helper.beginTransaction()
+`exports.up = async (dataAPI, migration) => {
+  const transaction = await dataAPI.beginTransaction()
   try {
     await transaction.executeStatement({ sql: 'CREATE TABLE' })
     await transaction.commit()
@@ -10,8 +10,8 @@ export const jsTemplate = (): string =>
   }
 }
 
-exports.down = async (helper, migration) => {
-  const t = await helper.beginTransaction()
+exports.down = async (dataAPI, migration) => {
+  const t = await dataAPI.beginTransaction()
   try {
     await t.executeStatement({ sql: 'DROP TABLE' })
     await t.commit()
@@ -25,8 +25,8 @@ exports.down = async (helper, migration) => {
 export const tsTemplate = (): string => 
 `import { MigrationFn } from 'data-api-migrations'
 
-export const up: MigrationFn = async (helper, migration) => {
-  const t = await helper.beginTransaction()
+export const up: MigrationFn = async (dataAPI, migration) => {
+  const t = await dataAPI.beginTransaction()
   try {
     await t.executeStatement({ sql: 'CREATE TABLE' })
     await t.commit()
@@ -36,8 +36,8 @@ export const up: MigrationFn = async (helper, migration) => {
   }
 }
 
-export const down: MigrationFn = async (helper, migration) => {
-  const t = await helper.beginTransaction()
+export const down: MigrationFn = async (dataAPI, migration) => {
+  const t = await dataAPI.beginTransaction()
   try {
     await t.executeStatement({ sql: 'DROP TABLE' })
     await t.commit()

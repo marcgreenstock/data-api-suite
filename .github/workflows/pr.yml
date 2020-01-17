@@ -8,6 +8,7 @@ on:
 jobs:
   test:
     name: Tests
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -28,6 +29,7 @@ jobs:
 
   lint:
     name: Code Lint
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master

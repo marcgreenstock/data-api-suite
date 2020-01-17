@@ -1,5 +1,7 @@
-import { QueryHelper } from './QueryHelper'
+import * as AuroraDataAPI from 'aurora-data-api'
+import DataAPIMigrations, { DataAPIMigrationsConfig } from './DataAPIMigrations'
 import { Migration } from './Migration'
 
-export * from './MigrationManager'
-export type MigrationFn = (helper: QueryHelper, migration: Migration) => Promise<void>
+export default DataAPIMigrations
+export { DataAPIMigrationsConfig }
+export type MigrationFn = (dataAPI: AuroraDataAPI, migration: Migration) => Promise<void>
