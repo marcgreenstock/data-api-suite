@@ -19,8 +19,10 @@ jobs:
         run: npm install
       - name: Bootstrap packages
         run: npm run bootstrap
+      - name: Start docker
+        run: docker-compose up --build -d
       - name: Execute test
-        run: npm run ci
+        run: npm run test
       - name: Report to Codecov
         uses: codecov/codecov-action@v1
         with:
