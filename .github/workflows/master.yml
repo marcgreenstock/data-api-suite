@@ -26,6 +26,10 @@ jobs:
         with:
           name: coverage
           path: coverage
+      - name: Report to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
     name: Code Lint
