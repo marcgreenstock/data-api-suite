@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Tests
-    timeout-minutes: 5
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -21,11 +21,6 @@ jobs:
         run: npm run bootstrap
       - name: Execute test
         run: npm run ci
-      - name: Upload coverage
-        uses: actions/upload-artifact@master
-        with:
-          name: coverage
-          path: coverage
       - name: Report to Codecov
         uses: codecov/codecov-action@v1
         with:
