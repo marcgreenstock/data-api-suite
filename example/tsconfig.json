@@ -8,6 +8,14 @@
     "outDir": ".build",
     "moduleResolution": "node",
     "lib": ["es2015"],
-    "rootDir": "./"
+    "rootDir": "./",
+    "baseUrl": "./",
+    "paths": {
+      "aurora-data-api": ["../packages/aurora-data-api/lib"],
+      "data-api-local": ["../packages/data-api-local/lib"],
+      "data-api-local-serverless": ["../packages/data-api-local-serverless/lib"],
+      "data-api-migrations": ["../packages/data-api-migrations/lib"],
+      "data-api-migrations-serverless": ["../packages/data-api-migrations-serverless/lib"],
+    }
   }
 }

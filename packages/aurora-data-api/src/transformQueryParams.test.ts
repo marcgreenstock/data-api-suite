@@ -1,4 +1,4 @@
-import transformQueryParams from './transformQueryParams'
+import { transformQueryParams } from './transformQueryParams'
 
 test('SqlParameter', () => {
   const result = transformQueryParams({

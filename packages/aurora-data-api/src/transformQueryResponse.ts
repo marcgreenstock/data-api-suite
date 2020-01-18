@@ -1,16 +1,15 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 
-type Value = null | string | number | boolean
-type FieldValue = Value | RDSDataService._Blob
-type ArrayValue = Array<Value | ArrayValue>
-
-export interface StringParser<T = unknown> {
-  (value: unknown): T;
+interface ObjLit {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }
 
-export interface StringParsers {
-  [typeName: string]: StringParser;
-}
+type BasicValue = null | string | number | boolean
+type FieldValue = BasicValue | RDSDataService._Blob
+type ArrayValue = Array<BasicValue | ArrayValue>
+type Value = FieldValue | ArrayValue
+type TransformedValue = Value | ObjLit | ObjLit[] | Date | Date[]
 
 export interface UnknownRow {
   [key: string]: unknown;
@@ -20,8 +19,12 @@ export interface Metadata {
   [name: string]: RDSDataService.ColumnMetadata;
 }
 
+export interface ValueTransformer<T = unknown> {
+  (value: Value, metadata: RDSDataService.ColumnMetadata, nextFn: Function): T;
+}
+
 export interface TransformQueryResponseOptions {
-  stringParsers?: StringParsers;
+  valueTransformer?: ValueTransformer;
 }
 
 export interface TransformedQueryResult<T> {
@@ -29,15 +32,27 @@ export interface TransformedQueryResult<T> {
   metadata: Metadata | null;
 }
 
-const timestampParser: StringParser<Date> = (value: string) => new Date(value)
-const jsonParser: StringParser<JSON> = (value: string) => JSON.parse(value)
-
-export const defaultStringParsers: StringParsers = {
-  'date': timestampParser,
-  'timestamp': timestampParser,
-  'timestampz': timestampParser,
-  'json': jsonParser,
-  'jsonb': jsonParser
+const defaultValueTransformer = (
+  value: Value,
+  metadata: RDSDataService.ColumnMetadata
+): TransformedValue => {
+  if (Array.isArray(value)) {
+    return value.map((v) => defaultValueTransformer(v, metadata))
+  } else if (typeof value === 'string') {
+    switch (metadata.typeName) {
+      case 'json':
+      case 'json[]':
+      case 'jsonb':
+      case 'jsonb[]': 
+        return JSON.parse(value)
+      case 'timestamp':
+      case 'timestamp[]':
+      case 'timestampz':
+      case 'timestampz[]':
+        return new Date(value)
+    }
+  }
+  return value
 }
 
 const transformArrayValue = (
@@ -67,13 +82,10 @@ const transformFieldValue = (
 
 export const transformQueryResponse = <T = UnknownRow>(
   result: RDSDataService.ExecuteStatementResponse,
-  options: TransformQueryResponseOptions = {}
+  options?: TransformQueryResponseOptions
 ): TransformedQueryResult<T> => {
   const { records, columnMetadata } = result
-  const stringParsers = {
-    ...defaultStringParsers,
-    ...options.stringParsers
-  }
+  const { valueTransformer } = { ...options }
 
   if (records === undefined || columnMetadata === undefined) {
     return {
@@ -93,15 +105,20 @@ export const transformQueryResponse = <T = UnknownRow>(
   const rows = records.map((fieldList) => {
     return fieldList.reduce((row, field, index) => {
       const metadatum = columnMetadata[index]
-      const typeName = metadatum.typeName
       const name = metadatum.name || `$${index}`
-      let value = transformFieldValue(field)
-      if (typeName in stringParsers) {
-        value = stringParsers[typeName](value)
-      }
-      return {
-        ...row,
-        [name]: value
+      const value = transformFieldValue(field)
+
+      if (typeof valueTransformer === 'function') {
+        const nextFn = (): TransformedValue => defaultValueTransformer(value, metadatum)
+        return {
+          ...row,
+          [name]: valueTransformer(value, metadatum, nextFn)
+        }
+      } else {
+        return {
+          ...row,
+          [name]: defaultValueTransformer(value, metadatum)
+        }
       }
     }, {})
   }) as T[]
@@ -111,5 +128,3 @@ export const transformQueryResponse = <T = UnknownRow>(
     metadata
   }
 }
-
-export default transformQueryResponse

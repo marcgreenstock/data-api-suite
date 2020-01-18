@@ -480,13 +480,13 @@ You can override and/or extend the default behaviour by providing your own `valu
 const valueTransformer = (
   value: unknown, 
   metadata: AuroraDataAPI.Metadata, 
-  next: AuroraDataAPI.ValueTransformerNextFn
+  next: Function
 ) => {
   if (
-    metadata.typeName === 'jsonb' && 
+    metadata.typeName === 'varchar' && 
     typeof value === 'string'
   ) {
-    return JSON.parse(value)
+    return value.toUpperCase()
   }
   return next() // remove this line to disable the default value transformer
 }
@@ -498,14 +498,12 @@ const client = new AuroraDataAPI({
 })
 
 // or add it to the options argument on #query or transaction#query
-const result = await client.query('SELECT data FROM table', undefined, { valueTransformer }) // => { rows: [{ data: { foo: 'bar' } }] }
+const result = await client.query('SELECT email FROM users', undefined, { valueTransformer }) // => { rows: [{ email: 'EXAMPLE@EXAMPLE.COM' }] }
 ```
 
-## AuroraDataAPITransaction
+## AuroraDataAPITransaction Methods
 
 [`AuroraDataAPI#beginTransaction`](AuroraDataAPI#beginTransaction) resolves an instance of `AuroraDataAPITransaction` that exposes
-
-### AuroraDataAPITransaction Methods
 
 | Name | Description |
 | ---- | ----------- |
@@ -516,43 +514,32 @@ const result = await client.query('SELECT data FROM table', undefined, { valueTr
 | `executeStatement` | |
 | `batchExecuteStatement` | |
 
+### `AuroraDataAPITransaction#query`
 
-## Full Example
 ```ts
-import * as AuroraDataAPI from 'aurora-data-api'
-
-interface UserRow {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: Date;
-}
-
-const client = new AuroraDataAPI({
-  database: 'my-db',
-  resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:example',
-  secretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:example'
-})
-
-const transaction = client.beginTransaction()
-try {
-  await transaction.batchQuery(
-    'INSERT INTO users (name, email) VALUES (:name, :email)',
-    [{ name: 'Billy Everyteen', email: 'billy@school.edu', }],
-    [{ name: 'Turanga Leela', email: 'leela@planetexpress.com' }]
-  )
-  transaction.commit()
-} catch (error) {
-  transaction.rollback()
-  throw error
-}
-
-const users = await client.query<UserRow>(
-  'SELECT * FROM users LIMIT :limit',
-  { limit: 1 },
-)
-console.log(users) // => [{ id: 1, name: 'Billy Everyteen', email: 'billy@school.edu', createdAt: Date(...) }]
+query<T = AuroraDataAPI.UnknownRow>(sql: string, params?: QueryParams, options: AuroraDataAPITransaction.TransactionQueryOptions) => Promise<AuroraDataAPI.QueryResult<T>>
 ```
+
+#### Arguments
+
+| Name | Description | Required |
+| ---- | ----------- | -------- |
+| `sql`  | The SQL query string to perform. | Yes |
+| `params` | See [Query Params](#Query-Params). | No |
+| `options` | See options below. | No |
+
+#### Options 
+
+| Name | Description | Default |
+| ---- | ----------- | ------- |
+| `includeResultMetadata` | Includes the column metadata also transforms the results. | `true` |
+| `continueAfterTimeout` | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `resultSetOptions` | Options that control how the result set is returned. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `valueTransformer` | See [Value Transformer](#Value-Transformer). | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction) |
+
+## Example
+
+Take a look at the example folder.
 
 ## MIT License
 

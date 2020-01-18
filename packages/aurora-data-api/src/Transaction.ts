@@ -1,36 +1,45 @@
 import * as AuroraDataAPI from './AuroraDataAPI'
 
-declare namespace AuroraDataAPITransaction {
+declare namespace Transaction {
   export type QueryOptions = Pick<
-    AuroraDataAPI.QueryOptions, 
-    'continueAfterTimeout' | 'includeResultMetadata' | 'resultSetOptions' | 'stringParsers'
+  AuroraDataAPI.QueryOptions,
+    'continueAfterTimeout' | 'includeResultMetadata' | 'resultSetOptions' | 'valueTransformer'
   >
   export type ExecuteStatementOptions = Pick<
-    AuroraDataAPI.ExecuteStatementOptions,
+  AuroraDataAPI.ExecuteStatementOptions,
     'continueAfterTimeout' | 'includeResultMetadata' | 'parameters' | 'resultSetOptions' | 'sql'
   >
   export type BatchExecuteStatementOptions = Pick<
-    AuroraDataAPI.BatchExecuteStatementOptions, 
+  AuroraDataAPI.BatchExecuteStatementOptions,
     'parameterSets' | 'sql'
   >
 }
 
-class AuroraDataAPITransaction {
+class Transaction {
   public isComplete: boolean
   public readonly dataApi: AuroraDataAPI
   public readonly transactionId: string
+  public readonly requestConfig: AuroraDataAPI.RequestConfig
 
-  constructor (dataApi: AuroraDataAPI, transactionId: string) {
+  constructor (dataApi: AuroraDataAPI, transactionId: string, requestConfig: AuroraDataAPI.RequestConfig) {
     this.isComplete = false
     this.dataApi = dataApi
     this.transactionId = transactionId
+    this.requestConfig = requestConfig
   }
 
   /**
    * Performs a commit of the transaction.
    */
   public async commit (): Promise<AuroraDataAPI.CommitTransactionResult> {
-    const result = await this.dataApi.commitTransaction(this.transactionId)
+    const {
+      secretArn,
+      resourceArn,
+    } = this.requestConfig
+    const result = await this.dataApi.commitTransaction(this.transactionId, {
+      secretArn,
+      resourceArn,
+    })
     this.isComplete = true
     return result
   }
@@ -39,7 +48,14 @@ class AuroraDataAPITransaction {
    * Performs a rollback of the transaction and cancels its changes.
    */
   public async rollback (): Promise<AuroraDataAPI.RollbackTransactionResult> {
-    const result =  await this.dataApi.rollbackTransaction(this.transactionId)
+    const {
+      secretArn,
+      resourceArn,
+    } = this.requestConfig
+    const result =  await this.dataApi.rollbackTransaction(this.transactionId, {
+      secretArn,
+      resourceArn,
+    })
     this.isComplete = true
     return result
   }
@@ -56,20 +72,31 @@ class AuroraDataAPITransaction {
   public async query<T = AuroraDataAPI.UnknownRow> (
     sql: string,
     params?: AuroraDataAPI.QueryParams,
-    options?: AuroraDataAPITransaction.QueryOptions
+    options?: Transaction.QueryOptions
   ): Promise<AuroraDataAPI.QueryResult<T>> {
     const {
       continueAfterTimeout,
+      database,
       includeResultMetadata,
+      resourceArn,
       resultSetOptions,
-      stringParsers,
-    } = { ...options }
+      schema,
+      secretArn,
+      valueTransformer,
+    } = { 
+      ...this.requestConfig,
+      ...options
+    }
     return this.dataApi.query(sql, params, {
       continueAfterTimeout,
+      database,
       includeResultMetadata,
+      resourceArn,
       resultSetOptions,
-      stringParsers,
+      schema,
+      secretArn,
       transactionId: this.transactionId,
+      valueTransformer,
     })
   }
 
@@ -77,44 +104,76 @@ class AuroraDataAPITransaction {
     sql: string,
     params?: AuroraDataAPI.QueryParams[],
   ): Promise<AuroraDataAPI.BatchQueryResult> {
+    const {
+      database,
+      resourceArn,
+      schema,
+      secretArn,
+    } = this.requestConfig
     return this.dataApi.batchQuery(sql, params, {
+      database,
+      resourceArn,
+      schema,
+      secretArn,
       transactionId: this.transactionId,
     })
   }
 
   public async executeStatement (
-    options: AuroraDataAPITransaction.ExecuteStatementOptions
+    options: Transaction.ExecuteStatementOptions
   ): Promise<AuroraDataAPI.ExecuteStatementResult> {
     const {
       continueAfterTimeout,
+      database,
       includeResultMetadata,
       parameters,
+      resourceArn,
       resultSetOptions,
+      schema,
+      secretArn,
       sql,
-    } = options
+    } = {
+      ...this.requestConfig,
+      ...options
+    }
     return this.dataApi.executeStatement({
       continueAfterTimeout,
+      database,
       includeResultMetadata,
       parameters,
+      resourceArn,
       resultSetOptions,
+      schema,
+      secretArn,
       sql,
       transactionId: this.transactionId,
     })
   }
 
   public async batchExecuteStatement (
-    options: AuroraDataAPITransaction.BatchExecuteStatementOptions
+    options: Transaction.BatchExecuteStatementOptions
   ): Promise<AuroraDataAPI.BatchExecuteStatementResult> {
     const {
+      database,
+      resourceArn,
       parameterSets,
+      schema,
+      secretArn,
       sql,
-    } = options
+    } = {
+      ...this.requestConfig,
+      ...options,
+    }
     return this.dataApi.batchExecuteStatement({
+      database,
+      resourceArn,
       parameterSets,
+      schema,
+      secretArn,
       sql,
       transactionId: this.transactionId,
     })
   }
 }
 
-export = AuroraDataAPITransaction
+export = Transaction

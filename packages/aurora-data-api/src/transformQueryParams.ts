@@ -70,5 +70,3 @@ export const transformQueryParams = (params: QueryParams): RDSDataService.SqlPar
     return { name, value }
   })
 }
-
-export default transformQueryParams

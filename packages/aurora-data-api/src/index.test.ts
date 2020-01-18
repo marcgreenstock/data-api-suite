@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import * as AuroraDataAPI from '.'
-import * as AuroraDataAPITransaction from './AuroraDataAPITransaction'
+import * as Transaction from './Transaction'
+import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 
 jest.mock('aws-sdk/clients/rdsdataservice')
 
@@ -16,8 +16,8 @@ const requestConfig: AuroraDataAPI.RequestConfig = {
   secretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:example',
 }
 const transformerOptions: AuroraDataAPI.TransformQueryResponseOptions = {
-  stringParsers: {
-    'timestamp': (value: string): Date => new Date(value)
+  valueTransformer: (value, metadata, next) => {
+    return next()
   }
 }
 const clientConfig: AuroraDataAPI.ClientConfig = {
@@ -70,7 +70,7 @@ describe('AuroraDataAPI#beginTransaction', () => {
     })) as any
   })
 
-  it ('calls RDSDataService#beginTransaction and returns an instance of AuroraDataAPITransaction', async () => {
+  it ('calls RDSDataService#beginTransaction and returns an instance of Transaction', async () => {
     const {
       database,
       resourceArn,
@@ -84,7 +84,7 @@ describe('AuroraDataAPI#beginTransaction', () => {
       schema,
       secretArn
     })
-    expect(result).toBeInstanceOf(AuroraDataAPITransaction)
+    expect(result).toBeInstanceOf(Transaction)
   })
 
   it ('can override the params passed to RDSDataService#beginTransaction', async () => {

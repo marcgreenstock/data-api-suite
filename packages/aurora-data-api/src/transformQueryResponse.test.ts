@@ -1,4 +1,5 @@
-import transformQueryResponse from './transformQueryResponse'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { transformQueryResponse, ValueTransformer } from './transformQueryResponse'
 
 test('undefined records', () => {
   const result = transformQueryResponse({ numberOfRecordsUpdated: 0 })
@@ -299,5 +300,58 @@ describe('typeParsers', () => {
       },
       rows: [{ example: new Date('2019-12-25 19:57:21') }]
     })
+  })
+})
+
+test('custom valueTransformer', () => {
+  const valueTransformer: ValueTransformer = (value, metadata, next) => {
+    switch (metadata.typeName) {
+      case 'varchar':
+        return value.toString().toUpperCase()
+      default:
+        return next()
+    }
+  }
+  const result = transformQueryResponse({
+    columnMetadata: [{
+      name: 'example1',
+      typeName: 'varchar'
+    }, {
+      name: 'example2',
+      typeName: 'varchar[]'
+    }, {
+      name: 'example3',
+      typeName: 'int8'
+    }],
+    records: [
+      [{
+        stringValue: 'dog'
+      }, {
+        arrayValue: {
+          arrayValues: [{
+            stringValues: ['a.a', 'a.b']
+          }, {
+            stringValues: ['b.a', 'b.b']
+          }]
+        }
+      }, {
+        longValue: 87
+      }]
+    ]
+  }, { valueTransformer })
+  expect(result).toMatchObject({
+    metadata: {
+      example1: { name: 'example1', typeName: 'varchar' },
+      example2: { name: 'example2', typeName: 'varchar[]'},
+      example3: { name: 'example3', typeName: 'int8' }
+    },
+    rows: [{
+      example1: 'DOG',
+      example2: [
+        ['a.a', 'a.b'], 
+        ['b.a', 'b.b']
+      ], 
+      example3: 87 
+    }]
   })
 })

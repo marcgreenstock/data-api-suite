@@ -1,4 +1,4 @@
-import * as AuroraDataAPITransaction from './AuroraDataAPITransaction'
+import * as Transaction from './Transaction'
 import * as AuroraDataAPI from './AuroraDataAPI'
 
 jest.mock('./AuroraDataAPI')
@@ -16,7 +16,7 @@ const requestConfig: AuroraDataAPI.RequestConfig = {
 
 const client = new AuroraDataAPI(requestConfig) as jest.Mocked<AuroraDataAPI>
 beforeEach(() => {
-  client.beginTransaction = jest.fn().mockResolvedValue(new AuroraDataAPITransaction(client, 'whatever'))
+  client.beginTransaction = jest.fn().mockResolvedValue(new Transaction(client, 'whatever', requestConfig))
   client.commitTransaction = jest.fn().mockResolvedValue({ transactionStatus: 'commited' })
   client.rollbackTransaction = jest.fn().mockResolvedValue({ transactionStatus: 'rolledback' })
   client.query = jest.fn().mockResolvedValue({})
@@ -28,18 +28,32 @@ beforeEach(() => {
 describe('AuroraDataAPITransaction#commit', () => {
   it ('calls #commitTransaction on the AuroraDataAPI instance', async () => {
     const transaction = await client.beginTransaction()
+    const {
+      resourceArn,
+      secretArn
+    } = requestConfig
     await transaction.commit()
     expect(client.commitTransaction)
-      .toHaveBeenCalledWith(transaction.transactionId)
+      .toHaveBeenCalledWith(transaction.transactionId, {
+        resourceArn,
+        secretArn
+      })
   })
 })
 
 describe('AuroraDataAPITransaction#rollback', () => {
   it ('calls #rollbackTransaction on the AuroraDataAPI instance', async () => {
     const transaction = await client.beginTransaction()
+    const {
+      resourceArn,
+      secretArn
+    } = requestConfig
     await transaction.rollback()
     expect(client.rollbackTransaction)
-      .toHaveBeenCalledWith(transaction.transactionId)
+      .toHaveBeenCalledWith(transaction.transactionId, {
+        resourceArn,
+        secretArn
+      })
   })
 })
 
@@ -48,24 +62,27 @@ describe('AuroraDataAPITransaction#query', () => {
     const transaction = await client.beginTransaction()
     const sql = 'SELECT * FROM users'
     const params = { id: 27 }
+    const {
+      continueAfterTimeout,
+      database,
+      resourceArn,
+      resultSetOptions,
+      schema,
+      secretArn,
+    } = {
+      ...requestConfig
+    }
     await transaction.query(sql, params)
     expect(client.query)
-      .toHaveBeenCalledWith(sql, params, { transactionId: transaction.transactionId })
-  })
-
-  it ('can override some options', async () => {
-    const transaction = await client.beginTransaction()
-    const sql = 'SELECT * FROM users'
-    const params = { id: 27 }
-    const options = {
-      includeResultMetadata: false,
-      resultSetOptions: {
-        decimalReturnType: 'STRING'
-      }
-    }
-    await transaction.query(sql, params, options)
-    expect(client.query)
-      .toHaveBeenCalledWith(sql, params, { ...options, transactionId: transaction.transactionId })
+      .toHaveBeenCalledWith(sql, params, {
+        transactionId: transaction.transactionId,
+        continueAfterTimeout,
+        database,
+        resourceArn,
+        resultSetOptions,
+        schema,
+        secretArn,
+      })
   })
 })
 
@@ -74,9 +91,21 @@ describe('AuroraDataAPITransaction#batchQuery', () => {
     const transaction = await client.beginTransaction()
     const sql = 'SELECT * FROM users where id = :id'
     const params = [{ id: 19 }]
+    const {
+      database,
+      resourceArn,
+      schema,
+      secretArn,
+    } = requestConfig
     await transaction.batchQuery(sql, params)
     expect(client.batchQuery)
-      .toHaveBeenCalledWith(sql, params, { transactionId: transaction.transactionId })
+      .toHaveBeenCalledWith(sql, params, {
+        transactionId: transaction.transactionId,
+        database,
+        resourceArn,
+        schema,
+        secretArn,
+      })
   })
 })
 
@@ -90,12 +119,26 @@ describe('AuroraDataAPITransaction#executeStatement', () => {
         longValue: 88
       }
     }]
+    const {
+      continueAfterTimeout,
+      database,
+      resourceArn,
+      resultSetOptions,
+      schema,
+      secretArn,
+    } = requestConfig
     await transaction.executeStatement({ sql, parameters })
     expect(client.executeStatement)
       .toHaveBeenCalledWith({
+        transactionId: transaction.transactionId,
         parameters, 
         sql,
-        transactionId: transaction.transactionId,
+        continueAfterTimeout,
+        database,
+        resourceArn,
+        resultSetOptions,
+        schema,
+        secretArn,
       })
   })
 })
@@ -110,12 +153,22 @@ describe('AuroraDataAPITransaction#batchExecuteStatement', () => {
         longValue: 99
       }
     }]]
+    const {
+      database,
+      resourceArn,
+      schema,
+      secretArn,
+    } = requestConfig
     await transaction.batchExecuteStatement({ sql, parameterSets })
     expect(client.batchExecuteStatement)
       .toHaveBeenCalledWith({
+        transactionId: transaction.transactionId,
         parameterSets,
         sql,
-        transactionId: transaction.transactionId, 
+        database,
+        resourceArn,
+        schema,
+        secretArn,
       })
   })
 })

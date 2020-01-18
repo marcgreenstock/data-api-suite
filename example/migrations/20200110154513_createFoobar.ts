@@ -1,7 +1,7 @@
 import { MigrationFn } from 'data-api-migrations'
 
-export const up: MigrationFn = async (helper, migration) => {
-  const t = await helper.beginTransaction();
+export const up: MigrationFn = async (dataAPI) => {
+  const t = await dataAPI.beginTransaction();
   try {
     await t.executeStatement({
       sql: `
@@ -20,8 +20,8 @@ export const up: MigrationFn = async (helper, migration) => {
   }
 }
 
-export const down: MigrationFn = async (helper, migration) => {
-  const t = await helper.beginTransaction()
+export const down: MigrationFn = async (dataAPI) => {
+  const t = await dataAPI.beginTransaction()
   try {
     await t.executeStatement({ sql: 'DROP TABLE foobar' })
     await t.commit()

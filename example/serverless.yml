@@ -23,8 +23,8 @@ provider:
 
 plugins:
   - serverless-plugin-typescript
-  - data-api-migrations-serverless
-  - data-api-local-serverless
+  - ../packages/data-api-migrations-serverless/lib
+  - ../packages/data-api-local-serverless/lib
   - serverless-offline
 
 custom:
@@ -35,33 +35,40 @@ custom:
     database:
       engine: postgresql
       connectionString: postgresql://localhost:5432/my-app
-  data-api-migrations:
+  DataAPIMigrations:
     destFolder: ./migrations
     typescript: true
     local:
-      clientConfig:
-        region: ${self:provider.region}
-        endpoint: http://localhost:8080
-        maxRetries: 0
-        credentials:
-          accessKeyId: example
-          secretAccessKey: example
-      methodConfig:
-        secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
-        resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
-        database: my-app
+      region: ${self:provider.region}
+      endpoint: http://localhost:8080
+      maxRetries: 0
+      secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+      resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+      database: my-app   
+      credentials:
+        accessKeyId: example
+        secretAccessKey: example     
     prod:
-      clientConfig:
-        region: ${self:provider.region}
-      methodConfig:
-        secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
-        resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
-        database: ${self:provider.environment.DATABASE_NAME}
+      region: ${self:provider.region}
+      secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+      resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+      database: ${self:provider.environment.DATABASE_NAME}
     
 functions:
-  example:
-    handler: handler.example
+  todoIndex:
+    handler: handler.todoIndex
     events:
       - http:
-          path: '/'
+          path: todos
           method: get
+  
+  todoShow:
+    handler: handler.todoShow
+    events:
+      - http:
+          path: todos/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true

@@ -1,25 +1,25 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
-import * as Transaction from './AuroraDataAPITransaction'
-import transformQueryParams, { QueryParams } from './transformQueryParams'
-import transformQueryResponse, {
-  defaultStringParsers,
+import * as Transaction from './Transaction'
+import { 
+  transformQueryParams, 
+  QueryParams 
+} from './transformQueryParams'
+import {
+  transformQueryResponse,
   Metadata,
-  StringParser,
-  StringParsers,
   TransformedQueryResult,
   TransformQueryResponseOptions,
   UnknownRow,
+  ValueTransformer
 } from './transformQueryResponse'
 
 declare namespace AuroraDataAPI {
   export { 
-    defaultStringParsers,
     Metadata,
     QueryParams, 
-    RDSDataService, 
-    StringParser,
-    StringParsers,
+    RDSDataService,
     Transaction,
+    ValueTransformer,
     TransformQueryResponseOptions,
     UnknownRow,
   }
@@ -108,11 +108,11 @@ class AuroraDataAPI {
       resultSetOptions,
       schema,
       secretArn,
-      stringParsers,
+      valueTransformer,
       ...clientConfig
     } = config
     this.transformOptions = {
-      stringParsers,
+      valueTransformer,
     }
     this.requestConfig = {
       continueAfterTimeout,
@@ -149,7 +149,12 @@ class AuroraDataAPI {
     if (transactionId === undefined) {
       throw new Error('transactionId missing from response')
     }
-    return new Transaction(this, transactionId)
+    return new Transaction(this, transactionId, {
+      database,
+      resourceArn,
+      schema,
+      secretArn,
+    })
   }
 
   public async commitTransaction (
@@ -199,12 +204,12 @@ class AuroraDataAPI {
       ...options,
     }
     const { 
-      stringParsers,
+      valueTransformer,
       ...executeStatementOptions
     } = methodOptions
     const transformOptions = {
       ...this.transformOptions,
-      stringParsers,
+      valueTransformer,
     }
     const parameters = params !== undefined ? transformQueryParams(params) : undefined
     const result = await this.executeStatement({
