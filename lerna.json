@@ -1,6 +1,5 @@
 {
   "packages": [
-    "example",
     "packages/aurora-data-api",
     "packages/data-api-local",
     "packages/data-api-local-serverless",
