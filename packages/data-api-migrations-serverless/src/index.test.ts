@@ -43,7 +43,7 @@ describe('migrations:create:generate', () => {
         }
       }
     }
-  
+
     const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'production', name })
     await plugin.hooks['migrations:create:generate']()
   })
@@ -80,7 +80,7 @@ describe('migrations:apply:exec', () => {
         }
       }
     }
-  
+
     const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'local' })
     await plugin.hooks['migrations:apply:exec']()
   })
@@ -118,7 +118,7 @@ describe('migrations:rollback:exec', () => {
         }
       }
     }
-  
+
     const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'local' })
     await plugin.hooks['migrations:rollback:exec']()
   })
@@ -155,7 +155,7 @@ describe('migrations:status:exec', () => {
         }
       }
     }
-  
+
     const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'local' })
     await plugin.hooks['migrations:status:exec']()
   })

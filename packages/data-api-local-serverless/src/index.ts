@@ -27,8 +27,9 @@ class DataAPILocalServerless implements Plugin {
   }
 
   private get config (): ServerOptions {
+    const custom = this.serverless.service.custom
     return {
-      ...this.serverless.service.custom['data-api-local'],
+      ...(custom['data-api-local'] || custom['DataAPILocal']),
       logger: this.log.bind(this)
     }
   }

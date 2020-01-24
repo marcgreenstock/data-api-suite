@@ -80,7 +80,7 @@ class DataAPIMigrationsServerless implements Plugin {
     }
   }
 
-  private manager (): DataAPIMigrations {    
+  private manager (): DataAPIMigrations {
     return new DataAPIMigrations({
       isLocal: this.stage === 'local',
       cwd: this.serverless.config.servicePath,

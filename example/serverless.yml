@@ -28,7 +28,7 @@ plugins:
   - serverless-offline
 
 custom:
-  data-api-local:
+  DataAPILocal:
     server:
       port: 8080
       hostname: localhost
