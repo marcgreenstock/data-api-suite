@@ -75,19 +75,6 @@ test('Buffer', () => {
   }])
 })
 
-test('Blob', () => {
-  const value = new Blob(['a', 'b'])
-  const result = transformQueryParams({
-    example: value
-  })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      blobValue: value
-    }
-  }])
-})
-
 test('Uint8Array', () => {
   const value = Uint8Array.from([1, 2, 3])
   const result = transformQueryParams({

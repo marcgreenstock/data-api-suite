@@ -1,7 +1,7 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import * as Errors from './Errors'
 
-type ParamValue = null | string | number | boolean | Buffer | Uint8Array | Blob | Date | CustomValue
+type ParamValue = null | string | number | boolean | Buffer | Uint8Array | Date | CustomValue
 type ParamArray = (boolean | string | number | Date | CustomValue | ParamArray)[]
 
 export interface CustomValue {
@@ -22,12 +22,11 @@ const isSqlParameter = (param: QueryParam): param is SqlParameter => {
     Object.keys(param.value).some((key) => keys.includes(key))
 }
 
-const isBlob = (param: QueryParam): param is Buffer | Uint8Array | Blob => {
+const isBlob = (param: QueryParam): param is Buffer | Uint8Array => {
   return param !== null &&
     typeof param === 'object' && (
       Buffer.isBuffer(param) ||
-      param instanceof Uint8Array ||
-      param instanceof Blob
+      param instanceof Uint8Array
     )
 }
 

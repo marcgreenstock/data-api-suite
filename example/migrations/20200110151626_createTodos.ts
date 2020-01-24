@@ -3,16 +3,15 @@ import { MigrationFn } from 'data-api-migrations'
 export const up: MigrationFn = async (dataAPI) => {
   const t = await dataAPI.beginTransaction()
   try {
-    await t.executeStatement({
-      sql: `
-        CREATE TABLE todos (
-          id SERIAL PRIMARY KEY,
-          name character varying,
-          "createdAt" TIMESTAMP DEFAULT now(),
-          "completedAt" TIMESTAMP
+    await t.query(`
+      CREATE TABLE "todos" (
+        "id" uuid DEFAULT uuid_generate_v1() PRIMARY KEY,
+        "name" varchar,
+        "completedAt" timestamp,
+        "createdAt" timestamp DEFAULT now(),
+        "updatedAt" timestamp DEFAULT now()
       )
-      `
-    })
+    `)
     await t.commit()
   } catch (error) {
     await t.rollback()
@@ -23,7 +22,7 @@ export const up: MigrationFn = async (dataAPI) => {
 export const down: MigrationFn = async (dataAPI) => {
   const t = await dataAPI.beginTransaction()
   try {
-    await t.executeStatement({ sql: 'DROP TABLE todos' })
+    await t.query('DROP TABLE "todos"')
     await t.commit()
   } catch (error) {
     await t.rollback()

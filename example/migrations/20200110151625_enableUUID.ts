@@ -1,18 +1,9 @@
 import { MigrationFn } from 'data-api-migrations'
 
 export const up: MigrationFn = async (dataAPI) => {
-  const t = await dataAPI.beginTransaction();
+  const t = await dataAPI.beginTransaction()
   try {
-    await t.executeStatement({
-      sql: `
-        CREATE TABLE foobar (
-          id SERIAL PRIMARY KEY,
-          name character varying,
-          "createdAt" TIMESTAMP DEFAULT now(),
-          "completedAt" TIMESTAMP
-      )
-      `
-    })
+    await t.query('create extension "uuid-ossp"')
     await t.commit()
   } catch (error) {
     await t.rollback()
@@ -23,7 +14,7 @@ export const up: MigrationFn = async (dataAPI) => {
 export const down: MigrationFn = async (dataAPI) => {
   const t = await dataAPI.beginTransaction()
   try {
-    await t.executeStatement({ sql: 'DROP TABLE foobar' })
+    await t.query('drop extension "uuid-ossp"')
     await t.commit()
   } catch (error) {
     await t.rollback()
