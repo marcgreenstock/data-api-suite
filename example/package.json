@@ -2,23 +2,21 @@
   "name": "example",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "link:aurora-data-api": "npm link ../packages/aurora-data-api",
-    "link:data-api-local": "npm link ../packages/data-api-local",
-    "link:data-api-local-serverless": "npm link ../packages/data-api-local-serverless",
-    "link:data-api-migrations": "npm link ../packages/data-api-migrations",
-    "link:data-api-migrations-serverless": "npm link ../packages/data-api-migrations-serverless",
-    "bootstrap": "npm run link:aurora-data-api && npm run link:data-api-local && npm run link:data-api-local-serverless && npm run link:data-api-migrations && npm run link:data-api-migrations-serverless"
-  },
-  "author": "",
+  "private": true,
   "license": "MIT",
   "dependencies": {
-    "aurora-data-api": "file:../packages/aurora-data-api"
+    "aurora-data-api": "0.0.0",
+    "http-errors": "^1.7.3",
+    "middy": "^0.33.2",
+    "yup": "^0.28.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.39",
+    "@types/http-errors": "^1.6.3",
     "@types/node": "^13.1.6",
+    "@types/yup": "^0.26.27",
+    "data-api-local-serverless": "0.0.2-alpha.8",
+    "data-api-migrations-serverless": "0.0.0",
     "serverless": "^1.60.5",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-typescript": "^1.1.9",

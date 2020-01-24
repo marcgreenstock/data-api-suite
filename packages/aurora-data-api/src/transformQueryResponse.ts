@@ -1,19 +1,15 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 
-interface ObjLit {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
-}
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type _JSON = Record<string | number, any>
 type BasicValue = null | string | number | boolean
 type FieldValue = BasicValue | RDSDataService._Blob
 type ArrayValue = Array<BasicValue | ArrayValue>
 type Value = FieldValue | ArrayValue
-type TransformedValue = Value | ObjLit | ObjLit[] | Date | Date[]
+type TransformedValue = Value | _JSON | _JSON[] | Date | Date[]
 
-export interface UnknownRow {
-  [key: string]: unknown;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type UnknownRow = Record<string | number, any>
 
 export interface Metadata {
   [name: string]: RDSDataService.ColumnMetadata;
@@ -43,7 +39,7 @@ const defaultValueTransformer = (
       case 'json':
       case 'json[]':
       case 'jsonb':
-      case 'jsonb[]': 
+      case 'jsonb[]':
         return JSON.parse(value)
       case 'timestamp':
       case 'timestamp[]':
@@ -62,7 +58,7 @@ const transformArrayValue = (
   if (value.longValues !== undefined) { return value.longValues }
   if (value.doubleValues !== undefined) { return value.doubleValues }
   if (value.booleanValues !== undefined) { return value.booleanValues }
-  if (value.arrayValues !== undefined) { 
+  if (value.arrayValues !== undefined) {
     return value.arrayValues.map((arrayValue) => transformArrayValue(arrayValue))
   }
   return []
@@ -95,29 +91,29 @@ export const transformQueryResponse = <T = UnknownRow>(
   }
 
   const metadata = columnMetadata.reduce<Metadata>((result, metadatum, index) => {
-    const name = metadatum.name || `$${index}`
+    const key = metadatum.name || index
     return {
       ...result,
-      [name]: metadatum
+      [key]: metadatum
     }
   }, {})
 
   const rows = records.map((fieldList) => {
     return fieldList.reduce((row, field, index) => {
       const metadatum = columnMetadata[index]
-      const name = metadatum.name || `$${index}`
+      const key = metadatum.name || index
       const value = transformFieldValue(field)
 
       if (typeof valueTransformer === 'function') {
         const nextFn = (): TransformedValue => defaultValueTransformer(value, metadatum)
         return {
           ...row,
-          [name]: valueTransformer(value, metadatum, nextFn)
+          [key]: valueTransformer(value, metadatum, nextFn)
         }
       } else {
         return {
           ...row,
-          [name]: defaultValueTransformer(value, metadatum)
+          [key]: defaultValueTransformer(value, metadatum)
         }
       }
     }, {})

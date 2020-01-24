@@ -23,8 +23,8 @@ provider:
 
 plugins:
   - serverless-plugin-typescript
-  - ../packages/data-api-migrations-serverless/lib
-  - ../packages/data-api-local-serverless/lib
+  - data-api-migrations-serverless
+  - data-api-local-serverless
   - serverless-offline
 
 custom:
@@ -44,16 +44,16 @@ custom:
       maxRetries: 0
       secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
       resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
-      database: my-app   
+      database: my-app
       credentials:
         accessKeyId: example
-        secretAccessKey: example     
+        secretAccessKey: example
     prod:
       region: ${self:provider.region}
       secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
       resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
       database: ${self:provider.environment.DATABASE_NAME}
-    
+
 functions:
   todoIndex:
     handler: handler.todoIndex
@@ -61,7 +61,7 @@ functions:
       - http:
           path: todos
           method: get
-  
+
   todoShow:
     handler: handler.todoShow
     events:
@@ -72,3 +72,30 @@ functions:
             parameters:
               paths:
                 id: true
+
+  createTodo:
+    handler: handler.createTodo
+    events:
+      - http:
+          path: todos
+          method: post
+
+  updateTodo:
+    handler: handler.updateTodo
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+          parameters:
+            paths:
+              id: true
+
+  # deleteTodo:
+  #   handler: handler.deleteTodo
+  #   events:
+  #     - http:
+  #         path: todos/{id}
+  #         method: deleteTodo
+  #         parameters:
+  #           paths:
+  #             id: true

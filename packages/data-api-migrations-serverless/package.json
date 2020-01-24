@@ -1,6 +1,6 @@
 {
   "name": "data-api-migrations-serverless",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
   "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-migrations-serverless",
   "repository": {
@@ -26,9 +26,9 @@
     "lib"
   ],
   "scripts": {
-    "build": "npm run clean && npm run compile",
+    "build": "npm run compile",
     "clean": "rm -rf ./lib",
-    "compile": "tsc -b tsconfig.build.json",
+    "compile": "tsc -b tsconfig.build.json --force --verbose",
     "prepare": "npm run build"
   },
   "license": "MIT",

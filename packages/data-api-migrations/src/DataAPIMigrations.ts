@@ -60,13 +60,13 @@ export class DataAPIMigrations {
     return filePath
   }
 
-  public async getAppliedMigrationIds (): Promise<number[]> {
+  public async getAppliedMigrationIds (): Promise<string[]> {
     await this.ensureMigrationTable()
-    const result = await this.dataAPI.query<{id: number}>('SELECT id FROM __migrations__')
+    const result = await this.dataAPI.query<{id: string}>('SELECT id FROM __migrations__')
     return result.rows.map((row) => row.id)
   }
 
-  public async applyMigrations (): Promise<number[]> {
+  public async applyMigrations (): Promise<string[]> {
     const [migrations, compiler] = await this.bootstrap()
     const migrationsToRun = migrations.filter((migration) => !migration.isApplied)
     try {
@@ -80,7 +80,7 @@ export class DataAPIMigrations {
     }
   }
 
-  public async rollbackMigrations (): Promise<number[]> {
+  public async rollbackMigrations (): Promise<string[]> {
     const [migrations, compiler] = await this.bootstrap()
     const migrationsToRun = migrations.filter((migration) => migration.isApplied).slice(-1, migrations.length)
     try {
@@ -103,7 +103,7 @@ export class DataAPIMigrations {
     })
     const appliedMigrationIds = await this.getAppliedMigrationIds()
     const files = await compiler.compile()
-    const migrations = 
+    const migrations =
       files
       .map((file) => {
         const fileName = path.basename(file, '.js')
@@ -111,17 +111,17 @@ export class DataAPIMigrations {
         if (!match || !match.groups || !match.groups.id || !match.groups.name) {
           return null
         } else {
-          const id = parseInt(match.groups.id)
+          const id = match.groups.id
           const name = match.groups.name
           return { id, name, file }
         }
       })
       .filter((data) => data !== null)
-      .sort((a, b) => a.id - b.id)
-      .map(({ id, ...data }) => new Migration({ 
+      .sort((a, b) => parseInt(a.id) - parseInt(b.id))
+      .map(({ id, ...data }) => new Migration({
         id,
         ...data,
-        dataAPI: this.dataAPI, 
+        dataAPI: this.dataAPI,
         isLocal: this.isLocal,
         isApplied: appliedMigrationIds.includes(id)
       }))
@@ -130,7 +130,7 @@ export class DataAPIMigrations {
 
   private async ensureMigrationTable (): Promise<void> {
     await this.dataAPI.query(
-      'CREATE TABLE IF NOT EXISTS __migrations__ (id bigint NOT NULL UNIQUE)',
+      'CREATE TABLE IF NOT EXISTS __migrations__ (id varchar NOT NULL UNIQUE)',
       undefined,
       { includeResultMetadata: false }
     )

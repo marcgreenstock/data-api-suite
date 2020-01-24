@@ -146,7 +146,7 @@ export class PostgresClient implements Client {
 
   private async query ({ query, values }: { query: string; values?: unknown[] }): Promise<QueryArrayResult> {
     try {
-      return this.client.query({ text: query, values, rowMode: 'array' })
+      return await this.client.query({ text: query, values, rowMode: 'array' })
     } catch (error) {
       throw createError(400, `${error.severity}: ${error.message}\n  Position: ${error.position}`)
     }

@@ -1,72 +1,148 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
+import * as Errors from './Errors'
 
-export type ParamValue = string | number | boolean
-export type ParamArrayValue = (string | number | boolean | ParamArrayValue)[]
+type ParamValue = null | string | number | boolean | Buffer | Uint8Array | Blob | Date | CustomValue
+type ParamArray = (boolean | string | number | Date | CustomValue | ParamArray)[]
+
+export interface CustomValue {
+  toSqlParameter (): SqlParameter;
+}
+export type SqlParameter = Omit<RDSDataService.SqlParameter, 'name'>
+export type QueryParam = ParamValue | ParamArray | SqlParameter
 export interface QueryParams {
-  [name: string]: ParamValue | ParamArrayValue | Omit<RDSDataService.SqlParameter, 'name'>;
+  [name: string]: QueryParam;
 }
 
-const transformParamArrayValue = (paramValueArray: ParamArrayValue): RDSDataService.ArrayValue => {
-  return paramValueArray.reduce<RDSDataService.ArrayValue>((result, paramValue) => {
-    if (paramValue instanceof Array) {
-      const arrayValues = result.arrayValues || []
-      return {
-        ...result,
-        arrayValues: [...arrayValues, transformParamArrayValue(paramValue)]
-      }
+const isSqlParameter = (param: QueryParam): param is SqlParameter => {
+  const keys = ['arrayValue', 'blobValue', 'booleanValue', 'doubleValue', 'isNull', 'longValue', 'stringValue']
+  return param !== null &&
+    typeof param === 'object' &&
+    'value' in param &&
+    typeof param.value === 'object' &&
+    Object.keys(param.value).some((key) => keys.includes(key))
+}
+
+const isBlob = (param: QueryParam): param is Buffer | Uint8Array | Blob => {
+  return param !== null &&
+    typeof param === 'object' && (
+      Buffer.isBuffer(param) ||
+      param instanceof Uint8Array ||
+      param instanceof Blob
+    )
+}
+
+const isCustomValue = (param: QueryParam): param is CustomValue => {
+  return typeof param === 'object' && typeof param['toSqlParameter'] === 'function'
+}
+
+const mergeArrayValue = <K extends keyof RDSDataService.ArrayValue>(
+  result: SqlParameter,
+  key: K,
+  value: RDSDataService.ArrayValue[K][0]
+): SqlParameter => ({
+  ...result,
+  value: {
+    ...result.value,
+    arrayValue: {
+      ...result.value.arrayValue,
+      [key]: [
+        ...result.value.arrayValue[key] || [],
+        value
+      ]
     }
-    if (typeof paramValue === 'boolean') {
-      const booleanValues = result.booleanValues || []
-      return {
-        ...result,
-        booleanValues: [...booleanValues, paramValue]
-      }
-    }
-    if (typeof paramValue === 'number') {
-      if (Number.isInteger(paramValue)) {
-        const longValues = result.longValues || []
-        return {
-          ...result,
-          longValues: [...longValues, paramValue]
+  }
+})
+
+const transformQueryParamArray = (paramArray: ParamArray): SqlParameter => {
+  return paramArray.reduce<SqlParameter>((result, value) => {
+    switch (typeof value) {
+      case 'object':
+        if (Array.isArray(value)) {
+          const sqlParameter = transformQueryParamArray(value)
+          return mergeArrayValue({
+            ...result,
+            typeHint: sqlParameter.typeHint
+          }, 'arrayValues', sqlParameter.value.arrayValue)
         }
-      }
-      const doubleValues = result.doubleValues || []
-      return {
-        ...result,
-        doubleValues: [...doubleValues, paramValue]
-      }
+        if (isCustomValue(value)) {
+          const sqlParameter = value.toSqlParameter()
+          return Object.entries(sqlParameter.value).reduce((result, [key, value]) => {
+            const pluralKey = `${key}s` as keyof RDSDataService.ArrayValue
+            return mergeArrayValue(result, pluralKey, value)
+          }, {
+            ...result,
+            typeHint: sqlParameter.typeHint
+          })
+        }
+        if (value instanceof Date) {
+          return mergeArrayValue({
+            ...result,
+            typeHint: 'TIMESTAMP'
+          }, 'stringValues', value.toISOString())
+        }
+        break
+      case 'boolean':
+        return mergeArrayValue(result, 'booleanValues', value)
+      case 'number':
+        if (Number.isInteger(value)) {
+          return mergeArrayValue(result, 'longValues', value)
+        } else {
+          return mergeArrayValue(result, 'doubleValues', value)
+        }
+      case 'string':
+        return mergeArrayValue(result, 'stringValues', value)
     }
-    const stringValues = (result.stringValues || []).map((v) => v.toString())
-    return {
-      ...result,
-      stringValues: [...stringValues, paramValue]
+    throw new Error('Type not supported.')
+  }, {
+    value: {
+      arrayValue: {}
     }
-  }, {})
-} 
-
-const transformParamValue = (value: ParamValue | ParamArrayValue): RDSDataService.Field => {
-  if (Array.isArray(value)) {
-    return { arrayValue: transformParamArrayValue(value) }
-  }
-  if (typeof value === 'boolean') {
-    return { booleanValue: value }
-  }
-  if (typeof value === 'number') {
-    if (Number.isInteger(value)) {
-      return { longValue: value }
-    } else {
-      return { doubleValue: value }
-    }
-  }
-  return { stringValue: value }
+  })
 }
 
-export const transformQueryParams = (params: QueryParams): RDSDataService.SqlParametersList => {
+const transformQueryParam = (value: QueryParam): SqlParameter => {
+  if (value === null || value === undefined) {
+    return { value: { isNull: true } }
+  }
+  switch (typeof value) {
+    case 'object':
+      if (isSqlParameter(value)) {
+        return value
+      }
+      if (isBlob(value)) {
+        return { value: { blobValue: value.valueOf() } }
+      }
+      if (Array.isArray(value)) {
+        return transformQueryParamArray(value)
+      }
+      if (isCustomValue(value)) {
+        return value.toSqlParameter()
+      }
+      if (value instanceof Date) {
+        return { typeHint: 'TIMESTAMP', value: { stringValue: value.toISOString() } }
+      }
+      break
+    case 'boolean':
+      return { value: { booleanValue: value } }
+    case 'number':
+      if (Number.isInteger(value)) {
+        return { value: { longValue: value } }
+      } else {
+        return { value: { doubleValue: value }}
+      }
+    case 'string':
+      return { value: { stringValue: value } }
+  }
+  throw new Error('Type not supported.')
+}
+
+export const transformQueryParams = (params: QueryParams): SqlParameter[] => {
   return Object.entries(params).map(([name, paramValue]) => {
-    if (typeof paramValue === 'object' && !Array.isArray(paramValue)) {
-      return { name, ...paramValue }
+    try {
+      const sqlParameter = transformQueryParam(paramValue)
+      return { name, ...sqlParameter }
+    } catch (error) {
+      throw new Errors.QueryParamError(name, error)
     }
-    const value = transformParamValue(paramValue)
-    return { name, value }
   })
 }

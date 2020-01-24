@@ -62,8 +62,8 @@ class Transaction {
 
   /**
    * Runs a SQL statement against a database.
-   * 
-   * The response size limit is 1 MB or 1,000 records. 
+   *
+   * The response size limit is 1 MB or 1,000 records.
    * If the call returns more than 1 MB of response data or over 1,000 records, the call is terminated.
    * @param sql - The SQL query string to perform.
    * @param [params] - `name`, `value` object with the `name` representing the `:name` placeholder in the `sql` argument and the value either a `string`, `boolean` or `number` type, or as a `RDSDataService.Field` (without `name`).
@@ -83,7 +83,7 @@ class Transaction {
       schema,
       secretArn,
       valueTransformer,
-    } = { 
+    } = {
       ...this.requestConfig,
       ...options
     }

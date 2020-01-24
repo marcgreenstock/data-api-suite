@@ -1,8 +1,12 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
+import * as Errors from './Errors'
 import * as Transaction from './Transaction'
-import { 
-  transformQueryParams, 
-  QueryParams 
+import {
+  transformQueryParams,
+  CustomValue,
+  SqlParameter,
+  QueryParam,
+  QueryParams,
 } from './transformQueryParams'
 import {
   transformQueryResponse,
@@ -10,18 +14,37 @@ import {
   TransformedQueryResult,
   TransformQueryResponseOptions,
   UnknownRow,
-  ValueTransformer
+  ValueTransformer,
 } from './transformQueryResponse'
+import {
+  JSONValue,
+  BlobValue,
+} from  './customValues'
 
 declare namespace AuroraDataAPI {
-  export { 
-    Metadata,
-    QueryParams, 
-    RDSDataService,
+  export {
+    Errors,
     Transaction,
+    RDSDataService,
+  }
+
+  export {
+    CustomValue,
+    QueryParam,
+    QueryParams,
+    SqlParameter,
+  }
+
+  export {
+    Metadata,
     ValueTransformer,
     TransformQueryResponseOptions,
     UnknownRow,
+  }
+
+  export {
+    JSONValue,
+    BlobValue,
   }
 
   export interface RequestConfig {
@@ -54,7 +77,7 @@ declare namespace AuroraDataAPI {
   export type CommitTransactionResult = RDSDataService.CommitTransactionResponse
 
   export type RollbackTransactionOptions = CommitTransactionOptions
-  
+
   export type RollbackTransactionResult = RDSDataService.RollbackTransactionResponse
 
   export interface QueryOptions extends TransformQueryResponseOptions {
@@ -89,7 +112,7 @@ declare namespace AuroraDataAPI {
 
   export interface BatchExecuteStatementOptions extends BatchQueryOptions {
     sql: RDSDataService.SqlStatement;
-    parameterSets?: RDSDataService.SqlParameterSets; 
+    parameterSets?: RDSDataService.SqlParameterSets;
   }
 
   export type BatchExecuteStatementResult = RDSDataService.BatchExecuteStatementResponse
@@ -195,7 +218,7 @@ class AuroraDataAPI {
 
   public async query<T = UnknownRow> (
     sql: string,
-    params?: QueryParams,
+    params?: AuroraDataAPI.QueryParams,
     options: AuroraDataAPI.QueryOptions = {},
   ): Promise<AuroraDataAPI.QueryResult<T>> {
     const methodOptions = {
@@ -203,7 +226,7 @@ class AuroraDataAPI {
       parseTimestamps: true,
       ...options,
     }
-    const { 
+    const {
       valueTransformer,
       ...executeStatementOptions
     } = methodOptions
@@ -217,8 +240,8 @@ class AuroraDataAPI {
       sql,
       parameters,
     })
-    const transformedResult = executeStatementOptions.includeResultMetadata 
-      ? transformQueryResponse<T>(result, transformOptions) 
+    const transformedResult = executeStatementOptions.includeResultMetadata
+      ? transformQueryResponse<T>(result, transformOptions)
       : undefined
     return {
       ...result,
@@ -260,7 +283,7 @@ class AuroraDataAPI {
 
   public async batchQuery (
     sql: string,
-    params?: QueryParams[],
+    params?: AuroraDataAPI.QueryParams[],
     options?: AuroraDataAPI.BatchQueryOptions,
   ): Promise<AuroraDataAPI.BatchQueryResult> {
     const parameterSets = params?.map(transformQueryParams)
@@ -297,4 +320,12 @@ class AuroraDataAPI {
     }).promise()
   }
 }
+
+Object.assign(AuroraDataAPI, {
+  Errors,
+  Transaction,
+  JSONValue,
+  BlobValue
+})
+
 export = AuroraDataAPI

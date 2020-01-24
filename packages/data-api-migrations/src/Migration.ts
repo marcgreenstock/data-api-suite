@@ -1,7 +1,7 @@
 import * as AuroraDataAPI from 'aurora-data-api'
 
 export class Migration {
-  public readonly id: number
+  public readonly id: string
   public readonly name: string
   public readonly file: string
   public readonly isApplied: boolean
@@ -29,8 +29,8 @@ export class Migration {
     const { up } = await import(this.file)
     await up(this.dataAPI, this)
     await this.dataAPI.query(
-      'INSERT INTO __migrations__ (id) VALUES (:id)', 
-      { id: this.id }, 
+      'INSERT INTO __migrations__ (id) VALUES (:id)',
+      { id: this.id },
       { includeResultMetadata: false }
     )
   }

@@ -120,10 +120,10 @@ test('missing name in metadata', () => {
   })
   expect(result).toMatchObject({
     metadata: {
-      $0: { typeName: 'varchar' },
-      $1: { typeName: 'int8' }
+      0: { typeName: 'varchar' },
+      1: { typeName: 'int8' }
     },
-    rows: [{ $0: 'hello world', $1: 7 }]
+    rows: [{ 0: 'hello world', 1: 7 }]
   })
 })
 
@@ -134,9 +134,9 @@ describe('arrayValue', () => {
         name: 'example'
       }],
       records: [
-        [{ 
+        [{
           arrayValue: {
-            stringValues: ['foo', 'bar'] 
+            stringValues: ['foo', 'bar']
           }
         }]
       ]
@@ -155,9 +155,9 @@ describe('arrayValue', () => {
         name: 'example'
       }],
       records: [
-        [{ 
+        [{
           arrayValue: {
-            longValues: [1, 2] 
+            longValues: [1, 2]
           }
         }]
       ]
@@ -176,9 +176,9 @@ describe('arrayValue', () => {
         name: 'example'
       }],
       records: [
-        [{ 
+        [{
           arrayValue: {
-            doubleValues: [1.1, 2.1] 
+            doubleValues: [1.1, 2.1]
           }
         }]
       ]
@@ -197,9 +197,9 @@ describe('arrayValue', () => {
         name: 'example'
       }],
       records: [
-        [{ 
+        [{
           arrayValue: {
-            booleanValues: [true, false] 
+            booleanValues: [true, false]
           }
         }]
       ]
@@ -211,14 +211,14 @@ describe('arrayValue', () => {
       rows: [{ example: [true, false] }]
     })
   })
-  
+
   test('arrayValues', () => {
     const result = transformQueryResponse({
       columnMetadata: [{
         name: 'example'
       }],
       records: [
-        [{ 
+        [{
           arrayValue: {
             arrayValues: [{
               booleanValues: [true, false]
@@ -245,9 +245,9 @@ describe('arrayValue', () => {
         name: 'example'
       }],
       records: [
-        [{ 
+        [{
           arrayValue: {
-            weirdValues: ['foo', 'bar'] 
+            weirdValues: ['foo', 'bar']
           }
         }]
       ]
@@ -348,10 +348,10 @@ test('custom valueTransformer', () => {
     rows: [{
       example1: 'DOG',
       example2: [
-        ['a.a', 'a.b'], 
+        ['a.a', 'a.b'],
         ['b.a', 'b.b']
-      ], 
-      example3: 87 
+      ],
+      example3: 87
     }]
   })
 })
