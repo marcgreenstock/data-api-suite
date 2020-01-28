@@ -154,11 +154,11 @@ Constructs a new instance of `AuroraDataAPI`.
 | ---- | ----------- |
 | [`query`](#auroradataapiquery) | Performs an SQL query. |
 | [`batchQuery`](#auroradataapibatchquery) | Runs a batch SQL statement over an array of data. |
-| [`beginTransaction`](auroradataapibegintransaction) | Starts a SQL transaction. |
+| [`beginTransaction`](#auroradataapibegintransaction) | Starts a SQL transaction. |
 | [`commitTransaction`](#auroradataapicommittransaction) | Commits and ends a SQL transaction. |
 | [`rollbackTransaction`](#auroradataapirollbacktransaction) | Rolls-back and ends a SQL transaction. |
-| [`executeStatement`](auroradataapiexecutestatement) | Abstraction of the [`RDSDataService#executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) method. |
-| [`batchExecuteStatement`](auroradataapibbatchexecutstatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method. |
+| [`executeStatement`](#auroradataapiexecutestatement) | Abstraction of the [`RDSDataService#executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) method. |
+| [`batchExecuteStatement`](#auroradataapibbatchexecutstatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method. |
 
 ### `AuroraDataAPI#query`
 
@@ -411,7 +411,7 @@ From the [SDK docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSD
 
 | Name | Description |
 | ---- | ----------- |
-| [`query`](#auroradataapitransactionqquery) | Performs an SQL query in the transaction. |
+| [`query`](#auroradataapitransactionquery) | Performs an SQL query in the transaction. |
 | [`batchQuery`](#auroradataapitransactionbatchquery) | Performs an SQL query over an array of data in the transaction. |
 | [`commit`](#auroradataapitransactioncommit) | Commits and ends the transaction. |
 | [`rollback`](#auroradataapitransactionrollback) | Rolls-back and ends the transaction. |
