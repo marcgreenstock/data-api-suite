@@ -97,9 +97,9 @@ Results are also simplified by transforming the records into a ready-to-use JS o
 }
 ```
 
-## [Data API for Aurora Serverless Suite](../../#readme)
+## [Data API for Aurora Serverless Suite](../..#readme)
 
-This library is part of the **[Data API for Aurora Serverless Suite](../../#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+This library is part of the **[Data API for Aurora Serverless Suite](../..#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
 
 ## Installation
 
