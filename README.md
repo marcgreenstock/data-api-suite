@@ -13,7 +13,7 @@ Each package has its own `README` with independent documentation.
 
 | Name | Description |
 | ---- | ----------- |
-| [`aurora-data-api`](packages/aurora-data-api) | [![NPM](https://img.shields.io/npm/v/aurora-data-api.svg)](https://www.npmjs.com/package/aurora-data-api)<br />An abstraction of the [RDSDataService](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) that implements the [Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html) and simplifies the request and response payloads.
+| [`aurora-data-api`](packages/aurora-data-api) | [![NPM](https://img.shields.io/npm/v/aurora-data-api.svg)](https://www.npmjs.com/package/aurora-data-api)<br />An abstraction of the [RDSDataService](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) that implements the [Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html) and simplifies the request and response payloads. |
 
 ### Serverless Framework Plugins
 
@@ -21,7 +21,7 @@ The following libraries are designed to work with the [Serverless Framework](htt
 
 | Name | Description |
 | ---- | ----------- |
-| [`data-api-local-serverless`](packages/data-api-local-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)<br />A Serverless plugin to start a local Aurora Serverless Data API server for offline development that plays nice with [`serverless-ofline`](https://github.com/dherault/serverless-offline). | 
+| [`data-api-local-serverless`](packages/data-api-local-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)<br />A Serverless plugin to start a local Aurora Serverless Data API server for offline development that plays nice with [`serverless-ofline`](https://github.com/dherault/serverless-offline). |
 | [`data-api-migrations-serverless`](packages/data-api-migrations-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-migrations-serverless.svg)](https://www.npmjs.com/package/data-api-migrations-serverless)<br />A Serverless plugin to generate, apply and rollback migrations on the Data API for Aurora Serverless. Plays nice with [`data-api-local-serverless`](packages/data-api-local-serverless). |
 
 ### Node.js Local Development Tools
@@ -35,7 +35,7 @@ The following libraries are designed to be used in a node.js environment.
 
 ## Example
 
-There is an example app that uses all of the above packages in the [example](migrations/example) folder. 
+There is an example app that uses all of the above packages in the [example](./example) folder. 
 
 ## Contributing
 
