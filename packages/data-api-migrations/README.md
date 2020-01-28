@@ -1,44 +1,39 @@
-# DataAPI Migrations
+# Data API Migrations
 
-```ts
-// migrations/20200103112043_createUsers.ts
+[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions) [![NPM](https://img.shields.io/npm/v/data-api-migrations.svg)](https://www.npmjs.com/package/data-api-migrations)
 
-import { UpMigration, DownMigration } from 'data-api-local-migrations'
+## Sumary
 
-const parameterSets = ['foo@example.com', 'bar@example.com'].map((email) => [{
-  name: 'email',
-  value: {
-    stringValue: email
-  }
-}])
+This is the core library for [data-api-migrations-serverless](../data-api-migrations-serverless). It is presently not intended for standalone use.
 
-export const up: UpMigration = async (client) => {
-  const transaction = await client.beginTransaction()
-  try {
-    await transaction.executeStatement({
-      sql: 'CREATE TABLE users (id INT, email VARCHAR)'
-    })
-    await transaction.batchExecuteStatement({
-      sql: 'INSERT INTO users (email) VALUES (:email)',
-      parameterSets
-    })
-    await transaction.commit()
-  } catch (error) {
-    await transaction.rollback()
-    throw error // ensure error is thrown to prevent subsequent migrations from running
-  }
-}
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local)
 
-export const down: DownMigration = async (client) => {
-  const transaction = await proxy.beginTransaction()
-  try {
-    await transaction.executeStatement({
-      sql: 'DROP TABLE users'
-    })
-    await transaction.commit()
-  } catch (error) {
-    await transaction.rollback()
-    throw error // ensure error is thrown to prevent subsequent rollbacks from running
-  }
-}
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+
+## Installation
+
+```sh
+$ npm install data-api-migrations --save-dev
 ```
+
+## MIT License
+
+Copyright (c) 2020 Marc Greenstock
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
