@@ -85,7 +85,7 @@ custom:
 
 ## Migration files
 
-Migrations files are created in the`[PROJECT_ROOT]/migrations` folder and each file exports two functions: `up` to apply migrations and `down` to rollback migrations.
+Migrations files are created in the `[PROJECT_ROOT]/migrations` folder and each file exports two functions: `up` to apply migrations and `down` to rollback migrations.
 
 ```ts
 // migrations/20200103112043_createUsers.ts
