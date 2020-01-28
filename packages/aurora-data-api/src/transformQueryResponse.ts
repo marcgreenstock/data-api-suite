@@ -19,10 +19,6 @@ export interface ValueTransformer<T = unknown> {
   (value: Value, metadata: RDSDataService.ColumnMetadata, nextFn: Function): T;
 }
 
-export interface TransformQueryResponseOptions {
-  valueTransformer?: ValueTransformer;
-}
-
 export interface TransformedQueryResult<T> {
   rows: T[] | null;
   metadata: Metadata | null;
@@ -78,10 +74,9 @@ const transformFieldValue = (
 
 export const transformQueryResponse = <T = UnknownRow>(
   result: RDSDataService.ExecuteStatementResponse,
-  options?: TransformQueryResponseOptions
+  valueTransformer?: ValueTransformer,
 ): TransformedQueryResult<T> => {
   const { records, columnMetadata } = result
-  const { valueTransformer } = { ...options }
 
   if (records === undefined || columnMetadata === undefined) {
     return {

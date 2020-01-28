@@ -1,6 +1,8 @@
 # AuroraDataAPI
 
-[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions)
+[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions) [![NPM](https://img.shields.io/npm/v/data-api-migrations-serverless.svg)](https://www.npmjs.com/package/data-api-migrations-serverless)
+
+## Summary
 
 **AuroraDataAPI** is an abstraction of the [RDSDataService](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) that implements the [Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html).
 
@@ -33,10 +35,10 @@ Results are also simplified by transforming the records into a ready-to-use JS o
     {
       id: 7,
       name: 'Filip J Fry'
-    }, 
+    },
     {
       id: 9,
-      name: 'Bender Bending Rrodregius'
+      name: 'Bender Bending Rodriguez'
     }
   ],
   metadata: {
@@ -74,7 +76,7 @@ Results are also simplified by transforming the records into a ready-to-use JS o
         longValue: 9
       },
       {
-        stringValue: 'Bender Bending Rrodregius'
+        stringValue: 'Bender Bending Rodriguez'
       }
     ]
   ],
@@ -95,6 +97,10 @@ Results are also simplified by transforming the records into a ready-to-use JS o
 }
 ```
 
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local)
+
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+
 ## Installation
 
 ```sh
@@ -105,7 +111,6 @@ $ npm install aurora-data-api --save
 
 ```ts
 import * from AuroraDataAPI
-
 const auroraDataAPI = new AuroraDataAPI({ ...config })
 auroraDataAPI.query('SELECT * FROM users').then(console.log)
 ```
@@ -113,34 +118,37 @@ auroraDataAPI.query('SELECT * FROM users').then(console.log)
 ## AuroraDataAPI#constructor
 
 ```ts
-new AuroraDataAPI(config: AuroraDataAPIConfig) => AuroraDataAPI
+new AuroraDataAPI(
+  config: AuroraDataAPI.Config
+) => AuroraDataAPI
 ```
 
 Constructs a new instance of `AuroraDataAPI`.
 
 #### Config
 
-| Name | Description | Required |
-| ---- | ----------- | -------- |
-| `resourceArn`| "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^executeStatement] | Yes |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^executeStatement] | Yes |
-| `database` | "The name of the database." [^executeStatement] | No |
-| `schema` | "The name of the database schema." [^executeStatement] | No |
-| `continueAfterTimeout` | "A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures." [^executeStatement] | No |
-| `resultSetOptions` | "Options that control how the result set is returned." [^executeStatement] | No |
-| `valueTransformer` | See [Value Transformer](#Value-Transformer). | No |
-| `...rest` | Unspecified properties (i.e. properties from `RDSDataService.ClientConfiguration`) will be used to construct the `RDSDataService` client. [See the AWS SDK docs for more info.](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#constructor-property) | Conditional - see note below. |
+| Name | Description | Required | Default |
+| ---- | ----------- | -------- | -------- |
+| `resourceArn`| The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Yes | `undefined` |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Yes | `undefined` |
+| `database` | The name of the database. | No | `undefined` |
+| `schema` | The name of the database schema. | No | `undefined` |
+| `includeResultMetadata` | A value that indicates whether to include metadata in the results. **Note**: must be `true` for the results to be transformed. | No | `true` |
+| `continueAfterTimeout` | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures. | No | `undefined` |
+| `resultSetOptions` | Options that control how the result set is returned. | No | `undefined` |
+| `valueTransformer` | See [Value Transformer](#Value-Transformer). | No | `undefined` |
+| `...rest` | Unspecified properties (i.e. properties from `RDSDataService.ClientConfiguration`) will be used to construct the `RDSDataService` client. [See the AWS SDK docs for more info.](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#constructor-property) | Conditional - see note below. | `undefined` |
 
 **Note**: The `RDSDataService` can be constructed without any properties, for instance when the [Global Configuration Object](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/global-config-object.html) is set.
 
 #### Class Properties
 
-| Name | Description | 
+| Name | Description |
 | ---- | ----------- |
 | `client` | Instance of the [`RDSDataService`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html). |
 | `requestConfig` | Object containing properties to send to the [`RDSDataService`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) methods. |
 
-## AuroraDataAPI Methods
+## `AuroraDataAPI` methods
 
 | Name | Description |
 | ---- | ----------- |
@@ -150,19 +158,21 @@ Constructs a new instance of `AuroraDataAPI`.
 | [`commitTransaction`](#AuroraDataAPI#commitTransaction) | Commits and ends a SQL transaction. |
 | [`rollbackTransaction`](#AuroraDataAPI#rollbackTransaction) | Rolls-back and ends a SQL transaction. |
 | [`executeStatement`](#AuroraDataAPI#executeStatement) | Abstraction of the [`RDSDataService#executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) method. |
-| [`batchExecuteStatement`](#AuroraDataAPI#batchExecuteStatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method. | 
+| [`batchExecuteStatement`](#AuroraDataAPI#batchExecuteStatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method. |
 
 ### `AuroraDataAPI#query`
 
 ```ts
-query(sql: string, params?: QueryParams, options: QueryOptions) => Promise<QueryResult>
+query<T = AuroraDataAPI.UnknownRow>(
+  sql: string,
+  params?: AuroraDataAPI.QueryParams,
+  options?: AuroraDataAPI.QueryOptions
+) => Promise<AuroraDataAPI.QueryResult<T>>
 ```
 
-As mentioned above, `AuroraDataAPI` simplifies the request and response payloads. The query method accepts 3 arguments (2 optional); `sql`, `params` and `options`.
+Performs an SQL statement.
 
-The `options` argument can be used to override any of the `RDSDataService.ExecuteStatementRequest` properties defined in the `AuroraDataAPI` constructor. In addition, the `options` argument also accepts `transactionId` and `includeResultMetadata` and `typeTransformers`.
-
-The `includeResultMetadata` property is `true` by default, and if true will transform the result set in the resolved payload.
+The response size limit is 1 MB or 1,000 records. If the call returns more than 1 MB of response data or over 1,000 records, the call is terminated. 
 
 #### Arguments
 
@@ -172,26 +182,32 @@ The `includeResultMetadata` property is `true` by default, and if true will tran
 | `params` | See [Query Params](#Query-Params). | No |
 | `options` | See options below. | No |
 
-#### Options 
+#### Options
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `includeResultMetadata` | Includes the column metadata also transforms the results. | `true` |
-| `continueAfterTimeout` | "A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures." [^executeStatement] | Defined in constructor. |
-| `database` | "The name of the database." [^executeStatement] | Defined in constructor. |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^executeStatement] | Defined in constructor. |
-| `resultSetOptions` | "Options that control how the result set is returned." [^executeStatement] | Defined in constructor. |
-| `schema` | "The name of the database schema." [^executeStatement] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^executeStatement] | Defined in constructor. |
-| `transactionId` | "The identifier of a transaction that was started by using the BeginTransaction operation. Specify the transaction ID of the transaction that you want to include the SQL statement in." [^executeStatement] | `undefined` |
+| `includeResultMetadata` | A value that indicates whether to include metadata in the results. **Note**: must be `true` for the results to be transformed. | Defined in constructor. |
+| `continueAfterTimeout` | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures. | Defined in constructor. |
+| `database` | The name of the database. | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `resultSetOptions` | Options that control how the result set is returned. | Defined in constructor. |
+| `schema` | The name of the database schema. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
+| `transactionId` | The identifier of a transaction that was started by using the BeginTransaction operation. Specify the transaction ID of the transaction that you want to include the SQL statement in. | `undefined` |
 | `valueTransformer` | See [Value Transformer](#Value-Transformer). | Defined in constructor. |
 
-[^executeStatement]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property
+#### Further reading
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html
 
 ### `AuroraDataAPI#batchQuery`
 
 ```ts
-batchQuery(sql: string, params?: QueryParams[], options?: BatchQueryOptions) => Promise<BatchQueryResult>
+batchQuery(
+  sql: string,
+  params?: AuroraDataAPI.QueryParams[],
+  options?: AuroraDataAPI.BatchQueryOptions
+) => Promise<AuroraDataAPI.BatchQueryResult>
 ```
 
 Runs a batch SQL statement over an array of data.
@@ -200,7 +216,7 @@ Runs a batch SQL statement over an array of data.
 
 | Name | Description | Required |
 | ---- | ----------- | -------- |
-| `sql`  | The SQL query string to perform. [^batchExecuteStatement] | Yes |
+| `sql`  | The SQL query string to perform. | Yes |
 | `params` | An array of [Query Params](#Query-Params). Maximum of 1,000. | No |
 | `options` | See options below. | No |
 
@@ -208,19 +224,21 @@ Runs a batch SQL statement over an array of data.
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `database` | "The name of the database." [^batchExecuteStatement] | Defined in constructor. |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^batchExecuteStatement] | Defined in constructor. |
-| `schema` | "The name of the database schema." [^batchExecuteStatement] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^batchExecuteStatement] | Defined in constructor. |
-| `transactionId` | "The identifier of a transaction that was started by using the BeginTransaction operation. Specify the transaction ID of the transaction that you want to include the SQL statement in." [^batchExecuteStatement] | `undefined` |
+| `database` | The name of the database. | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `schema` | The name of the database schema. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
+| `transactionId` | The identifier of a transaction that was started by using the BeginTransaction operation. Specify the transaction ID of the transaction that you want to include the SQL statement in. | `undefined` |
 
 ### `AuroraDataAPI#beginTransaction`
 
 ```ts
-beginTransaction(options?: BeginTransactionOptions) => Promise<AuroraDataAPITransaction>
+beginTransaction(
+  options?: AuroraDataAPI.BeginTransactionOptions
+) => Promise<AuroraDataAPI.Transaction>
 ```
 
-Starts a SQL transaction and resolves an instance of [`AuroraDataAPITransaction`](#AuroraDataAPITransaction).
+Starts a SQL transaction and resolves an instance of [`AuroraDataAPI.Transaction`](#AuroraDataAPI.Transaction).
 
 From the [AWS SDK Docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#beginTransaction-property):
 
@@ -238,17 +256,23 @@ From the [AWS SDK Docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `database` | "The name of the database." [^beginTransaction] | Defined in constructor. |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^beginTransaction] | Defined in constructor. |
-| `schema` | "The name of the database schema." [^beginTransaction] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^beginTransaction] | Defined in constructor. |
+| `database` | The name of the database. | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `schema` | The name of the database schema. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
 
-[^beginTransaction]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#beginTransaction-property
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#beginTransaction-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_BeginTransaction.html
 
 ### `AuroraDataAPI#commitTransaction`
 
 ```ts
-commitTransaction(transactionId: string, options?: CommitTransactionOptions) => Promise<CommitTransactionResult>
+commitTransaction(
+  transactionId: string,
+  options?: AuroraDataAPI.CommitTransactionOptions
+) => Promise<AuroraDataAPI.CommitTransactionResult>
 ```
 
 Ends a SQL transaction started with the `beginTransaction` method and commits the changes.
@@ -257,22 +281,28 @@ Ends a SQL transaction started with the `beginTransaction` method and commits th
 
 | Name | Description | Required |
 | ---- | ----------- | -------- |
-| `transactionId` | "The identifier of the transaction to end and commit." [^commitTransaction] | Yes |
+| `transactionId` | The identifier of the transaction to end and commit. | Yes |
 | `options` | See options below. | No |
 
 #### Options
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^commitTransaction] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^commitTransaction] | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
 
-[^commitTransaction]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#commitTransaction-property
+#### Further reading
 
-### `AuroraDataAPI#rolllbackTransaction`
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#commitTransaction-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_CommitTransaction.html
+
+### `AuroraDataAPI#rollbackTransaction`
 
 ```ts
-rollbackTransaction(transactionId: string, options?: CommitTransactionOptions) => Promise<RollbackTransactionResult>
+rollbackTransaction(
+  transactionId: string,
+  options?: AuroraDataAPI.CommitTransactionOptions
+) => Promise<AuroraDataAPI.RollbackTransactionResult>
 ```
 
 Ends a SQL transaction started with the `beginTransaction` method and rolls-back the changes.
@@ -281,22 +311,27 @@ Ends a SQL transaction started with the `beginTransaction` method and rolls-back
 
 | Name | Description | Required |
 | ---- | ----------- | -------- |
-| `transactionId` | "The identifier of the transaction to roll back." [^rollbackTransaction] | Yes |
+| `transactionId` | The identifier of the transaction to roll back. | Yes |
 | `options` | See options below. | No |
 
 #### Options
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^rollbackTransaction] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^rollbackTransaction] | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
 
-[^rollbackTransaction]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#rollbackTransaction-property
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#rollbackTransaction-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_RollbackTransaction.html
 
 ### `AuroraDataAPI#executeStatement`
 
 ```ts
-executeStatement(options: ExecuteStatementOptions) => Promise<RDSDataService.ExecuteStatementResponse>
+executeStatement(
+  options: AuroraDataAPI.ExecuteStatementOptions
+) => Promise<RDSDataService.ExecuteStatementResponse>
 ```
 
 Abstraction of the AWS SDK RDSDataService [`executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) operation.
@@ -313,22 +348,31 @@ From the [SDK Docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSD
 | ---- | ----------- | -------- |
 | `options` | See options below. | Yes |
 
+#### Options
+
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `sql` (Required) | "The SQL statement to run." [^executeStatement] | `undefined` |
-| `includeResultMetadata` | Includes the column metadata also transforms the results. | `undefined` |
-| `continueAfterTimeout` | "A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out." [^executeStatement]  | Defined in constructor. |
-| `database` | "The name of the database." [^executeStatement] | Defined in constructor. |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^executeStatement] | Defined in constructor. |
-| `resultSetOptions` | "Options that control how the result set is returned." [^executeStatement] | Defined in constructor. |
-| `schema` | "The name of the database schema." [^executeStatement] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^executeStatement] | Defined in constructor. |
-| `transactionId` | "The identifier of a transaction that was started by using the BeginTransaction operation. Specify the transaction ID of the transaction that you want to include the SQL statement in." [^executeStatement] | `undefined` |
+| `sql` (Required) | The SQL statement to run. | `undefined` |
+| `includeResultMetadata` | Includes the column metadata. | `undefined` |
+| `continueAfterTimeout` | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures. | Defined in constructor. |
+| `database` | The name of the database. | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `resultSetOptions` | Options that control how the result set is returned. | Defined in constructor. |
+| `schema` | The name of the database schema. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
+| `transactionId` | The identifier of a transaction that was started by using the BeginTransaction operation. Specify the transaction ID of the transaction that you want to include the SQL statement in. | `undefined` |
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html
 
 ### `AuroraDataAPI#batchExecuteStatement`
 
 ```ts
-batchExecuteStatement(options: BatchExecuteStatementOptions) => Promise<RDSDataService.BatchExecuteStatementResponse>
+batchExecuteStatement(
+  options: AuroraDataAPI.BatchExecuteStatementOptions
+) => Promise<RDSDataService.BatchExecuteStatementResponse>
 ```
 
 Abstraction of the AWS SDK RDSDataService [`batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) operation.
@@ -348,15 +392,174 @@ From the [SDK docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSD
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `sql` (Required) | "The SQL statement to run." [^batchExecuteStatement] | `undefined` |
-| `parameterSets` | "The parameter set for the batch operation. The maximum number of parameters in a parameter set is 1,000." [^batchExecuteStatement] | `undefined` |
-| `database` | "The name of the database." [^batchExecuteStatement] | Defined in constructor. |
-| `resourceArn` | "The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster." [^batchExecuteStatement] | Defined in constructor. |
-| `schema` | "The name of the database schema." [^batchExecuteStatement] | Defined in constructor. |
-| `secretArn` | "The name or ARN of the secret that enables access to the DB cluster." [^batchExecuteStatement] | Defined in constructor. |
-| `transactionId` | "The identifier of a transaction that was started by using the `beginTransaction` method. Specify the transaction ID of the transaction that you want to include the SQL statement in." [^batchExecuteStatement] | `undefined` |
+| `sql` (Required) | The SQL statement to run. | `undefined` |
+| `parameterSets` | The parameter set for the batch operation. The maximum number of parameters in a parameter set is 1,000. | `undefined` |
+| `database` | The name of the database. | Defined in constructor. |
+| `resourceArn` | The Amazon Resource Name (ARN) of the Aurora Serverless DB cluster. | Defined in constructor. |
+| `schema` | The name of the database schema. | Defined in constructor. |
+| `secretArn` | The name or ARN of the secret that enables access to the DB cluster. | Defined in constructor. |
+| `transactionId` | The identifier of a transaction that was started by using the `beginTransaction` method. Specify the transaction ID of the transaction that you want to include the SQL statement in. | `undefined` |
 
-[^batchExecuteStatement]: https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_BatchExecuteStatement.html
+
+## `AuroraDataAPI.Transaction` methods
+
+[`AuroraDataAPI#beginTransaction`](AuroraDataAPI#beginTransaction) resolves an instance of `AuroraDataAPI.Transaction` that exposes the following methods:
+
+| Name | Description |
+| ---- | ----------- |
+| [`query`](#AuroraDataAPI.Transaction#query) | Performs an SQL query in the transaction. |
+| [`batchQuery`](#AuroraDataAPI.Transaction#batchQuery) | Performs an SQL query over an array of data in the transaction. |
+| [`commit`](#AuroraDataAPI.Transaction#commit) | Commits and ends the transaction. |
+| [`rollback`](#AuroraDataAPI.Transaction#rollback) | Rolls-back and ends the transaction. |
+| [`executeStatement`](#AuroraDataAPI.Transaction#executeStatement) | Abstraction of the [`RDSDataService#executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) method in context of the transaction. |
+| [`batchExecuteStatement`](#AuroraDataAPI.Transaction#batchExecuteStatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method in context of the transaction. |
+
+### `AuroraDataAPI.Transaction#query`
+
+```ts
+query<T = AuroraDataAPI.UnknownRow>(
+  sql: string,
+  params?: AuroraDataAPI.QueryParams,
+  options?: AuroraDataAPI.Transaction.TransactionQueryOptions
+) => Promise<AuroraDataAPI.QueryResult<T>>
+```
+
+Performs an SQL statement in the transaction.
+
+The response size limit is 1 MB or 1,000 records. If the call returns more than 1 MB of response data or over 1,000 records, the call is terminated.
+
+#### Arguments
+
+| Name | Description | Required |
+| ---- | ----------- | -------- |
+| `sql`  | The SQL statement string to perform. | Yes |
+| `params` | See [Query Params](#Query-Params). | No |
+| `options` | See options below. | No |
+
+#### Options
+
+| Name | Description | Default |
+| ---- | ----------- | ------- |
+| `includeResultMetadata` | A value that indicates whether to include metadata in the results. **Note**: must be `true` for the results to be transformed. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `continueAfterTimeout` | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `resultSetOptions` | Options that control how the result set is returned. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `valueTransformer` | See [Value Transformer](#Value-Transformer). | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction) |
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html
+
+### `AuroraDataAPI.Transaction#batchQuery`
+
+```ts
+batchQuery(
+  sql: string,
+  params?: AuroraDataAPI.QueryParams[]
+) => Promise<AuroraDataAPI.QueryResult<T>>
+```
+
+Performs a batch SQL statement over an array of data in the transaction.
+
+#### Arguments
+
+| Name     | Description                                                  | Required |
+| -------- | ------------------------------------------------------------ | -------- |
+| `sql`    | The SQL query string to perform.                             | Yes      |
+| `params` | An array of [Query Params](#Query-Params). Maximum of 1,000. | No       |
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_BatchExecuteStatement.html
+
+### `AuroraDataAPI.Transaction#commit`
+
+Commits and ends the transaction.
+
+```ts
+commit() => Promise<AuroraDataAPI.CommitTransactionResult>
+```
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#commitTransaction-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_CommitTransaction.html
+
+### `AuroraDataAPI.Transaction#rollback`
+
+```ts
+rollback() => Promise<AuroraDataAPI.RollbackTransactionResult>
+```
+
+Rolls-back and ends the transaction.
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#rollbackTransaction-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_RollbackTransaction.html
+
+### `AuroraDataAPI.Transaction#executeStatement`
+
+```ts
+executeStatement(
+  options: AuroraDataAPI.Transaction.ExecuteStatementOptions
+) => Promise<RDSDataService.ExecuteStatementResponse>
+```
+
+Abstraction of the [`RDSDataService#executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) method in context of the transaction.
+
+#### Arguments
+
+| Name      | Description        | Required |
+| --------- | ------------------ | -------- |
+| `options` | See options below. | Yes      |
+
+#### Options
+
+| Name                    | Description                                                  | Default                                                      |
+| ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `sql` (Required)        | The SQL statement to run.                                    | `undefined`                                                  |
+| `includeResultMetadata` | A value that indicates whether to include metadata in the results. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `continueAfterTimeout`  | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out.<br /><br />For DDL statements, we recommend continuing to run the statement after the call times out. When a DDL statement terminates before it is finished running, it can result in errors and possibly corrupted data structures. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+| `resultSetOptions`      | Options that control how the result set is returned.         | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html
+
+### `AuroraDataAPI.Transaction#batchExecuteStatement`
+
+```ts
+batchExecuteStatement(
+  options: AuroraDataAPI.Transaction.BatchExecuteStatementOptions
+) => Promise<RDSDataService.BatchExecuteStatementResponse>
+```
+
+Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method in context of the transaction.
+
+#### Arguments
+
+| Name      | Description        | Required |
+| --------- | ------------------ | -------- |
+| `options` | See options below. | Yes      |
+
+#### Options
+
+| Name             | Description                                                  | Default     |
+| ---------------- | ------------------------------------------------------------ | ----------- |
+| `sql` (Required) | The SQL statement to run.                                    | `undefined` |
+| `parameterSets`  | The parameter set for the batch operation. The maximum number of parameters in a parameter set is 1,000. | `undefined` |
+
+#### Further reading
+
+- https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property
+- https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_BatchExecuteStatement.html
 
 ## Query Params
 
@@ -395,9 +598,9 @@ query('UPDATE users SET json_data = :jsonData WHERE id = :id', {
 })
 ```
 
-Note that `name` is ommited from the object because it is defined by the key. 
+Note that `name` is omitted from the object because it is defined by the key.
 
-See [The docs on RDSDataService#executeStatement](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) for more information on how to structure your parameter in the "RDSDataService way".
+See [The docs on RDSDataService#executeStatement](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) and the [SqlParameter documentation](https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_SqlParameter.html) for more information on how to structure your parameter in the "RDSDataService way".
 
 ### How values are transformed
 
@@ -411,6 +614,8 @@ See [The docs on RDSDataService#executeStatement](https://docs.aws.amazon.com/AW
 | `boolean[]` | `{ arrayValue: { booleanValues: values } }` |
 | `number[]` (integer) | `{ arrayValue: { longValues: values } }` |
 | `number[]` (float) | `{ arrayValue: { doubleValues: values } }` |
+| `instanceof Buffer` | `{ blobValue: value }` |
+| `instanceof Uint8Array` | `{ blobValue: value }` |
 
 Multidimensional arrays are also transformed recursively:
 
@@ -468,22 +673,59 @@ Multidimensional arrays are also transformed recursively:
 
 ```
 
+### Custom value classes
+
+Support for `CustomValue` classes make it easy to "DRY" your code. They offer a way to encapsulate your values so they can be transformed into an `SqlParameter`. Here is an example of a `uuid` value:
+
+```ts
+class UUIDValue implements AuroraDataAPI.CustomValue {
+  private value: string
+
+  constructor (value: string) {
+    this.value = value
+  }
+
+  toSqlParameter (): AuroraDataAPI.SqlParameter {
+    return {
+      typeHint: 'uuid',
+      value: {
+        stringValue: this.value
+      }
+    }
+  }
+}
+
+await query(
+  'SELECT * FROM users WHERE uuid = :uuid',
+  { uuid: new UUIDValue(req.params.uuid) }
+)
+
+// it works with arrays too:
+await query(
+  'SELECT * FROM users WHERE uuid = ANY(:uuids)',
+  { uuids: req.params.uuids.map((uuid) => new UUIDValue(uuid)) }
+)
+
+```
+
+A few predefined custom values are available: `AuroraDataAPI.JSONValue` and `AuroraDataAPI.BlobValue`, for more information please take a look at [`src/customValues.ts`](src/customValues.ts).
+
 ## Value Transformer
 
 When `includeResultMetadata` is `true`, the Data API response payload includes metadata for each of the columns in the result set. In cases such as `timezone`, `json` or `jsonb` columns, the column value will be returned as a `stringValue` (or `stringValues` in the case of an array).
 
 By default `AuroraDataAPI` some types (such as those described above) into the expected objects. e.g. a `timezone` column will be parsed with `new Date`, a `jsonb` column will parsed using `JSON.parse`.
 
-You can override and/or extend the default behaviour by providing your own `valueTransformer` like so:
+You can override and/or extend the default behavior by providing your own `valueTransformer` like so:
 
 ```ts
 const valueTransformer = (
-  value: unknown, 
-  metadata: AuroraDataAPI.Metadata, 
+  value: any,
+  metadata: RDSDataService.ColumnMetadata,
   next: Function
 ) => {
   if (
-    metadata.typeName === 'varchar' && 
+    metadata.typeName === 'varchar' &&
     typeof value === 'string'
   ) {
     return value.toUpperCase()
@@ -498,48 +740,16 @@ const client = new AuroraDataAPI({
 })
 
 // or add it to the options argument on #query or transaction#query
-const result = await client.query('SELECT email FROM users', undefined, { valueTransformer }) // => { rows: [{ email: 'EXAMPLE@EXAMPLE.COM' }] }
+const result = await client.query(
+  'SELECT email FROM users',
+  undefined,
+  { valueTransformer }
+) // => { rows: [{ email: 'EXAMPLE@EXAMPLE.COM' }] }
 ```
-
-## AuroraDataAPITransaction Methods
-
-[`AuroraDataAPI#beginTransaction`](AuroraDataAPI#beginTransaction) resolves an instance of `AuroraDataAPITransaction` that exposes
-
-| Name | Description |
-| ---- | ----------- |
-| `query` | Runs an SQL query in the transaction. |
-| `batchQuery` | Runs and SQL query over an array of data in the transaction. |
-| `commit` | |
-| `rollback` | |
-| `executeStatement` | |
-| `batchExecuteStatement` | |
-
-### `AuroraDataAPITransaction#query`
-
-```ts
-query<T = AuroraDataAPI.UnknownRow>(sql: string, params?: QueryParams, options: AuroraDataAPITransaction.TransactionQueryOptions) => Promise<AuroraDataAPI.QueryResult<T>>
-```
-
-#### Arguments
-
-| Name | Description | Required |
-| ---- | ----------- | -------- |
-| `sql`  | The SQL query string to perform. | Yes |
-| `params` | See [Query Params](#Query-Params). | No |
-| `options` | See options below. | No |
-
-#### Options 
-
-| Name | Description | Default |
-| ---- | ----------- | ------- |
-| `includeResultMetadata` | Includes the column metadata also transforms the results. | `true` |
-| `continueAfterTimeout` | A value that indicates whether to continue running the statement after the call times out. By default, the statement stops running when the call times out. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
-| `resultSetOptions` | Options that control how the result set is returned. | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction). |
-| `valueTransformer` | See [Value Transformer](#Value-Transformer). | Defined in [`#beginTransaction`](#AuroraDataAPI#beginTransaction) |
 
 ## Example
 
-Take a look at the example folder.
+Take a look at the [example folder](../../example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
 
 ## MIT License
 

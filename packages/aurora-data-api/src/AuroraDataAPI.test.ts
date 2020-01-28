@@ -15,11 +15,7 @@ const requestConfig: AuroraDataAPI.RequestConfig = {
   schema: 'example',
   secretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:example',
 }
-const transformerOptions: AuroraDataAPI.TransformQueryResponseOptions = {
-  valueTransformer: (value, metadata, next) => {
-    return next()
-  }
-}
+
 const clientConfig: AuroraDataAPI.ClientConfig = {
   endpoint: 'http://localhost:8080',
   region: 'us-east-1',
@@ -32,15 +28,19 @@ const clientConfig: AuroraDataAPI.ClientConfig = {
   }
 }
 
+const config: AuroraDataAPI.Config = {
+  valueTransformer: (value, metadata, next) => {
+    return next()
+  },
+  ...requestConfig,
+  ...clientConfig,
+}
+
 let client: AuroraDataAPI
 let mockedRdsClient: jest.Mocked<RDSDataService>
 
 const setClient = (): AuroraDataAPI => {
-  client = new AuroraDataAPI({
-    ...requestConfig,
-    ...clientConfig,
-    ...transformerOptions,
-  })
+  client = new AuroraDataAPI(config)
   mockedRdsClient = client.client as jest.Mocked<RDSDataService>
   return client
 }
@@ -53,7 +53,7 @@ describe('new AuroraDataAPI', () => {
   })
 
   it ('sets the transformOptions', () => {
-    expect(client.transformOptions).toMatchObject(transformerOptions)
+    expect(client.transformOptions).toMatchObject({ valueTransformer: config.valueTransformer })
   })
 
   it ('sets the client', () => {
@@ -208,7 +208,6 @@ describe('AuroraDataAPI#query', () => {
     const result = await client.query(sql, { foo: 'bar' })
     expect(mockedRdsClient.executeStatement).toHaveBeenCalledWith({
       ...client.requestConfig,
-      includeResultMetadata: true,
       sql,
       parameters: [{
         name: 'foo',

@@ -338,7 +338,7 @@ test('custom valueTransformer', () => {
         longValue: 87
       }]
     ]
-  }, { valueTransformer })
+  }, valueTransformer)
   expect(result).toMatchObject({
     metadata: {
       example1: { name: 'example1', typeName: 'varchar' },

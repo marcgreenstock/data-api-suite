@@ -12,14 +12,13 @@ import {
   transformQueryResponse,
   Metadata,
   TransformedQueryResult,
-  TransformQueryResponseOptions,
   UnknownRow,
   ValueTransformer,
 } from './transformQueryResponse'
 import {
   JSONValue,
   BlobValue,
-} from  './customValues'
+} from './customValues'
 
 declare namespace AuroraDataAPI {
   export {
@@ -38,7 +37,6 @@ declare namespace AuroraDataAPI {
   export {
     Metadata,
     ValueTransformer,
-    TransformQueryResponseOptions,
     UnknownRow,
   }
 
@@ -50,15 +48,20 @@ declare namespace AuroraDataAPI {
   export interface RequestConfig {
     continueAfterTimeout?: RDSDataService.Boolean;
     database?: RDSDataService.DbName;
+    includeResultMetadata?: RDSDataService.Boolean;
     resourceArn: RDSDataService.Arn;
     resultSetOptions?: RDSDataService.ResultSetOptions;
     schema?: RDSDataService.DbName;
     secretArn: RDSDataService.Arn;
   }
 
+  export interface TransformOptions {
+    valueTransformer?: ValueTransformer;
+  }
+
   export type ClientConfig = Omit<RDSDataService.ClientConfiguration, 'apiVersion'>
 
-  export type AuroraDataAPIConfig = RequestConfig & TransformQueryResponseOptions & ClientConfig
+  export type Config = RequestConfig & TransformOptions & ClientConfig
 
   export interface BeginTransactionOptions {
     database?: RDSDataService.DbName;
@@ -80,7 +83,7 @@ declare namespace AuroraDataAPI {
 
   export type RollbackTransactionResult = RDSDataService.RollbackTransactionResponse
 
-  export interface QueryOptions extends TransformQueryResponseOptions {
+  export interface QueryOptions extends TransformOptions {
     continueAfterTimeout?: RDSDataService.Boolean;
     database?: RDSDataService.DbName;
     includeResultMetadata?: RDSDataService.Boolean;
@@ -119,27 +122,35 @@ declare namespace AuroraDataAPI {
 }
 
 class AuroraDataAPI {
-  public readonly transformOptions: TransformQueryResponseOptions
+  public readonly transformOptions: AuroraDataAPI.TransformOptions
   public readonly client: RDSDataService
   public readonly requestConfig: AuroraDataAPI.RequestConfig
 
-  constructor (config: AuroraDataAPI.AuroraDataAPIConfig) {
+  constructor (config: AuroraDataAPI.Config) {
+    const defaults = {
+      includeResultMetadata: true,
+    }
     const {
       continueAfterTimeout,
       database,
+      includeResultMetadata,
       resourceArn,
       resultSetOptions,
       schema,
       secretArn,
       valueTransformer,
       ...clientConfig
-    } = config
+    } = {
+      ...defaults,
+      ...config,
+    }
     this.transformOptions = {
       valueTransformer,
     }
     this.requestConfig = {
       continueAfterTimeout,
       database,
+      includeResultMetadata,
       resourceArn,
       resultSetOptions,
       schema,
@@ -219,30 +230,23 @@ class AuroraDataAPI {
   public async query<T = UnknownRow> (
     sql: string,
     params?: AuroraDataAPI.QueryParams,
-    options: AuroraDataAPI.QueryOptions = {},
+    options?: AuroraDataAPI.QueryOptions,
   ): Promise<AuroraDataAPI.QueryResult<T>> {
-    const methodOptions = {
-      includeResultMetadata: true,
-      parseTimestamps: true,
-      ...options,
-    }
     const {
       valueTransformer,
       ...executeStatementOptions
-    } = methodOptions
-    const transformOptions = {
-      ...this.transformOptions,
-      valueTransformer,
+    } = {
+      ...this.requestConfig,
+      ...options
     }
-    const parameters = params !== undefined ? transformQueryParams(params) : undefined
+    const parameters = params && transformQueryParams(params)
     const result = await this.executeStatement({
       ...executeStatementOptions,
       sql,
       parameters,
     })
-    const transformedResult = executeStatementOptions.includeResultMetadata
-      ? transformQueryResponse<T>(result, transformOptions)
-      : undefined
+
+    const transformedResult = result.columnMetadata && transformQueryResponse<T>(result, valueTransformer)
     return {
       ...result,
       ...transformedResult,

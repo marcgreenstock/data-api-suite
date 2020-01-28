@@ -72,16 +72,19 @@ class Transaction {
   public async query<T = AuroraDataAPI.UnknownRow> (
     sql: string,
     params?: AuroraDataAPI.QueryParams,
-    options?: Transaction.QueryOptions
+    options?: Transaction.QueryOptions,
   ): Promise<AuroraDataAPI.QueryResult<T>> {
+    const transactionId = this.transactionId
     const {
-      continueAfterTimeout,
       database,
-      includeResultMetadata,
       resourceArn,
-      resultSetOptions,
       schema,
       secretArn,
+    } = this.requestConfig
+    const {
+      continueAfterTimeout,
+      includeResultMetadata,
+      resultSetOptions,
       valueTransformer,
     } = {
       ...this.requestConfig,
@@ -95,7 +98,7 @@ class Transaction {
       resultSetOptions,
       schema,
       secretArn,
-      transactionId: this.transactionId,
+      transactionId,
       valueTransformer,
     })
   }
@@ -104,6 +107,7 @@ class Transaction {
     sql: string,
     params?: AuroraDataAPI.QueryParams[],
   ): Promise<AuroraDataAPI.BatchQueryResult> {
+    const transactionId = this.transactionId
     const {
       database,
       resourceArn,
@@ -115,22 +119,25 @@ class Transaction {
       resourceArn,
       schema,
       secretArn,
-      transactionId: this.transactionId,
+      transactionId,
     })
   }
 
   public async executeStatement (
-    options: Transaction.ExecuteStatementOptions
+    options: Transaction.ExecuteStatementOptions,
   ): Promise<AuroraDataAPI.ExecuteStatementResult> {
+    const transactionId = this.transactionId
     const {
-      continueAfterTimeout,
       database,
-      includeResultMetadata,
-      parameters,
       resourceArn,
-      resultSetOptions,
       schema,
       secretArn,
+    } = this.requestConfig
+    const {
+      continueAfterTimeout,
+      includeResultMetadata,
+      parameters,
+      resultSetOptions,
       sql,
     } = {
       ...this.requestConfig,
@@ -146,19 +153,22 @@ class Transaction {
       schema,
       secretArn,
       sql,
-      transactionId: this.transactionId,
+      transactionId,
     })
   }
 
   public async batchExecuteStatement (
-    options: Transaction.BatchExecuteStatementOptions
+    options: Transaction.BatchExecuteStatementOptions,
   ): Promise<AuroraDataAPI.BatchExecuteStatementResult> {
+    const transactionId = this.transactionId
     const {
       database,
       resourceArn,
-      parameterSets,
       schema,
       secretArn,
+    } = this.requestConfig
+    const {
+      parameterSets,
       sql,
     } = {
       ...this.requestConfig,
@@ -171,7 +181,7 @@ class Transaction {
       schema,
       secretArn,
       sql,
-      transactionId: this.transactionId,
+      transactionId,
     })
   }
 }
