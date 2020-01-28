@@ -158,7 +158,7 @@ Constructs a new instance of `AuroraDataAPI`.
 | [`commitTransaction`](#auroradataapicommittransaction) | Commits and ends a SQL transaction. |
 | [`rollbackTransaction`](#auroradataapirollbacktransaction) | Rolls-back and ends a SQL transaction. |
 | [`executeStatement`](#auroradataapiexecutestatement) | Abstraction of the [`RDSDataService#executeStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#executeStatement-property) method. |
-| [`batchExecuteStatement`](#auroradataapibbatchexecutstatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method. |
+| [`batchExecuteStatement`](#auroradataapibatchexecutestatement) | Abstraction of the RDSDataService [`RDSDataService#batchExecuteStatement`](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html#batchExecuteStatement-property) method. |
 
 ### `AuroraDataAPI#query`
 
@@ -407,7 +407,7 @@ From the [SDK docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSD
 
 ## `AuroraDataAPI.Transaction` methods
 
-[`AuroraDataAPI#beginTransaction`](AuroraDataAPI#beginTransaction) resolves an instance of `AuroraDataAPI.Transaction` that exposes the following methods:
+[`AuroraDataAPI#beginTransaction`](#auroradataapibegintransaction) resolves an instance of `AuroraDataAPI.Transaction` that exposes the following methods:
 
 | Name | Description |
 | ---- | ----------- |
