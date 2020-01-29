@@ -2,7 +2,7 @@
 
 ## Summary
 
-A Serverless plugin to **generate**, **apply** and **rollback** migrations on the Data API for Aurora Serverless. Plays nice with [data-api-local-serverless](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/data-api-local-serverless) and [aurora-data-api](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/aurora-data-api).
+A Serverless plugin to **generate**, **apply** and **rollback** migrations on the Data API for Aurora Serverless. Plays nice with the [Data API Local Serverless Plugin](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/data-api-local-serverless) and [Aurora Data API Client](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/aurora-data-api).
 
 ## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-suite#readme)
 
@@ -72,7 +72,7 @@ custom:
 | Name            | Description                                                  | Default |
 | --------------- | ------------------------------------------------------------ | ------- |
 | `typescript`    | Enable/disable typescript migration files.                   | `true`  |
-| `[stage].(...)` | [See AuroraDataAPI#Constructor](../aurora-data-api/README.md#AuroraDataAPI#constructor). |         |
+| `[stage].(...)` | [See AuroraDataAPI#Constructor](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/aurora-data-api#auroradataapiconstructor). |         |
 
 ## Commands
 
@@ -123,7 +123,7 @@ export const down: MigrationFn = async (dataAPI) => {
 }
 ```
 
-The first argument `dataAPI` is an instance of the [aurora-data-api](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/aurora-data-api#readme) library.
+The first argument `dataAPI` is an instance of the [Aurora Data API Client](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/aurora-data-api#readme) library.
 
 ## Example
 

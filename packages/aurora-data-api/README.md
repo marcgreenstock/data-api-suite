@@ -1,10 +1,10 @@
-# AuroraDataAPI
+# Aurora Data API Client
 
 [![Master](https://github.com/marcgreenstock/data-api-suite/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-suite/actions) [![NPM](https://img.shields.io/npm/v/aurora-data-api.svg)](https://www.npmjs.com/package/aurora-data-api)
 
 ## Summary
 
-**AuroraDataAPI** is an abstraction of the [RDSDataService](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) that implements the [Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html).
+**Aurora Data API Client** is an abstraction of the [RDSDataService](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/RDSDataService.html) that implements the [Data API for Aurora Serverless](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html).
 
 Query requests are simplified; instead of expecting clunky query params it expects only a JSON object:
 

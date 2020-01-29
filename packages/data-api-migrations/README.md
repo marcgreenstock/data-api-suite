@@ -4,7 +4,7 @@
 
 ## Sumary
 
-This is the core library for [data-api-migrations-serverless](../data-api-migrations-serverless). It is presently not intended for standalone use.
+This is the core library for [Data API Local Serverless Plugin](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/data-api-migrations-serverless). It is presently not intended for standalone use.
 
 ## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-suite#readme)
 
