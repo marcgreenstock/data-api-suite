@@ -1,14 +1,14 @@
 # Data API Local
 
-[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions) [![NPM](https://img.shields.io/npm/v/data-api-local.svg)](https://www.npmjs.com/package/data-api-local)
+[![Master](https://github.com/marcgreenstock/data-api-suite/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-suite/actions) [![NPM](https://img.shields.io/npm/v/data-api-local.svg)](https://www.npmjs.com/package/data-api-local)
 
 ## Summary
 
 **Data API Local Plugin** is a [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) emulator. Its purpose is to simplify the development of applications using the Data API by making it available offline and local, similar to [serverless-dynamodb-local](https://github.com/99xt/serverless-dynamodb-local) but for PostgreSQL (MySQL coming soon).
 
-## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-suite#readme)
 
-This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-suite#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
 
 ## Usage
 
@@ -57,7 +57,7 @@ const result = await client.executeStatement({
 
 ## Example
 
-Take a look at the [example folder](https://github.com/marcgreenstock/data-api-local/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
+Take a look at the [example folder](https://github.com/marcgreenstock/data-api-suite/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
 
 ## MIT License
 

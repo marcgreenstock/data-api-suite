@@ -2,14 +2,14 @@
   "name": "data-api-migrations-serverless",
   "version": "0.0.0",
   "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
-  "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-migrations-serverless",
+  "homepage": "https://github.com/marcgreenstock/data-api-suite/tree/master/packages/data-api-migrations-serverless",
   "repository": {
     "type": "git",
-    "url": "https://github.com/marcgreenstock/data-api-local.git",
+    "url": "https://github.com/marcgreenstock/data-api-suite.git",
     "directory": "packages/data-api-migrations-serverless"
   },
   "bugs": {
-    "url": "https://github.com/marcgreenstock/data-api-local/issues"
+    "url": "https://github.com/marcgreenstock/data-api-suite/issues"
   },
   "keywords": [
     "AWS Aurora Serverless Data API",

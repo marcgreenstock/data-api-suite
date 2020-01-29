@@ -1,6 +1,6 @@
 # AuroraDataAPI
 
-[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions) [![NPM](https://img.shields.io/npm/v/aurora-data-api.svg)](https://www.npmjs.com/package/aurora-data-api)
+[![Master](https://github.com/marcgreenstock/data-api-suite/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-suite/actions) [![NPM](https://img.shields.io/npm/v/aurora-data-api.svg)](https://www.npmjs.com/package/aurora-data-api)
 
 ## Summary
 
@@ -97,9 +97,9 @@ Results are also simplified by transforming the records into a ready-to-use JS o
 }
 ```
 
-## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-suite#readme)
 
-This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-suite#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
 
 ## Installation
 
@@ -172,7 +172,7 @@ query<T = AuroraDataAPI.UnknownRow>(
 
 Performs an SQL statement.
 
-The response size limit is 1 MB or 1,000 records. If the call returns more than 1 MB of response data or over 1,000 records, the call is terminated. 
+The response size limit is 1 MB or 1,000 records. If the call returns more than 1 MB of response data or over 1,000 records, the call is terminated.
 
 #### Arguments
 
@@ -708,7 +708,7 @@ await query(
 
 ```
 
-A few predefined custom values are available: `AuroraDataAPI.JSONValue` and `AuroraDataAPI.BlobValue`, for more information please take a look at [`src/customValues.ts`](https://github.com/marcgreenstock/data-api-local/tree/master/packages/aurora-data-api/src/customValues.ts).
+A few predefined custom values are available: `AuroraDataAPI.JSONValue` and `AuroraDataAPI.BlobValue`, for more information please take a look at [`src/customValues.ts`](https://github.com/marcgreenstock/data-api-suite/tree/master/packages/aurora-data-api/src/customValues.ts).
 
 ## Value Transformer
 
@@ -749,7 +749,7 @@ const result = await client.query(
 
 ## Example
 
-Take a look at the [example folder](https://github.com/marcgreenstock/data-api-local/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
+Take a look at the [example folder](https://github.com/marcgreenstock/data-api-suite/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
 
 ## MIT License
 
