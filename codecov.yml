@@ -1,0 +1,17 @@
+codecov:
+  flags:
+    aurora-data-api:
+      paths:
+        - packages/aurora-data-api/src
+    data-api-local:
+      paths:
+        - packages/data-api-local/src
+    data-api-local-serverless:
+      paths:
+        - packages/data-api-local-serverless/src
+    data-api-migrations:
+      paths:
+        - packages/data-api-migrations/src
+    data-api-migrations-serverless:
+      paths:
+        - packages/data-api-migrations-serverless/src
