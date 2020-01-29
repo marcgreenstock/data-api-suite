@@ -1,6 +1,6 @@
 {
   "name": "data-api-migrations",
-  "version": "0.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Migrations library for Aurora Serverless Data API.",
   "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-migrations",
   "repository": {
@@ -24,11 +24,11 @@
   },
   "license": "MIT",
   "dependencies": {
+    "aurora-data-api": "1.0.0-alpha.0",
     "date-fns": "^2.8.1",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
-    "typescript": "^3.7.4",
-    "aurora-data-api": "0.0.0"
+    "typescript": "^3.7.4"
   },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
