@@ -19,9 +19,9 @@ Each package has its own `README` with independent documentation.
 
 The following libraries are designed to work with the [Serverless Framework](https://serverless.com/).
 
-| Name | Description |
-| ---- | ----------- |
-| [`data-api-local-serverless`](packages/data-api-local-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)<br />A Serverless plugin to start a local Aurora Serverless Data API server for offline development that plays nice with [`serverless-ofline`](https://github.com/dherault/serverless-offline). |
+| Name                                                         | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [`data-api-local-serverless`](packages/data-api-local-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-local-serverless.svg)](https://www.npmjs.com/package/data-api-local-serverless)<br />A Serverless plugin to start a local Aurora Serverless Data API emulator for offline development that plays nice with [`serverless-ofline`](https://github.com/dherault/serverless-offline). |
 | [`data-api-migrations-serverless`](packages/data-api-migrations-serverless) | [![NPM](https://img.shields.io/npm/v/data-api-migrations-serverless.svg)](https://www.npmjs.com/package/data-api-migrations-serverless)<br />A Serverless plugin to generate, apply and rollback migrations on the Data API for Aurora Serverless. Plays nice with [`data-api-local-serverless`](packages/data-api-local-serverless). |
 
 ### Node.js Local Development Tools
@@ -35,7 +35,7 @@ The following libraries are designed to be used in a node.js environment.
 
 ## Example
 
-There is an example app that uses all of the above packages in the [example](./example) folder. 
+Take a look at the [example folder](https://github.com/marcgreenstock/data-api-local/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
 
 ## Contributing
 

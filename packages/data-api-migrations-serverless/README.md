@@ -2,11 +2,11 @@
 
 ## Summary
 
-A Serverless plugin to **generate**, **apply** and **rollback** migrations on the Data API for Aurora Serverless. Plays nice with [data-api-local-serverless](packages/data-api-local-serverless) and [aurora-data-api](../aurora-data-api).
+A Serverless plugin to **generate**, **apply** and **rollback** migrations on the Data API for Aurora Serverless. Plays nice with [data-api-local-serverless](https://github.com/marcgreenstock/data-api-local/tree/master/packages/data-api-local-serverless) and [aurora-data-api](https://github.com/marcgreenstock/data-api-local/tree/master/packages/aurora-data-api).
 
-## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local)
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)
 
-This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
 
 ## Installation
 
@@ -123,11 +123,11 @@ export const down: MigrationFn = async (dataAPI) => {
 }
 ```
 
-The first argument `dataAPI` is an instance of the [aurora-data-api](../aurora-data-api) library.
+The first argument `dataAPI` is an instance of the [aurora-data-api](https://github.com/marcgreenstock/data-api-local/tree/master/packages/aurora-data-api#readme) library.
 
 ## Example
 
-Take a look at the [example folder](../../example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
+Take a look at the [example folder](https://github.com/marcgreenstock/data-api-local/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
 
 ## MIT License
 

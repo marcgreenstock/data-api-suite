@@ -97,9 +97,9 @@ Results are also simplified by transforming the records into a ready-to-use JS o
 }
 ```
 
-## [Data API for Aurora Serverless Suite](../..#readme)
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)
 
-This library is part of the **[Data API for Aurora Serverless Suite](../..#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
 
 ## Installation
 
@@ -708,7 +708,7 @@ await query(
 
 ```
 
-A few predefined custom values are available: `AuroraDataAPI.JSONValue` and `AuroraDataAPI.BlobValue`, for more information please take a look at [`src/customValues.ts`](src/customValues.ts).
+A few predefined custom values are available: `AuroraDataAPI.JSONValue` and `AuroraDataAPI.BlobValue`, for more information please take a look at [`src/customValues.ts`](https://github.com/marcgreenstock/data-api-local/tree/master/packages/aurora-data-api/src/customValues.ts).
 
 ## Value Transformer
 
@@ -749,7 +749,7 @@ const result = await client.query(
 
 ## Example
 
-Take a look at the [example folder](../../example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
+Take a look at the [example folder](https://github.com/marcgreenstock/data-api-local/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
 
 ## MIT License
 
