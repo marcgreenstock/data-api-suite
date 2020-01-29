@@ -311,7 +311,7 @@ export class Server {
 
   private log (message: string): void {
     if (typeof this.logger === 'function') {
-      this.logger(`DataAPILocal [HTTP] ${message}`)
+      this.logger(message)
     }
   }
 }

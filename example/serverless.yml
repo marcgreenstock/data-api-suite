@@ -1,0 +1,101 @@
+service: myApp
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: us-east-1
+  environment:
+    AWS_REGION: ${self:provider.region}
+    DATA_API_SECRET_ARN: arn:aws:secretsmanager:us-east-1:123456789012:secret:example
+    DATA_API_RESOURCE_ARN: arn:aws:rds:us-east-1:123456789012:cluster:example
+    DATA_API_DATABASE_NAME: my-app
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "secretsmanager:GetSecretValue"
+      Resource:
+        - ${self:provider.environment.DATA_API_SECRET_ARN}
+    - Effect: Allow
+      Action:
+        - "rds-data:*"
+      Resource:
+        - ${self:provider.environment.DATA_API_RESOURCE_ARN}
+
+plugins:
+  - serverless-plugin-typescript
+  - data-api-migrations-serverless
+  - data-api-local-serverless
+  - serverless-offline
+
+custom:
+  DataAPILocal:
+    server:
+      port: 8080
+      hostname: localhost
+    database:
+      engine: postgresql
+      connectionString: postgresql://localhost:5432/my-app
+  DataAPIMigrations:
+    destFolder: ./migrations
+    typescript: true
+    local:
+      region: ${self:provider.region}
+      endpoint: http://localhost:8080
+      maxRetries: 0
+      secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+      resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+      database: ${self:provider.environment.DATA_API_DATABASE_NAME}
+      credentials:
+        accessKeyId: example
+        secretAccessKey: example
+    prod:
+      region: ${self:provider.region}
+      secretArn: ${self:provider.environment.DATA_API_SECRET_ARN}
+      resourceArn: ${self:provider.environment.DATA_API_RESOURCE_ARN}
+      database: ${self:provider.environment.DATA_API_DATABASE_NAME}
+
+functions:
+  listTodos:
+    handler: todos.list
+    events:
+      - http:
+          path: todos
+          method: get
+
+  getTodo:
+    handler: todos.get
+    events:
+      - http:
+          path: todos/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
+
+  createTodo:
+    handler: todos.create
+    events:
+      - http:
+          path: todos
+          method: post
+
+  updateTodo:
+    handler: todos.update
+    events:
+      - http:
+          path: todos/{id}
+          method: put
+          parameters:
+            paths:
+              id: true
+
+  deleteToto:
+    handler: todos.remove
+    events:
+      - http:
+          path: todos/{id}
+          method: delete
+          parameters:
+            paths:
+              id: true

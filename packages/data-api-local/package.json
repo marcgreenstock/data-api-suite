@@ -27,8 +27,8 @@
   ],
   "scripts": {
     "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
-    "compile": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf ./lib",
+    "compile": "tsc -b tsconfig.build.json  --force --verbose",
     "prepare": "npm run build"
   },
   "license": "MIT",

@@ -1,0 +1,34 @@
+{
+  "name": "aurora-data-api",
+  "version": "0.0.0",
+  "description": "Aurora Serverless Data API Client that simplifies the request and response payloads.",
+  "homepage": "https://github.com/marcgreenstock/data-api-local/tree/master/packages/aurora-data-api",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcgreenstock/data-api-local.git",
+    "directory": "packages/aurora-data-api"
+  },
+  "bugs": {
+    "url": "https://github.com/marcgreenstock/data-api-local/issues"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rm -rf ./lib",
+    "compile": "tsc -b tsconfig.build.json  --force --verbose",
+    "prepare": "npm run build"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.601.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "@types/node": "^13.1.6",
+    "typescript": "^3.7.4"
+  }
+}

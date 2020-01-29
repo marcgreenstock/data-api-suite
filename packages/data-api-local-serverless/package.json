@@ -28,7 +28,7 @@
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "rm -rf ./lib && rm -f tsconfig.build.tsbuildinfo",
-    "compile": "tsc -p tsconfig.build.json",
+    "compile": "tsc -b tsconfig.build.json  --force --verbose",
     "prepare": "npm run build"
   },
   "license": "MIT",
@@ -39,6 +39,7 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
+    "chalk": "^3.0.0",
     "data-api-local": "^0.0.2-alpha.8"
   },
   "peerDependencies": {

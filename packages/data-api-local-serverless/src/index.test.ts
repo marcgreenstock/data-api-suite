@@ -36,6 +36,7 @@ describe('hooks', () => {
   beforeAll(async () => {
     await plugin.hooks['before:offline:start:init']()
   })
+
   test('before:offline:start:init', async () => {
     expect(dataApiLocal).toHaveBeenCalledWith({ ...config, logger: expect.any(Function) })
   })

@@ -8,27 +8,21 @@ on:
 jobs:
   test:
     name: Tests
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
           node-version: 10.x
-      - name: Build the docker-compose stack
-        run: docker-compose up --build -d
-      - name: Check running containers
-        run: docker ps -a
       - name: Install Dependencies
         run: npm install
       - name: Bootstrap packages
         run: npm run bootstrap
+      - name: Start docker
+        run: docker-compose up --build -d
       - name: Execute test
         run: npm run test
-      - name: Upload coverage
-        uses: actions/upload-artifact@master
-        with:
-          name: coverage
-          path: coverage
       - name: Report to Codecov
         uses: codecov/codecov-action@v1
         with:
@@ -36,6 +30,7 @@ jobs:
 
   lint:
     name: Code Lint
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master

@@ -1,14 +1,20 @@
 # Data API Local
 
-AWS Aurora Serverless Data API emulator for local development.
+[![Master](https://github.com/marcgreenstock/data-api-local/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-local/actions) [![NPM](https://img.shields.io/npm/v/data-api-local.svg)](https://www.npmjs.com/package/data-api-local)
 
-**Note:** Currently only supports PostgreSQL - MySQL is on the roadmap.
+## Summary
 
-## Example:
+**Data API Local Plugin** is a [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) emulator. Its purpose is to simplify the development of applications using the Data API by making it available offline and local, similar to [serverless-dynamodb-local](https://github.com/99xt/serverless-dynamodb-local) but for PostgreSQL (MySQL coming soon).
+
+## [Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)
+
+This library is part of the **[Data API for Aurora Serverless Suite](https://github.com/marcgreenstock/data-api-local#readme)**, a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplify and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
+
+## Usage
 
 ```ts
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
-import { dataApiLocal } from './data-api-local'
+import { dataApiLocal } from 'data-api-local'
 
 // assuming your in an async function
 await dataApiLocal({
@@ -48,3 +54,29 @@ const result = await client.executeStatement({
   resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:dummy'
 }).promise()
 ```
+
+## Example
+
+Take a look at the [example folder](https://github.com/marcgreenstock/data-api-local/tree/master/example) for a complete example app that uses all the **Data API for Aurora Serverless Suite** packages.
+
+## MIT License
+
+Copyright (c) 2020 Marc Greenstock
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
