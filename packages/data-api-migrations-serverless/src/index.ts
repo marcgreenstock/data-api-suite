@@ -37,7 +37,7 @@ class DataAPIMigrationsServerless implements Plugin {
         lifecycleEvents: ['help'],
         commands: {
           create: {
-            usage: 'Generate a new migration file',
+            usage: 'Generate a new migration file.',
             lifecycleEvents: ['generate'],
             options: {
               name: {

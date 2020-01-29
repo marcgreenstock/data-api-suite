@@ -77,7 +77,7 @@ const handleError = (error: Error): AWSLambda.APIGatewayProxyResult => {
   }
 }
 
-const getTodo = async (id: string) => {
+const getTodo = async (id: string): Promise<Todo> => {
   const { rows } = await dataAPI.query<Todo>(
     'SELECT * FROM "todos" WHERE "id" = :id LIMIT 1',
     { id: new UUIDValue(id) }

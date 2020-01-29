@@ -17,7 +17,7 @@ export interface DataAPIMigrationsConfig {
   logger?: Function;
   compiler?: CompilerDerived;
   isLocal?: boolean;
-  dataAPI: AuroraDataAPI.AuroraDataAPIConfig;
+  dataAPI: AuroraDataAPI.Config;
 }
 
 export class DataAPIMigrations {
