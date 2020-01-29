@@ -1,6 +1,6 @@
 # Data API for Aurora Serverless Suite
 
-[![tests](https://github.com/marcgreenstock/data-api-suite/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-suite/actions) [![codecov](https://codecov.io/gh/marcgreenstock/data-api-local/branch/master/graph/badge.svg)](https://codecov.io/gh/marcgreenstock/data-api-local)
+[![tests](https://github.com/marcgreenstock/data-api-suite/workflows/master/badge.svg)](https://github.com/marcgreenstock/data-api-suite/actions) [![codecov](https://codecov.io/gh/marcgreenstock/data-api-suite/branch/master/graph/badge.svg)](https://codecov.io/gh/marcgreenstock/data-api-suite)
  [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 The **Data API for Aurora Serverless Suite** is a [Monorepo](https://en.wikipedia.org/wiki/Monorepo) that includes libraries, [Serverless Framework](https://serverless.com/) plugins and development tools to simplity and enhance the development, deployment and use of the [Data API for Aurora Serverless](https://aws.amazon.com/blogs/aws/new-data-api-for-amazon-aurora-serverless/) on Amazon Web Services.
