@@ -5,7 +5,7 @@
   "private": true,
   "license": "MIT",
   "dependencies": {
-    "aurora-data-api": "0.0.0",
+    "aurora-data-api": "^1.0.0-alpha.2",
     "http-errors": "^1.7.3",
     "middy": "^0.33.2",
     "yup": "^0.28.0"
@@ -15,8 +15,8 @@
     "@types/http-errors": "^1.6.3",
     "@types/node": "^13.1.6",
     "@types/yup": "^0.26.27",
-    "data-api-local-serverless": "0.0.2-alpha.8",
-    "data-api-migrations-serverless": "0.0.0",
+    "data-api-local-serverless": "^1.0.0-alpha.2",
+    "data-api-migrations-serverless": "^1.0.0-alpha.2",
     "serverless": "^1.60.5",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-typescript": "^1.1.9",
