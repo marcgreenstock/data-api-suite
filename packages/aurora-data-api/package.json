@@ -30,5 +30,12 @@
     "@types/jest": "^24.0.25",
     "@types/node": "^13.1.6",
     "typescript": "^3.7.4"
-  }
+  },
+  "keywords": [
+    "aws",
+    "rds",
+    "aurura",
+    "data api",
+    "postgres"
+  ]
 }
