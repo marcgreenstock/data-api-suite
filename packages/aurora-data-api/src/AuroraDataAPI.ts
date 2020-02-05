@@ -236,6 +236,7 @@ class AuroraDataAPI {
       valueTransformer,
       ...executeStatementOptions
     } = {
+      ...this.transformOptions,
       ...this.requestConfig,
       ...options
     }
