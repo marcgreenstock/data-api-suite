@@ -24,16 +24,16 @@
   },
   "license": "MIT",
   "dependencies": {
-    "aurora-data-api": "1.0.0-alpha.3",
-    "date-fns": "^2.8.1",
+    "aurora-data-api": "^1.0.0-alpha.3",
+    "date-fns": "^2.11.0",
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
-    "typescript": "^3.7.4"
+    "typescript": "^3.8.3"
   },
   "devDependencies": {
-    "@types/fs-extra": "^8.0.1",
-    "@types/jest": "^24.9.0",
+    "@types/fs-extra": "^8.1.0",
+    "@types/jest": "^24.9.1",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.1.2"
+    "@types/node": "^13.9.3"
   }
 }
