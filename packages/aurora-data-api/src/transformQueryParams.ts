@@ -13,6 +13,17 @@ export interface QueryParams {
   [name: string]: QueryParam;
 }
 
+const formatISO9075 = (date: Date): string => {
+  const y = date.getUTCFullYear().toString()
+  const m = (date.getUTCMonth() + 1).toString().padStart(2, '0')
+  const d = date.getUTCDay().toString().padStart(2, '0')
+  const h = date.getUTCHours().toString().padStart(2, '0')
+  const min = date.getUTCMinutes().toString().padStart(2, '0')
+  const sec = date.getUTCSeconds().toString().padStart(2, '0')
+  const ms = date.getUTCMilliseconds().toString()
+  return `${y}-${m}-${d} ${h}:${min}:${sec}.${ms}`
+}
+
 const isSqlParameter = (param: QueryParam): param is SqlParameter => {
   const keys = ['arrayValue', 'blobValue', 'booleanValue', 'doubleValue', 'isNull', 'longValue', 'stringValue']
   return param !== null &&
@@ -118,7 +129,12 @@ const transformQueryParam = (value: QueryParam): SqlParameter => {
         return value.toSqlParameter()
       }
       if (value instanceof Date) {
-        return { typeHint: 'TIMESTAMP', value: { stringValue: value.toISOString() } }
+        return {
+          typeHint: 'TIMESTAMP',
+          value: {
+            stringValue: formatISO9075(value)
+          }
+        }
       }
       break
     case 'boolean':

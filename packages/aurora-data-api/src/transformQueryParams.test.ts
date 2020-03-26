@@ -115,15 +115,22 @@ test('JSONValue', () => {
 })
 
 test('Date', () => {
-  const value = new Date()
+  const date = new Date()
+  const y = date.getUTCFullYear().toString()
+  const m = (date.getUTCMonth() + 1).toString().padStart(2, '0')
+  const d = date.getUTCDay().toString().padStart(2, '0')
+  const h = date.getUTCHours().toString().padStart(2, '0')
+  const min = date.getUTCMinutes().toString().padStart(2, '0')
+  const sec = date.getUTCSeconds().toString().padStart(2, '0')
+  const ms = date.getUTCMilliseconds().toString()
   const result = transformQueryParams({
-    example: value
+    example: date
   })
   expect(result).toMatchObject([{
     name: 'example',
     typeHint: 'TIMESTAMP',
     value: {
-      stringValue: value.toISOString()
+      stringValue: `${y}-${m}-${d} ${h}:${min}:${sec}.${ms}`
     }
   }])
 })
