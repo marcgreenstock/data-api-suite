@@ -256,13 +256,13 @@ describe('AuroraDataAPI#batchQuery', () => {
       schema,
       secretArn
     } = requestConfig
-    const sql = 'INSERT INTO users (name, interests) VALUES (:name, :interests)'
+    const sql = 'INSERT INTO users (name, interests::varchar[]) VALUES (:name, :interests)'
     const result = await client.batchQuery(sql, [{
       name: 'sam',
-      interests: ['books', 'running', 'cooking']
+      interests: '{"books", "running", "cooking"}'
     }, {
       name: 'roger',
-      interests: ['cats', 'dogs', 'babies']
+      interests: '{"cats", "dogs", "babies"}'
     }])
     const parameterSets: RDSDataService.SqlParameterSets = [
       [{
@@ -273,9 +273,7 @@ describe('AuroraDataAPI#batchQuery', () => {
       }, {
         name: 'interests',
         value: {
-          arrayValue: {
-            stringValues: ['books', 'running', 'cooking']
-          }
+          stringValue: '{"books", "running", "cooking"}'
         }
       }],
       [{
@@ -286,9 +284,7 @@ describe('AuroraDataAPI#batchQuery', () => {
       }, {
         name: 'interests',
         value: {
-          arrayValue: {
-            stringValues: ['cats', 'dogs', 'babies']
-          }
+          stringValue: '{"cats", "dogs", "babies"}'
         }
       }]
     ]

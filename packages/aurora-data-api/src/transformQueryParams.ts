@@ -2,13 +2,12 @@ import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import * as Errors from './Errors'
 
 type ParamValue = null | string | number | boolean | Buffer | Uint8Array | Date | CustomValue
-type ParamArray = (boolean | string | number | Date | CustomValue | ParamArray)[]
 
 export interface CustomValue {
   toSqlParameter (): SqlParameter;
 }
 export type SqlParameter = Omit<RDSDataService.SqlParameter, 'name'>
-export type QueryParam = ParamValue | ParamArray | SqlParameter
+export type QueryParam = ParamValue | SqlParameter
 export interface QueryParams {
   [name: string]: QueryParam;
 }
@@ -45,71 +44,6 @@ const isCustomValue = (param: QueryParam): param is CustomValue => {
   return typeof param === 'object' && typeof param['toSqlParameter'] === 'function'
 }
 
-const mergeArrayValue = <K extends keyof RDSDataService.ArrayValue>(
-  result: SqlParameter,
-  key: K,
-  value: RDSDataService.ArrayValue[K][0]
-): SqlParameter => ({
-  ...result,
-  value: {
-    ...result.value,
-    arrayValue: {
-      ...result.value.arrayValue,
-      [key]: [
-        ...result.value.arrayValue[key] || [],
-        value
-      ]
-    }
-  }
-})
-
-const transformQueryParamArray = (paramArray: ParamArray): SqlParameter => {
-  return paramArray.reduce<SqlParameter>((result, value) => {
-    switch (typeof value) {
-      case 'object':
-        if (Array.isArray(value)) {
-          const sqlParameter = transformQueryParamArray(value)
-          return mergeArrayValue({
-            ...result,
-            typeHint: sqlParameter.typeHint
-          }, 'arrayValues', sqlParameter.value.arrayValue)
-        }
-        if (isCustomValue(value)) {
-          const sqlParameter = value.toSqlParameter()
-          return Object.entries(sqlParameter.value).reduce((result, [key, value]) => {
-            const pluralKey = `${key}s` as keyof RDSDataService.ArrayValue
-            return mergeArrayValue(result, pluralKey, value)
-          }, {
-            ...result,
-            typeHint: sqlParameter.typeHint
-          })
-        }
-        if (value instanceof Date) {
-          return mergeArrayValue({
-            ...result,
-            typeHint: 'TIMESTAMP'
-          }, 'stringValues', value.toISOString())
-        }
-        break
-      case 'boolean':
-        return mergeArrayValue(result, 'booleanValues', value)
-      case 'number':
-        if (Number.isInteger(value)) {
-          return mergeArrayValue(result, 'longValues', value)
-        } else {
-          return mergeArrayValue(result, 'doubleValues', value)
-        }
-      case 'string':
-        return mergeArrayValue(result, 'stringValues', value)
-    }
-    throw new Error('Type not supported.')
-  }, {
-    value: {
-      arrayValue: {}
-    }
-  })
-}
-
 const transformQueryParam = (value: QueryParam): SqlParameter => {
   if (value === null || value === undefined) {
     return { value: { isNull: true } }
@@ -121,9 +55,6 @@ const transformQueryParam = (value: QueryParam): SqlParameter => {
       }
       if (isBlob(value)) {
         return { value: { blobValue: value.valueOf() } }
-      }
-      if (Array.isArray(value)) {
-        return transformQueryParamArray(value)
       }
       if (isCustomValue(value)) {
         return value.toSqlParameter()
