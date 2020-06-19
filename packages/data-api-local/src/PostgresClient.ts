@@ -94,8 +94,8 @@ export class PostgresClient implements Client {
     return this.client.end()
   }
 
-  public async beginTransaction (): Promise<void> {
-    await this.query({ query: 'BEGIN' })
+  public async beginTransaction (schema?: string): Promise<void> {
+    await this.query({ query: 'BEGIN', schema })
   }
 
   public async commitTransaction (): Promise<void> {
@@ -107,9 +107,10 @@ export class PostgresClient implements Client {
   }
 
   public async executeSql ({
-    sqlStatements
+    sqlStatements,
+    schema
   }: ExecuteSqlRequest): Promise<RDSDataService.Types.ExecuteSqlResponse> {
-    await this.query({ query: sqlStatements })
+    await this.query({ query: sqlStatements, schema })
     return {
       sqlStatementResults: []
     }
@@ -118,10 +119,11 @@ export class PostgresClient implements Client {
   public async executeStatement ({
     sql,
     parameters,
+    schema,
     includeResultMetadata = false
   }: ExecuteStatementRequest): Promise<RDSDataService.Types.ExecuteStatementResponse> {
     const { query, values } = transformQuery(sql, parameters)
-    const result = await this.query({ query, values })
+    const result = await this.query({ query, values, schema })
     return {
       columnMetadata: includeResultMetadata ? await this.buildColumnMetadata(result.fields) : undefined,
       records: transformResult(result),
@@ -131,12 +133,13 @@ export class PostgresClient implements Client {
 
   public async batchExecuteStatement ({
     sql,
+    schema,
     parameterSets = []
   }: BatchExecuteStatementRequest): Promise<RDSDataService.Types.BatchExecuteStatementResponse> {
     await Promise.all(
       parameterSets.map((parameters) => {
         const { query, values } = transformQuery(sql, parameters)
-        return this.query({ query, values })
+        return this.query({ query, values, schema })
       })
     )
     return {
@@ -144,8 +147,9 @@ export class PostgresClient implements Client {
     }
   }
 
-  private async query ({ query, values }: { query: string; values?: unknown[] }): Promise<QueryArrayResult> {
+  private async query ({ query, values, schema = 'public' }: { query: string; values?: unknown[], schema?: string }): Promise<QueryArrayResult> {
     try {
+      await this.client.query(`SET search_path TO ${schema};`);
       return await this.client.query({ text: query, values, rowMode: 'array' })
     } catch (error) {
       throw createError(400, `${error.severity}: ${error.message}\n  Position: ${error.position}`)

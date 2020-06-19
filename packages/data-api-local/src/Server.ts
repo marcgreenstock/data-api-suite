@@ -126,7 +126,7 @@ export class Server {
     res: express.Response,
     next: express.NextFunction
   ): Promise<void> {
-    const { database, sqlStatements } = req.body
+    const { database, sqlStatements, schema } = req.body
     try {
       if (typeof sqlStatements !== 'string' || sqlStatements.trim() === '') {
         throw createError(400, 'SQL is empty')
@@ -134,7 +134,7 @@ export class Server {
       const client = await this.createClient({ database })
       try {
         this.log(`[executeSql] ${sqlStatements}`)
-        const result = await client.executeSql({ sqlStatements })
+        const result = await client.executeSql({ sqlStatements, schema })
         res.status(200).send(result)
       } finally {
         await client.disconnect()
@@ -209,13 +209,13 @@ export class Server {
     res: express.Response,
     next: express.NextFunction
   ): Promise<void> {
-    const { database } = req.body
+    const { database, schema } = req.body
     const transactionId = Buffer.from(uuid()).toString('base64')
     try {
       const client = await this.createClient({ database, transactionId })
       try {
         this.log(`[beginTransaction] transactionId: ${transactionId}`)
-        await client.beginTransaction()
+        await client.beginTransaction(schema)
         res.status(200).json({ transactionId })
       } catch (error) {
         await this.pool[transactionId].disconnect()

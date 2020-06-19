@@ -2,16 +2,19 @@ import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 
 export interface ExecuteSqlRequest {
   sqlStatements: RDSDataService.Types.SqlStatement;
+  schema?: string;
 }
 
 export interface ExecuteStatementRequest {
   sql: RDSDataService.Types.SqlStatement;
+  schema?: string;
   parameters?: RDSDataService.Types.SqlParametersList;
   includeResultMetadata?: boolean;
 }
 
 export interface BatchExecuteStatementRequest {
   sql: RDSDataService.Types.SqlStatement;
+  schema?: string;
   parameterSets?: RDSDataService.Types.SqlParameterSets;
 }
 
@@ -20,7 +23,7 @@ export abstract class Client {
 
   abstract async disconnect (): Promise<void>
 
-  abstract async beginTransaction (): Promise<void>
+  abstract async beginTransaction (schema?: string): Promise<void>
 
   abstract async commitTransaction (): Promise<void>
 
