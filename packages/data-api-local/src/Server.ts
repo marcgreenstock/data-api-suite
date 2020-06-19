@@ -149,8 +149,11 @@ export class Server {
     res: express.Response,
     next: express.NextFunction
   ): Promise<void> {
+    // Intentionally omit `schema` from `client.executeStatement` call as it's "not currently supported" according to AWS docs.
+    // See AWS docs for most up to date supported status. https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html
     const {
       database,
+      schema,
       transactionId,
       sql,
       ...rest

@@ -48,7 +48,11 @@ const result = await client.executeStatement({
       longValue: 42
     }
   }],
-  database: 'example'
+  database: 'example',
+  // `schema` is an optional parameter for `BeginTransaction`, `ExecuteSql` and `ExecuteStatement` operations
+  // although reportedly "not supported" for `ExecuteStatement`. See AWS docs for most up to date supported status.
+  // https://docs.aws.amazon.com/rdsdataservice/latest/APIReference/API_ExecuteStatement.html
+  schema: 'public',
   // secretArn and resourceArn are not used but are required for the AWS SDK
   secretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:dummy',
   resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:dummy'
