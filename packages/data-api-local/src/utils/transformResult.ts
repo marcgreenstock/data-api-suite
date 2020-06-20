@@ -1,5 +1,5 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
-import { QueryResult, types, FieldDef } from 'pg'
+import { QueryResult, types, FieldDef, QueryArrayResult } from 'pg'
 import { TypeId } from 'pg-types'
 
 const transformStringValue = (value: unknown): string => {
@@ -73,7 +73,19 @@ const transformValue = (field: FieldDef, value: unknown): RDSDataService.Types.F
   }
 }
 
-export const transformResult = (result: QueryResult): RDSDataService.Types.SqlRecords => {
+export const transformSqlResult = (result: QueryArrayResult): RDSDataService.Records => {
+  return result.rows.map((row): RDSDataService.Record => {
+    return {
+      values: row.map((value, index): RDSDataService.Value => {
+        const field = result.fields[index];
+
+        return transformValue(field, value);
+      }),
+    };
+  });
+};
+
+export const transformStatementResult = (result: QueryArrayResult): RDSDataService.Types.SqlRecords => {
   return result.rows.map((columns) => {
     return columns.map((value: unknown, index: number) => {
       const field = result.fields[index]

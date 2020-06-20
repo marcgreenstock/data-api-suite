@@ -13,7 +13,7 @@ import {
   BatchExecuteStatementRequest
 } from './Client'
 import { transformQuery } from './utils/transformQuery'
-import { transformResult } from './utils/transformResult'
+import { transformStatementResult, transformSqlResult } from './utils/transformResult'
 
 const getColumnTypeData = (field: FieldDef): RDSDataService.Types.ColumnMetadata => {
   if (field.dataTypeSize == -1 && field.dataTypeModifier == -1) {
@@ -110,10 +110,26 @@ export class PostgresClient implements Client {
     sqlStatements,
     schema
   }: ExecuteSqlRequest): Promise<RDSDataService.Types.ExecuteSqlResponse> {
-    await this.query({ query: sqlStatements, schema })
+    const statements = sqlStatements.split(';');
+
     return {
-      sqlStatementResults: []
-    }
+      sqlStatementResults: await Promise.all(statements.map(async (statement): Promise<RDSDataService.SqlStatementResult> => {
+        const result = await this.query({ query: statement, schema });
+
+        return {
+          numberOfRecordsUpdated: result.command === 'UPDATE' ? result.rowCount : 0,
+
+          resultFrame: {
+            records: transformSqlResult(result),
+
+            resultSetMetadata: {
+              columnCount: result.fields.length,
+              columnMetadata: await this.buildColumnMetadata(result.fields),
+            },
+          },
+        };
+      })),
+    };
   }
 
   public async executeStatement ({
@@ -126,7 +142,7 @@ export class PostgresClient implements Client {
     const result = await this.query({ query, values, schema })
     return {
       columnMetadata: includeResultMetadata ? await this.buildColumnMetadata(result.fields) : undefined,
-      records: transformResult(result),
+      records: transformStatementResult(result),
       numberOfRecordsUpdated: result.command === 'UPDATE' ? result.rowCount : 0
     }
   }

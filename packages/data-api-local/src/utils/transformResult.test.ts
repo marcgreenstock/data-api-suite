@@ -1,4 +1,4 @@
-import { transformResult } from './transformResult'
+import { transformStatementResult } from './transformResult'
 import { QueryResult, types } from 'pg'
 
 test('transformResult', () => {
@@ -155,7 +155,7 @@ test('transformResult', () => {
       format: 'TEXT'
     }]
   }
-  const result = transformResult(queryResult)
+  const result = transformStatementResult(queryResult)
   expect(result).toMatchObject([[
     { isNull: true },
     { stringValue: 'example' },
