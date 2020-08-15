@@ -67,7 +67,7 @@ describe('DataAPIMigrations#getAppliedMigrationIds', () => {
   it('ensures the migration table exists', async () => {
     await manager.getAppliedMigrationIds()
     expect(auroraDataAPIMock.query).toHaveBeenCalledWith(
-      'CREATE TABLE IF NOT EXISTS __migrations__ (id varchar NOT NULL UNIQUE)',
+      'CREATE TABLE IF NOT EXISTS __migrations__ (id varchar(255) NOT NULL UNIQUE)',
       undefined,
       { includeResultMetadata: false }
     )

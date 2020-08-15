@@ -130,7 +130,7 @@ export class DataAPIMigrations {
 
   private async ensureMigrationTable (): Promise<void> {
     await this.dataAPI.query(
-      'CREATE TABLE IF NOT EXISTS __migrations__ (id varchar NOT NULL UNIQUE)',
+      'CREATE TABLE IF NOT EXISTS __migrations__ (id varchar(255) NOT NULL UNIQUE)',
       undefined,
       { includeResultMetadata: false }
     )
