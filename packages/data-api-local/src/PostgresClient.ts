@@ -207,7 +207,7 @@ export class PostgresClient implements Client {
           FROM pg_class c
           JOIN pg_namespace n ON n.oid = c.relnamespace
           JOIN pg_attribute a ON attrelid = c.oid
-          WHERE c.oid = ANY($1::oid[])
+          WHERE c.oid = ANY($1::oid[]) AND NOT a.attisdropped
           ORDER BY a.attnum ASC
       `,
       values: [oids]
