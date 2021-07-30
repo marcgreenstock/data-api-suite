@@ -6,26 +6,26 @@ import * as yup from 'yup'
 class UUIDValue implements AuroraDataAPI.CustomValue {
   private value: string
 
-  constructor (value: string) {
+  constructor(value: string) {
     this.value = value
   }
 
-  toSqlParameter (): AuroraDataAPI.SqlParameter {
+  toSqlParameter(): AuroraDataAPI.SqlParameter {
     return {
       typeHint: 'uuid',
       value: {
-        stringValue: this.value
-      }
+        stringValue: this.value,
+      },
     }
   }
 }
 
 interface Todo {
-  id: string;
-  name: string;
-  completedAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  id: string
+  name: string
+  completedAt: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 const dataAPI = new AuroraDataAPI({
@@ -36,11 +36,13 @@ const dataAPI = new AuroraDataAPI({
   database: process.env.DATA_API_DATABASE_NAME,
   credentials: {
     accessKeyId: 'example',
-    secretAccessKey: 'example'
-  }
+    secretAccessKey: 'example',
+  },
 })
 
-const parseEventBody = (event: AWSLambda.APIGatewayEvent): { [key: string]: unknown } => {
+const parseEventBody = (
+  event: AWSLambda.APIGatewayEvent
+): { [key: string]: unknown } => {
   if (event.body === null) {
     throw new createError.BadRequest('JSON body is required in request')
   }
@@ -64,16 +66,17 @@ const handleError = (error: Error): AWSLambda.APIGatewayProxyResult => {
       statusCode: 400,
       body: JSON.stringify({
         message: error.message,
-        errors: error.errors
-      })
+        errors: error.errors,
+      }),
     }
   }
-  const statusCode = error instanceof createError.HttpError ? error.statusCode : 500
+  const statusCode =
+    error instanceof createError.HttpError ? error.statusCode : 500
   return {
     statusCode,
     body: JSON.stringify({
-      message: error.message
-    })
+      message: error.message,
+    }),
   }
 }
 
@@ -90,10 +93,12 @@ const getTodo = async (id: string): Promise<Todo> => {
 
 export const list: AWSLambda.APIGatewayProxyHandler = async () => {
   try {
-    const { rows } = await dataAPI.query<Todo>('SELECT * FROM "todos" ORDER BY "createdAt" ASC')
+    const { rows } = await dataAPI.query<Todo>(
+      'SELECT * FROM "todos" ORDER BY "createdAt" ASC'
+    )
     return {
       statusCode: 200,
-      body: JSON.stringify(rows)
+      body: JSON.stringify(rows),
     }
   } catch (error) {
     return handleError(error)
@@ -105,7 +110,7 @@ export const get: AWSLambda.APIGatewayProxyHandler = async (event) => {
     const todo = await getTodo(parseEventId(event))
     return {
       statusCode: 200,
-      body: JSON.stringify(todo)
+      body: JSON.stringify(todo),
     }
   } catch (error) {
     return handleError(error)
@@ -114,10 +119,12 @@ export const get: AWSLambda.APIGatewayProxyHandler = async (event) => {
 
 export const create: AWSLambda.APIGatewayProxyHandler = async (event) => {
   try {
-    const { name, completedAt } = yup.object({
-      name: yup.string().required(),
-      completedAt: yup.date().nullable()
-    }).validateSync(parseEventBody(event))
+    const { name, completedAt } = yup
+      .object({
+        name: yup.string().required(),
+        completedAt: yup.date().nullable(),
+      })
+      .validateSync(parseEventBody(event))
     const { rows } = await dataAPI.query<Todo>(
       'INSERT INTO "todos" ("name", "completedAt") VALUES (:name, :completedAt) RETURNING *',
       { name, completedAt }
@@ -127,7 +134,7 @@ export const create: AWSLambda.APIGatewayProxyHandler = async (event) => {
     }
     return {
       statusCode: 201,
-      body: JSON.stringify(rows[0])
+      body: JSON.stringify(rows[0]),
     }
   } catch (error) {
     return handleError(error)
@@ -137,11 +144,14 @@ export const create: AWSLambda.APIGatewayProxyHandler = async (event) => {
 export const update: AWSLambda.APIGatewayProxyHandler = async (event) => {
   try {
     const todo = await getTodo(parseEventId(event))
-    const { name, completedAt } = yup.object({
-      name: yup.string().default(todo.name),
-      completedAt: yup.date().nullable().default(todo.completedAt)
-    }).validateSync(parseEventBody(event))
-    const { rows } = await dataAPI.query<Todo>(`
+    const { name, completedAt } = yup
+      .object({
+        name: yup.string().default(todo.name),
+        completedAt: yup.date().nullable().default(todo.completedAt),
+      })
+      .validateSync(parseEventBody(event))
+    const { rows } = await dataAPI.query<Todo>(
+      `
       UPDATE "todos"
         SET
           "name" = :name,
@@ -157,7 +167,7 @@ export const update: AWSLambda.APIGatewayProxyHandler = async (event) => {
     }
     return {
       statusCode: 200,
-      body: JSON.stringify(rows[0])
+      body: JSON.stringify(rows[0]),
     }
   } catch (error) {
     return handleError(error)
@@ -167,10 +177,12 @@ export const update: AWSLambda.APIGatewayProxyHandler = async (event) => {
 export const remove: AWSLambda.APIGatewayProxyHandler = async (event) => {
   try {
     const todo = await getTodo(parseEventId(event))
-    await dataAPI.query('DELETE FROM todos WHERE id = :id', { id: new UUIDValue(todo.id) })
+    await dataAPI.query('DELETE FROM todos WHERE id = :id', {
+      id: new UUIDValue(todo.id),
+    })
     return {
       statusCode: 204,
-      body: ''
+      body: '',
     }
   } catch (error) {
     return handleError(error)

@@ -13,69 +13,74 @@ let client: RDSDataService
 const executeStatement = async (
   sql: string,
   options?: {
-    parameters?: RDSDataService.Types.SqlParametersList;
-    transactionId?: string;
-    includeResultMetadata?: boolean;
+    parameters?: RDSDataService.Types.SqlParametersList
+    transactionId?: string
+    includeResultMetadata?: boolean
   }
 ): Promise<RDSDataService.Types.ExecuteStatementResponse> => {
   const {
     parameters,
     transactionId,
-    includeResultMetadata = true
+    includeResultMetadata = true,
   } = options || {}
-  return await client.executeStatement({
-    sql,
-    parameters,
-    includeResultMetadata,
-    database: DATABASE,
-    secretArn: SECRET_ARN,
-    resourceArn: RESOURCE_ARN,
-    transactionId
-  }).promise()
+  return await client
+    .executeStatement({
+      sql,
+      parameters,
+      includeResultMetadata,
+      database: DATABASE,
+      secretArn: SECRET_ARN,
+      resourceArn: RESOURCE_ARN,
+      transactionId,
+    })
+    .promise()
 }
 
 // batchExecuteStatement helper
 const batchExecuteStatement = async (
   sql: string,
   options?: {
-    parameterSets?: RDSDataService.Types.SqlParameterSets;
-    transactionId?: string;
-    includeResultMetadata?: boolean;
+    parameterSets?: RDSDataService.Types.SqlParameterSets
+    transactionId?: string
+    includeResultMetadata?: boolean
   }
 ): Promise<RDSDataService.Types.BatchExecuteStatementResponse> => {
-  const {
-    parameterSets,
-    transactionId
-  } = options || {}
-  return await client.batchExecuteStatement({
-    sql,
-    parameterSets,
-    transactionId,
-    database: DATABASE,
-    secretArn: SECRET_ARN,
-    resourceArn: RESOURCE_ARN,
-  }).promise()
+  const { parameterSets, transactionId } = options || {}
+  return await client
+    .batchExecuteStatement({
+      sql,
+      parameterSets,
+      transactionId,
+      database: DATABASE,
+      secretArn: SECRET_ARN,
+      resourceArn: RESOURCE_ARN,
+    })
+    .promise()
 }
 
 // executeSQL helper
 const executeSql = async (
   sqlStatements: string
 ): Promise<RDSDataService.Types.ExecuteSqlResponse> => {
-  return await client.executeSql({
-    sqlStatements,
-    awsSecretStoreArn: SECRET_ARN,
-    dbClusterOrInstanceArn: RESOURCE_ARN,
-    database: DATABASE
-  }).promise()
+  return await client
+    .executeSql({
+      sqlStatements,
+      awsSecretStoreArn: SECRET_ARN,
+      dbClusterOrInstanceArn: RESOURCE_ARN,
+      database: DATABASE,
+    })
+    .promise()
 }
 
 // beginTransaction helper
 const beginTransaction = async (): Promise<string> => {
-  const { transactionId } = await client.beginTransaction({
-    database: DATABASE,
-    secretArn: SECRET_ARN,
-    resourceArn: RESOURCE_ARN
-  }).promise()
+  const { transactionId } = await client
+    .beginTransaction({
+      database: DATABASE,
+      secretArn: SECRET_ARN,
+      resourceArn: RESOURCE_ARN,
+    })
+    .promise()
   return transactionId
 }
 
@@ -83,22 +88,26 @@ const beginTransaction = async (): Promise<string> => {
 const commitTransaction = async (
   transactionId: string
 ): Promise<RDSDataService.Types.CommitTransactionResponse> => {
-  return await client.commitTransaction({
-    transactionId,
-    secretArn: SECRET_ARN,
-    resourceArn: RESOURCE_ARN
-  }).promise()
+  return await client
+    .commitTransaction({
+      transactionId,
+      secretArn: SECRET_ARN,
+      resourceArn: RESOURCE_ARN,
+    })
+    .promise()
 }
 
 // rollbackTransaction helper
 const rollbackTransaction = async (
   transactionId: string
 ): Promise<RDSDataService.Types.RollbackTransactionResponse> => {
-  return await client.rollbackTransaction({
-    transactionId,
-    secretArn: SECRET_ARN,
-    resourceArn: RESOURCE_ARN
-  }).promise()
+  return await client
+    .rollbackTransaction({
+      transactionId,
+      secretArn: SECRET_ARN,
+      resourceArn: RESOURCE_ARN,
+    })
+    .promise()
 }
 
 beforeAll(async () => {
@@ -106,22 +115,22 @@ beforeAll(async () => {
     logger: () => undefined,
     server: {
       hostname: 'localhost',
-      port: 8080
+      port: 8080,
     },
     database: {
       engine: 'postgresql',
       port: 54320,
       user: 'test',
-      password: 'test'
-    }
+      password: 'test',
+    },
   })
   client = new RDSDataService({
     endpoint: 'http://localhost:8080',
     region: 'us-east-1',
     credentials: {
       accessKeyId: 'example',
-      secretAccessKey: 'example'
-    }
+      secretAccessKey: 'example',
+    },
   })
 })
 
@@ -153,7 +162,7 @@ describe('#executeStatement', () => {
       } catch (error) {
         expect(error).toMatchObject({
           message: 'SQL is empty',
-          code: 'BadRequestException'
+          code: 'BadRequestException',
         })
       }
     })
@@ -165,7 +174,7 @@ describe('#executeStatement', () => {
       } catch (error) {
         expect(error).toMatchObject({
           message: `Transaction ${transactionId} is not found`,
-          code: 'BadRequestException'
+          code: 'BadRequestException',
         })
       }
     })
@@ -186,7 +195,7 @@ describe('#executeStatement', () => {
       schemaName: '',
       tableName: '',
       type: 0,
-      typeName: ''
+      typeName: '',
     }
     const result = await executeStatement(`
       SELECT
@@ -202,93 +211,105 @@ describe('#executeStatement', () => {
     `)
     expect(result).toMatchObject({
       numberOfRecordsUpdated: 0,
-      records: [[
-        { longValue: 12345 },
-        { longValue: 12345 },
-        { stringValue: '12345' },
-        { longValue: 12345 },
-        { doubleValue: 12345.7 },
-        { doubleValue: 12345.67 },
-        { stringValue: '12345.67' },
-        { stringValue: 'helloWorld' },
-        { stringValue: '{"foo":1,"bar":2}' }
-      ]],
-      columnMetadata: [{
-        ...metadataDefaults,
-        precision: 5,
-        type: 21,
-        isSigned: true,
-        name: 'int2Value',
-        label: 'int2Value',
-        typeName: 'int2'
-      }, {
-        ...metadataDefaults,
-        precision: 10,
-        type: 23,
-        isSigned: true,
-        name: 'int4Value',
-        label: 'int4Value',
-        typeName: 'int4'
-      }, {
-        ...metadataDefaults,
-        precision: 10,
-        type: 26,
-        isSigned: true,
-        name: 'oidValue',
-        label: 'oidValue',
-        typeName: 'oid'
-      }, {
-        ...metadataDefaults,
-        precision: 19,
-        type: 20,
-        isSigned: true,
-        name: 'int8Value',
-        label: 'int8Value',
-        typeName: 'int8'
-      }, {
-        ...metadataDefaults,
-        precision: 8,
-        scale: 8,
-        type: 700,
-        isSigned: true,
-        name: 'float4Value',
-        label: 'float4Value',
-        typeName: 'float4'
-      }, {
-        ...metadataDefaults,
-        precision: 17,
-        scale: 17,
-        type: 701,
-        isSigned: true,
-        name: 'float8Value',
-        label: 'float8Value',
-        typeName: 'float8'
-      }, {
-        ...metadataDefaults,
-        precision: 10,
-        scale: 2,
-        type: 1700,
-        isSigned: true,
-        name: 'numericValue',
-        label: 'numericValue',
-        typeName: 'numeric'
-      }, {
-        ...metadataDefaults,
-        precision: 2147483647,
-        scale: 0,
-        type: 1043,
-        name: 'varcharValue',
-        label: 'varcharValue',
-        typeName: 'varchar'
-      }, {
-        ...metadataDefaults,
-        precision: 2147483647,
-        scale: 0,
-        type: 114,
-        name: 'jsonValue',
-        label: 'jsonValue',
-        typeName: 'json'
-      }]
+      records: [
+        [
+          { longValue: 12345 },
+          { longValue: 12345 },
+          { stringValue: '12345' },
+          { longValue: 12345 },
+          { doubleValue: 12345.7 },
+          { doubleValue: 12345.67 },
+          { stringValue: '12345.67' },
+          { stringValue: 'helloWorld' },
+          { stringValue: '{"foo":1,"bar":2}' },
+        ],
+      ],
+      columnMetadata: [
+        {
+          ...metadataDefaults,
+          precision: 5,
+          type: 21,
+          isSigned: true,
+          name: 'int2Value',
+          label: 'int2Value',
+          typeName: 'int2',
+        },
+        {
+          ...metadataDefaults,
+          precision: 10,
+          type: 23,
+          isSigned: true,
+          name: 'int4Value',
+          label: 'int4Value',
+          typeName: 'int4',
+        },
+        {
+          ...metadataDefaults,
+          precision: 10,
+          type: 26,
+          isSigned: true,
+          name: 'oidValue',
+          label: 'oidValue',
+          typeName: 'oid',
+        },
+        {
+          ...metadataDefaults,
+          precision: 19,
+          type: 20,
+          isSigned: true,
+          name: 'int8Value',
+          label: 'int8Value',
+          typeName: 'int8',
+        },
+        {
+          ...metadataDefaults,
+          precision: 8,
+          scale: 8,
+          type: 700,
+          isSigned: true,
+          name: 'float4Value',
+          label: 'float4Value',
+          typeName: 'float4',
+        },
+        {
+          ...metadataDefaults,
+          precision: 17,
+          scale: 17,
+          type: 701,
+          isSigned: true,
+          name: 'float8Value',
+          label: 'float8Value',
+          typeName: 'float8',
+        },
+        {
+          ...metadataDefaults,
+          precision: 10,
+          scale: 2,
+          type: 1700,
+          isSigned: true,
+          name: 'numericValue',
+          label: 'numericValue',
+          typeName: 'numeric',
+        },
+        {
+          ...metadataDefaults,
+          precision: 2147483647,
+          scale: 0,
+          type: 1043,
+          name: 'varcharValue',
+          label: 'varcharValue',
+          typeName: 'varchar',
+        },
+        {
+          ...metadataDefaults,
+          precision: 2147483647,
+          scale: 0,
+          type: 114,
+          name: 'jsonValue',
+          label: 'jsonValue',
+          typeName: 'json',
+        },
+      ],
     })
   })
 
@@ -297,31 +318,38 @@ describe('#executeStatement', () => {
     beforeEach(async () => {
       const now = new Date()
       transactionId = await beginTransaction()
-      await executeStatement(`
+      await executeStatement(
+        `
         INSERT INTO "users" ("email", "createdAt", "updatedAt")
           VALUES (:email, :createdAt, :updatedAt)
           RETURNING *
-      `, {
-        transactionId,
-        parameters: [{
-          name: 'email',
-          value: {
-            stringValue: 'example@example.com'
-          }
-        }, {
-          name: 'createdAt',
-          typeHint: 'TIMESTAMP',
-          value: {
-            stringValue: now.toISOString()
-          }
-        }, {
-          name: 'updatedAt',
-          typeHint: 'TIMESTAMP',
-          value: {
-            stringValue: now.toISOString()
-          }
-        }]
-      })
+      `,
+        {
+          transactionId,
+          parameters: [
+            {
+              name: 'email',
+              value: {
+                stringValue: 'example@example.com',
+              },
+            },
+            {
+              name: 'createdAt',
+              typeHint: 'TIMESTAMP',
+              value: {
+                stringValue: now.toISOString(),
+              },
+            },
+            {
+              name: 'updatedAt',
+              typeHint: 'TIMESTAMP',
+              value: {
+                stringValue: now.toISOString(),
+              },
+            },
+          ],
+        }
+      )
     })
 
     test('commiting', async () => {
@@ -351,25 +379,29 @@ describe('#batchExecuteStatement', () => {
   const parameterSets = [
     'example1@example.com',
     'example2@example.com',
-    'example3@example.com'
-  ].map((stringValue) => [{
-    name: 'email',
-    value: {
-      stringValue
-    }
-  }, {
-    name: 'createdAt',
-    typeHint: 'TIMESTAMP',
-    value: {
-      stringValue: now.toISOString()
-    }
-  }, {
-    name: 'updatedAt',
-    typeHint: 'TIMESTAMP',
-    value: {
-      stringValue: now.toISOString()
-    }
-  }])
+    'example3@example.com',
+  ].map((stringValue) => [
+    {
+      name: 'email',
+      value: {
+        stringValue,
+      },
+    },
+    {
+      name: 'createdAt',
+      typeHint: 'TIMESTAMP',
+      value: {
+        stringValue: now.toISOString(),
+      },
+    },
+    {
+      name: 'updatedAt',
+      typeHint: 'TIMESTAMP',
+      value: {
+        stringValue: now.toISOString(),
+      },
+    },
+  ])
 
   describe('error handeling', () => {
     test('empty sql', async () => {
@@ -378,7 +410,7 @@ describe('#batchExecuteStatement', () => {
       } catch (error) {
         expect(error).toMatchObject({
           message: 'SQL is empty',
-          code: 'BadRequestException'
+          code: 'BadRequestException',
         })
       }
     })
@@ -390,7 +422,7 @@ describe('#batchExecuteStatement', () => {
       } catch (error) {
         expect(error).toMatchObject({
           message: `Transaction ${transactionId} is not found`,
-          code: 'BadRequestException'
+          code: 'BadRequestException',
         })
       }
     })
@@ -399,7 +431,9 @@ describe('#batchExecuteStatement', () => {
   test('multiple inserts', async () => {
     await batchExecuteStatement(sql, { parameterSets })
     const result = await executeStatement('SELECT count(*) FROM "users"')
-    expect(result.records).toMatchObject([[{ longValue: parameterSets.length }]])
+    expect(result.records).toMatchObject([
+      [{ longValue: parameterSets.length }],
+    ])
   })
 
   describe('transactions', () => {
@@ -415,7 +449,9 @@ describe('#batchExecuteStatement', () => {
 
       await commitTransaction(transactionId)
       const result2 = await executeStatement('SELECT count(*) FROM "users"')
-      expect(result2.records).toMatchObject([[{ longValue: parameterSets.length }]])
+      expect(result2.records).toMatchObject([
+        [{ longValue: parameterSets.length }],
+      ])
     })
 
     test('rolling back', async () => {

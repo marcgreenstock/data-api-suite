@@ -6,18 +6,18 @@ import { format as formatDate } from 'date-fns'
 import { jsTemplate, tsTemplate } from './templates'
 import { Migration } from './Migration'
 import { TypeScriptCompiler } from './TypeScriptCompiler'
-import { Compiler, CompilerDerived } from './Compiler'
+import { Compiler, CompilerClass } from './Compiler'
 
 const ID_FORMAT = 'yyyyMMddHHmmss'
 
 export interface DataAPIMigrationsConfig {
-  cwd?: string;
-  migrationsFolder?: string;
-  typescript?: boolean;
-  logger?: Function;
-  compiler?: CompilerDerived;
-  isLocal?: boolean;
-  dataAPI: AuroraDataAPI.Config;
+  cwd?: string
+  migrationsFolder?: string
+  typescript?: boolean
+  logger?: (message: string) => void
+  compiler?: CompilerClass
+  isLocal?: boolean
+  dataAPI: AuroraDataAPI.Config
 }
 
 export class DataAPIMigrations {
@@ -25,19 +25,19 @@ export class DataAPIMigrations {
   public readonly typescript: boolean
   public readonly isLocal: boolean
   public readonly dataAPI: AuroraDataAPI
-  protected logger: Function
-  protected compiler: CompilerDerived
+  protected logger: (message: string) => void
+  protected compiler: CompilerClass
   protected migrationsPath: string
   protected buildPath: string
 
-  constructor ({
+  constructor({
     cwd,
     migrationsFolder,
     typescript,
     logger,
     compiler,
     isLocal,
-    dataAPI
+    dataAPI,
   }: DataAPIMigrationsConfig) {
     this.logger = logger
     this.cwd = cwd = cwd || process.cwd()
@@ -49,7 +49,7 @@ export class DataAPIMigrations {
     this.dataAPI = new AuroraDataAPI(dataAPI)
   }
 
-  public async generateMigration (name: string): Promise<string> {
+  public async generateMigration(name: string): Promise<string> {
     name = _.camelCase(name)
     const id = formatDate(new Date(), ID_FORMAT)
     const template = this.typescript ? tsTemplate : jsTemplate
@@ -60,18 +60,24 @@ export class DataAPIMigrations {
     return filePath
   }
 
-  public async getAppliedMigrationIds (): Promise<string[]> {
+  public async getAppliedMigrationIds(): Promise<string[]> {
     await this.ensureMigrationTable()
-    const result = await this.dataAPI.query<{id: string}>('SELECT id FROM __migrations__')
+    const result = await this.dataAPI.query<{ id: string }>(
+      'SELECT id FROM __migrations__'
+    )
     return result.rows.map((row) => row.id)
   }
 
-  public async applyMigrations (): Promise<string[]> {
+  public async applyMigrations(): Promise<string[]> {
     const [migrations, compiler] = await this.bootstrap()
-    const migrationsToRun = migrations.filter((migration) => !migration.isApplied)
+    const migrationsToRun = migrations.filter(
+      (migration) => !migration.isApplied
+    )
     try {
-      for (let i = 0; i < migrationsToRun.length; i ++) {
-        this.log(`Applying ${migrationsToRun[i].id} - ${migrationsToRun[i].name}`)
+      for (let i = 0; i < migrationsToRun.length; i++) {
+        this.log(
+          `Applying ${migrationsToRun[i].id} - ${migrationsToRun[i].name}`
+        )
         await migrationsToRun[i].apply()
       }
       return migrationsToRun.map((migration) => migration.id)
@@ -80,12 +86,16 @@ export class DataAPIMigrations {
     }
   }
 
-  public async rollbackMigrations (): Promise<string[]> {
+  public async rollbackMigrations(): Promise<string[]> {
     const [migrations, compiler] = await this.bootstrap()
-    const migrationsToRun = migrations.filter((migration) => migration.isApplied).slice(-1, migrations.length)
+    const migrationsToRun = migrations
+      .filter((migration) => migration.isApplied)
+      .slice(-1, migrations.length)
     try {
       for (let i = 0; i < migrationsToRun.length; i++) {
-        this.log(`Rolling back ${migrationsToRun[i].id} - ${migrationsToRun[i].name}`)
+        this.log(
+          `Rolling back ${migrationsToRun[i].id} - ${migrationsToRun[i].name}`
+        )
         await migrationsToRun[i].rollback()
       }
       return migrationsToRun.map((migration) => migration.id)
@@ -94,17 +104,16 @@ export class DataAPIMigrations {
     }
   }
 
-  private async bootstrap (): Promise<[Migration[], Compiler]> {
+  private async bootstrap(): Promise<[Migration[], Compiler]> {
     const compiler = new this.compiler({
       cwd: this.cwd,
       migrationsPath: this.migrationsPath,
       buildPath: this.buildPath,
-      logger: this.log.bind(this)
+      logger: this.log.bind(this),
     })
     const appliedMigrationIds = await this.getAppliedMigrationIds()
     const files = await compiler.compile()
-    const migrations =
-      files
+    const migrations = files
       .map((file) => {
         const fileName = path.basename(file, '.js')
         const match = fileName.match(/^(?<id>\d{14})_(?<name>\w+)/)
@@ -118,17 +127,20 @@ export class DataAPIMigrations {
       })
       .filter((data) => data !== null)
       .sort((a, b) => parseInt(a.id) - parseInt(b.id))
-      .map(({ id, ...data }) => new Migration({
-        id,
-        ...data,
-        dataAPI: this.dataAPI,
-        isLocal: this.isLocal,
-        isApplied: appliedMigrationIds.includes(id)
-      }))
+      .map(
+        ({ id, ...data }) =>
+          new Migration({
+            id,
+            ...data,
+            dataAPI: this.dataAPI,
+            isLocal: this.isLocal,
+            isApplied: appliedMigrationIds.includes(id),
+          })
+      )
     return [migrations, compiler]
   }
 
-  private async ensureMigrationTable (): Promise<void> {
+  private async ensureMigrationTable(): Promise<void> {
     await this.dataAPI.query(
       'CREATE TABLE IF NOT EXISTS __migrations__ (id varchar NOT NULL UNIQUE)',
       undefined,
@@ -136,7 +148,7 @@ export class DataAPIMigrations {
     )
   }
 
-  private log (message: string): void {
+  private log(message: string): void {
     if (typeof this.logger === 'function') {
       this.logger(message)
     }

@@ -33,13 +33,13 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^13.9.3",
-    "@types/serverless": "^1.18.6",
-    "serverless": "^1.67.0",
-    "typescript": "^3.8.3"
+    "@types/node": "^16.4.7",
+    "@types/serverless": "^1.78.32",
+    "serverless": "^2.52.1",
+    "typescript": "^4.3.5"
   },
   "dependencies": {
-    "chalk": "^3.0.0",
+    "chalk": "^4.1.1",
     "data-api-local": "^1.0.0-alpha.2"
   },
   "peerDependencies": {

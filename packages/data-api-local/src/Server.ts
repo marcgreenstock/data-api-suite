@@ -1,13 +1,10 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as http from 'http'
-import * as uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import * as createError from 'http-errors'
 import { Client } from './Client'
-import {
-  PostgresClient,
-  PostgresClientConfig
-} from './PostgresClient'
+import { PostgresClient, PostgresClientConfig } from './PostgresClient'
 
 const DEFAULT_PORT = 8080
 const DEFAULT_HOSTNAME = 'localhost'
@@ -15,20 +12,20 @@ const DEFAULT_HOSTNAME = 'localhost'
 export type engines = 'postgresql'
 
 export interface ServerConfig {
-  hostname?: string;
-  port?: number;
+  hostname?: string
+  port?: number
 }
 
 export interface PostgresConnectionOptions extends PostgresClientConfig {
-  engine: 'postgresql';
+  engine: 'postgresql'
 }
 
 export type DbConfig = PostgresConnectionOptions
 
 export interface ServerOptions {
-  database: DbConfig;
-  server?: ServerConfig;
-  logger?: Function;
+  database: DbConfig
+  server?: ServerConfig
+  logger?: (message: string) => void
 }
 
 export class Server {
@@ -36,17 +33,13 @@ export class Server {
   protected httpServer: http.Server
   protected port: number
   protected hostname: string
-  protected logger: Function
+  protected logger: (message: string) => void
   protected logLevel: string
   protected engine: engines
   protected dbConfig: PostgresConnectionOptions
   protected pool: { [id: string]: Client }
 
-  constructor ({
-    logger = console.info,
-    server,
-    database
-  }: ServerOptions) {
+  constructor({ logger = console.info, server, database }: ServerOptions) {
     this.logger = logger
     this.port = server.port || DEFAULT_PORT
     this.hostname = server.hostname || DEFAULT_HOSTNAME
@@ -64,8 +57,8 @@ export class Server {
     this.app.use(this.handleError.bind(this))
   }
 
-  public async start (): Promise<Server> {
-    await new Promise((resolve) => {
+  public async start(): Promise<Server> {
+    await new Promise<void>((resolve) => {
       this.httpServer = this.app.listen(this.port, this.hostname, () => {
         this.log(`listening on http://${this.hostname}:${this.port}`)
         resolve()
@@ -74,21 +67,23 @@ export class Server {
     return this
   }
 
-  public async stop (): Promise<void> {
-    await new Promise((resolve, reject) => {
+  public async stop(): Promise<void> {
+    await new Promise<void>((resolve, reject) => {
       this.httpServer.close((error) => {
-        if (error) { return reject(error) }
+        if (error) {
+          return reject(error)
+        }
         resolve()
       })
     })
   }
 
-  private async createClient ({
+  private async createClient({
     database = this.dbConfig.database,
-    transactionId
+    transactionId,
   }: {
-    database?: string;
-    transactionId?: string;
+    database?: string
+    transactionId?: string
   }): Promise<Client> {
     const { engine, ...config } = this.dbConfig
     let client: Client
@@ -103,12 +98,12 @@ export class Server {
     return client
   }
 
-  private async getClient ({
+  private async getClient({
     database = this.dbConfig.database,
-    transactionId
+    transactionId,
   }: {
-    database?: string;
-    transactionId?: string;
+    database?: string
+    transactionId?: string
   }): Promise<Client> {
     if (transactionId !== undefined) {
       if (transactionId in this.pool) {
@@ -121,7 +116,7 @@ export class Server {
     }
   }
 
-  private async executeSql (
+  private async executeSql(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
@@ -144,17 +139,12 @@ export class Server {
     }
   }
 
-  private async executeStatement (
+  private async executeStatement(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ): Promise<void> {
-    const {
-      database,
-      transactionId,
-      sql,
-      ...rest
-    } = req.body
+    const { database, transactionId, sql, ...rest } = req.body
     try {
       if (typeof sql !== 'string' || sql.trim() === '') {
         throw createError(400, 'SQL is empty')
@@ -174,17 +164,12 @@ export class Server {
     }
   }
 
-  private async batchExecuteStatement (
+  private async batchExecuteStatement(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ): Promise<void> {
-    const {
-      database,
-      transactionId,
-      sql,
-      ...rest
-    } = req.body
+    const { database, transactionId, sql, ...rest } = req.body
     try {
       if (typeof sql !== 'string' || sql.trim() === '') {
         throw createError(400, 'SQL is empty')
@@ -204,7 +189,7 @@ export class Server {
     }
   }
 
-  private async beginTransaction (
+  private async beginTransaction(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
@@ -227,7 +212,7 @@ export class Server {
     }
   }
 
-  private async commitTransaction (
+  private async commitTransaction(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
@@ -251,7 +236,7 @@ export class Server {
     }
   }
 
-  private async rollbackTransaction (
+  private async rollbackTransaction(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
@@ -275,7 +260,7 @@ export class Server {
     }
   }
 
-  private setRequestId (
+  private setRequestId(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
@@ -286,20 +271,22 @@ export class Server {
     next()
   }
 
-  private handleError (
+  private handleError(
     error: Error,
     _req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ): void {
     /* istanbul ignore next */
-    if (res.headersSent) { return next(error) }
+    if (res.headersSent) {
+      return next(error)
+    }
     const errorTypes = {
       400: 'BadRequestException:http://internal.amazon.com/coral/com.amazon.rdsdataservice/',
       403: 'ForbiddenException:http://internal.amazon.com/coral/com.amazon.rdsdataservice/',
       404: 'NotFoundException:http://internal.amazon.com/coral/com.amazon.rdsdataservice/',
       500: 'InternalServerErrorException:http://internal.amazon.com/coral/com.amazon.rdsdataservice/',
-      503: 'ServiceUnavailableError:http://internal.amazon.com/coral/com.amazon.rdsdataservice/'
+      503: 'ServiceUnavailableError:http://internal.amazon.com/coral/com.amazon.rdsdataservice/',
     }
     let statusCode = 500
     if (error instanceof createError.HttpError) {
@@ -309,7 +296,7 @@ export class Server {
     res.status(statusCode).json({ message: error.message })
   }
 
-  private log (message: string): void {
+  private log(message: string): void {
     if (typeof this.logger === 'function') {
       this.logger(message)
     }

@@ -1,4 +1,8 @@
-import { transformQueryParams, SqlParameter, CustomValue } from './transformQueryParams'
+import {
+  transformQueryParams,
+  SqlParameter,
+  CustomValue,
+} from './transformQueryParams'
 import { BlobValue, JSONValue } from './customValues'
 
 class WeirdClass {}
@@ -6,16 +10,16 @@ class WeirdClass {}
 class SpecialValue implements CustomValue {
   public value: string
 
-  constructor (value: string) {
+  constructor(value: string) {
     this.value = value
   }
 
-  toSqlParameter (): SqlParameter {
+  toSqlParameter(): SqlParameter {
     return {
       typeHint: 'special',
       value: {
-        stringValue: this.value
-      }
+        stringValue: this.value,
+      },
     }
   }
 }
@@ -25,93 +29,107 @@ test('SqlParameter', () => {
     example: {
       typeHint: 'json',
       value: {
-        stringValue: '{"foo": "bar"}'
-      }
-    }
+        stringValue: '{"foo": "bar"}',
+      },
+    },
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    typeHint: 'json',
-    value: {
-      stringValue: '{"foo": "bar"}'
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      typeHint: 'json',
+      value: {
+        stringValue: '{"foo": "bar"}',
+      },
+    },
+  ])
 })
 
 test('Null', () => {
   const result = transformQueryParams({
-    example: null
+    example: null,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      isNull: true
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        isNull: true,
+      },
+    },
+  ])
 })
 
 test('Boolean', () => {
   const result = transformQueryParams({
-    example: true
+    example: true,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      booleanValue: true
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        booleanValue: true,
+      },
+    },
+  ])
 })
 
 test('Buffer', () => {
   const value = Buffer.from('i is a buffer')
   const result = transformQueryParams({
-    example: value
+    example: value,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      blobValue: value
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        blobValue: value,
+      },
+    },
+  ])
 })
 
 test('Uint8Array', () => {
   const value = Uint8Array.from([1, 2, 3])
   const result = transformQueryParams({
-    example: value
+    example: value,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      blobValue: value
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        blobValue: value,
+      },
+    },
+  ])
 })
 
 test('BlobValue', () => {
   const result = transformQueryParams({
-    example: new BlobValue('i is a blob')
+    example: new BlobValue('i is a blob'),
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      blobValue: 'i is a blob'
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        blobValue: 'i is a blob',
+      },
+    },
+  ])
 })
 
 test('JSONValue', () => {
   const data = { foo: 'bar' }
   const result = transformQueryParams({
-    example: new JSONValue(data)
+    example: new JSONValue(data),
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    typeHint: 'json',
-    value: {
-      stringValue: JSON.stringify(data)
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      typeHint: 'json',
+      value: {
+        stringValue: JSON.stringify(data),
+      },
+    },
+  ])
 })
 
 test('Date', () => {
@@ -124,70 +142,84 @@ test('Date', () => {
   const sec = date.getUTCSeconds().toString().padStart(2, '0')
   const ms = date.getUTCMilliseconds().toString()
   const result = transformQueryParams({
-    example: date
+    example: date,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    typeHint: 'TIMESTAMP',
-    value: {
-      stringValue: `${y}-${m}-${d} ${h}:${min}:${sec}.${ms}`
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      typeHint: 'TIMESTAMP',
+      value: {
+        stringValue: `${y}-${m}-${d} ${h}:${min}:${sec}.${ms}`,
+      },
+    },
+  ])
 })
 
 test('String', () => {
   const result = transformQueryParams({
-    example: 'hello world'
+    example: 'hello world',
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      stringValue: 'hello world'
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        stringValue: 'hello world',
+      },
+    },
+  ])
 })
 
 test('Integer', () => {
   const result = transformQueryParams({
-    example: 996
+    example: 996,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      longValue: 996
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        longValue: 996,
+      },
+    },
+  ])
 })
 
 test('Float', () => {
   const result = transformQueryParams({
-    example: 123.45
+    example: 123.45,
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    value: {
-      doubleValue: 123.45
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      value: {
+        doubleValue: 123.45,
+      },
+    },
+  ])
 })
 
 test('Unknown', () => {
   expect(() => {
     transformQueryParams({
-      example: new WeirdClass() as unknown
+      example: new WeirdClass() as unknown,
     })
-  }).toThrow(new Error(`Could not transform "example" to an SqlParameter. Reason: "Type not supported."`))
+  }).toThrow(
+    new Error(
+      `Could not transform "example" to an SqlParameter. Reason: "Type not supported."`
+    )
+  )
 })
 
 test('CustomValue', () => {
   const result = transformQueryParams({
-    example: new SpecialValue('egg')
+    example: new SpecialValue('egg'),
   })
-  expect(result).toMatchObject([{
-    name: 'example',
-    typeHint: 'special',
-    value: {
-      stringValue: 'egg'
-    }
-  }])
+  expect(result).toMatchObject([
+    {
+      name: 'example',
+      typeHint: 'special',
+      value: {
+        stringValue: 'egg',
+      },
+    },
+  ])
 })
