@@ -27,7 +27,7 @@ export class TypeScriptCompiler extends Compiler {
 
   private async getTypescriptCompilerOptions (): Promise<ts.CompilerOptions> {
     const configFilePath = path.join(this.cwd, 'tsconfig.json')
-    if (fs.pathExists(configFilePath)) {
+    if (fs.pathExistsSync(configFilePath)) {
       this.logger('Using local tsconfig.json')
       const configFileText = (await fs.readFile(configFilePath)).toString()
       const result = ts.parseConfigFileTextToJson(configFilePath, configFileText)
