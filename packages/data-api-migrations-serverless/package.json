@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^3.0.0",
-    "data-api-migrations": "1.0.0-alpha.4"
+    "data-api-migrations": "^1.0.0-alpha.4"
   },
   "devDependencies": {
     "@types/jest": "^24.9.1",
