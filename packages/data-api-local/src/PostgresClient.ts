@@ -10,12 +10,14 @@ import {
   Client,
   ExecuteSqlRequest,
   ExecuteStatementRequest,
-  BatchExecuteStatementRequest
+  BatchExecuteStatementRequest,
 } from './Client'
 import { transformQuery } from './utils/transformQuery'
 import { transformResult } from './utils/transformResult'
 
-const getColumnTypeData = (field: FieldDef): RDSDataService.Types.ColumnMetadata => {
+const getColumnTypeData = (
+  field: FieldDef
+): RDSDataService.Types.ColumnMetadata => {
   if (field.dataTypeSize == -1 && field.dataTypeModifier == -1) {
     return { precision: 2147483647, scale: 0 }
   }
@@ -25,14 +27,14 @@ const getColumnTypeData = (field: FieldDef): RDSDataService.Types.ColumnMetadata
       return {
         precision: 19,
         scale: 0,
-        isSigned: true
+        isSigned: true,
       }
     case 21: // int2
     case 1005: // _int2
       return {
         precision: 5,
         scale: 0,
-        isSigned: true
+        isSigned: true,
       }
     case 23: // int4
     case 1007: // _int4
@@ -41,34 +43,34 @@ const getColumnTypeData = (field: FieldDef): RDSDataService.Types.ColumnMetadata
       return {
         precision: 10,
         scale: 0,
-        isSigned: true
+        isSigned: true,
       }
     case 700: // float4
     case 1021: // _float4
       return {
         precision: 8,
         scale: 8,
-        isSigned: true
+        isSigned: true,
       }
     case 701: // float8
     case 1022: // _float8
       return {
         precision: 17,
         scale: 17,
-        isSigned: true
+        isSigned: true,
       }
     case 1700: // numeric
     case 1231: // _numeric
       return {
         precision: ((field.dataTypeModifier - 4) >> 16) & 65535,
         scale: (field.dataTypeModifier - 4) & 65535,
-        isSigned: true
+        isSigned: true,
       }
     default:
       return {
         precision: 2147483647,
         scale: 0,
-        isCaseSensitive: true
+        isCaseSensitive: true,
       }
   }
 }
@@ -79,59 +81,61 @@ export class PostgresClient implements Client {
   protected client: UpstreamPostgresClient
   protected config: string | PostgresClientConfig
 
-  constructor (config: string | PostgresClientConfig) {
+  constructor(config: string | PostgresClientConfig) {
     this.config = config
   }
 
-  public async connect (): Promise<PostgresClient> {
+  public async connect(): Promise<PostgresClient> {
     this.client = new UpstreamPostgresClient(this.config)
 
     await this.client.connect()
     return this
   }
 
-  public async disconnect (): Promise<void> {
+  public async disconnect(): Promise<void> {
     return this.client.end()
   }
 
-  public async beginTransaction (): Promise<void> {
+  public async beginTransaction(): Promise<void> {
     await this.query({ query: 'BEGIN' })
   }
 
-  public async commitTransaction (): Promise<void> {
+  public async commitTransaction(): Promise<void> {
     await this.query({ query: 'COMMIT' })
   }
 
-  public async rollbackTransaction (): Promise<void> {
+  public async rollbackTransaction(): Promise<void> {
     await this.query({ query: 'ROLLBACK' })
   }
 
-  public async executeSql ({
-    sqlStatements
+  public async executeSql({
+    sqlStatements,
   }: ExecuteSqlRequest): Promise<RDSDataService.Types.ExecuteSqlResponse> {
     await this.query({ query: sqlStatements })
     return {
-      sqlStatementResults: []
+      sqlStatementResults: [],
     }
   }
 
-  public async executeStatement ({
+  public async executeStatement({
     sql,
     parameters,
-    includeResultMetadata = false
+    includeResultMetadata = false,
   }: ExecuteStatementRequest): Promise<RDSDataService.Types.ExecuteStatementResponse> {
     const { query, values } = transformQuery(sql, parameters)
     const result = await this.query({ query, values })
     return {
-      columnMetadata: includeResultMetadata ? await this.buildColumnMetadata(result.fields) : undefined,
+      columnMetadata: includeResultMetadata
+        ? await this.buildColumnMetadata(result.fields)
+        : undefined,
       records: transformResult(result),
-      numberOfRecordsUpdated: result.command === 'UPDATE' ? result.rowCount : 0
+      numberOfRecordsUpdated: result.command === 'UPDATE' ? result.rowCount : 0,
     }
   }
 
-  public async batchExecuteStatement ({
+  public async batchExecuteStatement({
     sql,
-    parameterSets = []
+    parameterSets = [],
   }: BatchExecuteStatementRequest): Promise<RDSDataService.Types.BatchExecuteStatementResponse> {
     await Promise.all(
       parameterSets.map((parameters) => {
@@ -140,22 +144,33 @@ export class PostgresClient implements Client {
       })
     )
     return {
-      updateResults: []
+      updateResults: [],
     }
   }
 
-  private async query ({ query, values }: { query: string; values?: unknown[] }): Promise<QueryArrayResult> {
+  private async query({
+    query,
+    values,
+  }: {
+    query: string
+    values?: unknown[]
+  }): Promise<QueryArrayResult> {
     try {
       return await this.client.query({ text: query, values, rowMode: 'array' })
     } catch (error) {
-      throw createError(400, `${error.severity}: ${error.message}\n  Position: ${error.position}`)
+      throw createError(
+        400,
+        `${error.severity}: ${error.message}\n  Position: ${error.position}`
+      )
     }
   }
 
-  private async buildColumnMetadata (fields: FieldDef[]): Promise<RDSDataService.Types.Metadata> {
+  private async buildColumnMetadata(
+    fields: FieldDef[]
+  ): Promise<RDSDataService.Types.Metadata> {
     const [typeMetadata, tableMetadata] = await Promise.all([
       this.fetchTypeMetadata(fields),
-      this.fetchTableMetadata(fields)
+      this.fetchTableMetadata(fields),
     ])
     return fields.map((field, index) => ({
       arrayBaseColumnType: 0,
@@ -170,24 +185,30 @@ export class PostgresClient implements Client {
       label: field.name,
       ...typeMetadata[index],
       ...tableMetadata[index],
-      ...getColumnTypeData(field)
+      ...getColumnTypeData(field),
     }))
   }
 
-  private async fetchTypeMetadata (fields: FieldDef[]): Promise<RDSDataService.Types.Metadata> {
+  private async fetchTypeMetadata(
+    fields: FieldDef[]
+  ): Promise<RDSDataService.Types.Metadata> {
     const oids = [...new Set(fields.map((field) => field.dataTypeID))]
     const query = {
       text: `SELECT oid AS "type", typname AS "typeName" FROM pg_type WHERE oid = ANY($1::oid[])`,
-      values: [oids]
+      values: [oids],
     }
     const result = await this.client.query(query)
     return fields.map((field) => {
-      const { type, typeName } = result.rows.find(({ type }) => type === field.dataTypeID)
+      const { type, typeName } = result.rows.find(
+        ({ type }) => type === field.dataTypeID
+      )
       return { type, typeName }
     })
   }
 
-  private async fetchTableMetadata (fields: FieldDef[]): Promise<RDSDataService.Types.Metadata> {
+  private async fetchTableMetadata(
+    fields: FieldDef[]
+  ): Promise<RDSDataService.Types.Metadata> {
     const oids = [...new Set(fields.map((field) => field.tableID))]
     const query = {
       text: `
@@ -210,21 +231,23 @@ export class PostgresClient implements Client {
           WHERE c.oid = ANY($1::oid[]) AND NOT a.attisdropped
           ORDER BY a.attnum ASC
       `,
-      values: [oids]
+      values: [oids],
     }
     const result = await this.client.query(query)
     return fields.map((field) => {
-      const row = result.rows.find(({ tableID, columnID }) => tableID === field.tableID && columnID === field.columnID)
+      const row = result.rows.find(
+        ({ tableID, columnID }) =>
+          tableID === field.tableID && columnID === field.columnID
+      )
       if (row) {
-        const {
-          tableName,
-          nullable,
-          isAutoIncrement
-        } = result.rows.find(({ tableID, columnID }) => tableID === field.tableID && columnID === field.columnID)
+        const { tableName, nullable, isAutoIncrement } = result.rows.find(
+          ({ tableID, columnID }) =>
+            tableID === field.tableID && columnID === field.columnID
+        )
         return {
           nullable,
           tableName,
-          isAutoIncrement
+          isAutoIncrement,
         }
       } else {
         return {}

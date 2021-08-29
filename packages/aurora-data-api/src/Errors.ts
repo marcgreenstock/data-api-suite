@@ -4,8 +4,10 @@ namespace Errors {
     public readonly paramName: string
     public readonly reason: Error
 
-    constructor (paramName: string, reason: Error) {
-      super(`Could not transform "${paramName}" to an SqlParameter. Reason: "${reason.message}"`)
+    constructor(paramName: string, reason: Error) {
+      super(
+        `Could not transform "${paramName}" to an SqlParameter. Reason: "${reason.message}"`
+      )
       this.paramName = paramName
       this.reason = reason
     }

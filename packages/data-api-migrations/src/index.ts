@@ -4,4 +4,7 @@ import { Migration } from './Migration'
 
 export default DataAPIMigrations
 export { DataAPIMigrationsConfig }
-export type MigrationFn = (dataAPI: AuroraDataAPI, migration: Migration) => Promise<void>
+export type MigrationFn = (
+  dataAPI: AuroraDataAPI,
+  migration: Migration
+) => Promise<void>

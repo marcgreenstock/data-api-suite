@@ -8,7 +8,7 @@ class DataAPILocalServerless implements Plugin {
   protected serverless: Serverless
   protected server: Server
 
-  constructor (serverless: Serverless) {
+  constructor(serverless: Serverless) {
     this.serverless = serverless
 
     const startHandler = this.startHandler.bind(this)
@@ -22,24 +22,24 @@ class DataAPILocalServerless implements Plugin {
       'before:migrations:apply:init': startHandler,
       'after:migrations:apply:end': endHandler,
       'before:migrations:rollback:init': startHandler,
-      'after:migrations:rollback:end': endHandler
+      'after:migrations:rollback:end': endHandler,
     }
   }
 
-  private get config (): ServerOptions {
+  private get config(): ServerOptions {
     const custom = this.serverless.service.custom
     return {
       ...(custom['data-api-local'] || custom['DataAPILocal']),
-      logger: this.log.bind(this)
+      logger: this.log.bind(this),
     }
   }
 
-  private async startHandler (): Promise<void> {
+  private async startHandler(): Promise<void> {
     this.log('Starting server...')
     this.server = await dataApiLocal(this.config)
   }
 
-  private async endHandler (): Promise<void> {
+  private async endHandler(): Promise<void> {
     this.log('Stopping server...')
     await this.server.stop()
   }

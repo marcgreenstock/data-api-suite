@@ -12,16 +12,18 @@ type TransformedValue = Value | _JSON | _JSON[] | Date | Date[]
 export type UnknownRow = Record<string | number, any>
 
 export interface Metadata {
-  [name: string]: RDSDataService.ColumnMetadata;
+  [name: string]: RDSDataService.ColumnMetadata
 }
 
-export interface ValueTransformer<T = unknown> {
-  (value: Value, metadata: RDSDataService.ColumnMetadata, nextFn: Function): T;
-}
+export type ValueTransformer = (
+  value: Value,
+  metadata: RDSDataService.ColumnMetadata,
+  nextFn: () => TransformedValue
+) => TransformedValue
 
 export interface TransformedQueryResult<T> {
-  rows: T[] | null;
-  metadata: Metadata | null;
+  rows: T[] | null
+  metadata: Metadata | null
 }
 
 const defaultValueTransformer = (
@@ -47,15 +49,23 @@ const defaultValueTransformer = (
   return value
 }
 
-const transformArrayValue = (
-  value: RDSDataService.ArrayValue
-): ArrayValue => {
-  if (value.stringValues !== undefined) { return value.stringValues }
-  if (value.longValues !== undefined) { return value.longValues }
-  if (value.doubleValues !== undefined) { return value.doubleValues }
-  if (value.booleanValues !== undefined) { return value.booleanValues }
+const transformArrayValue = (value: RDSDataService.ArrayValue): ArrayValue => {
+  if (value.stringValues !== undefined) {
+    return value.stringValues
+  }
+  if (value.longValues !== undefined) {
+    return value.longValues
+  }
+  if (value.doubleValues !== undefined) {
+    return value.doubleValues
+  }
+  if (value.booleanValues !== undefined) {
+    return value.booleanValues
+  }
   if (value.arrayValues !== undefined) {
-    return value.arrayValues.map((arrayValue) => transformArrayValue(arrayValue))
+    return value.arrayValues.map((arrayValue) =>
+      transformArrayValue(arrayValue)
+    )
   }
   return []
 }
@@ -63,35 +73,50 @@ const transformArrayValue = (
 const transformFieldValue = (
   field: RDSDataService.Field
 ): FieldValue | ArrayValue => {
-  if (field.stringValue !== undefined) { return field.stringValue }
-  if (field.longValue !== undefined) { return field.longValue }
-  if (field.doubleValue !== undefined) { return field.doubleValue }
-  if (field.booleanValue !== undefined) { return field.booleanValue }
-  if (field.blobValue !== undefined) { return field.blobValue }
-  if (field.arrayValue !== undefined) { return transformArrayValue(field.arrayValue) }
+  if (field.stringValue !== undefined) {
+    return field.stringValue
+  }
+  if (field.longValue !== undefined) {
+    return field.longValue
+  }
+  if (field.doubleValue !== undefined) {
+    return field.doubleValue
+  }
+  if (field.booleanValue !== undefined) {
+    return field.booleanValue
+  }
+  if (field.blobValue !== undefined) {
+    return field.blobValue
+  }
+  if (field.arrayValue !== undefined) {
+    return transformArrayValue(field.arrayValue)
+  }
   return null
 }
 
 export const transformQueryResponse = <T = UnknownRow>(
   result: RDSDataService.ExecuteStatementResponse,
-  valueTransformer?: ValueTransformer,
+  valueTransformer?: ValueTransformer
 ): TransformedQueryResult<T> => {
   const { records, columnMetadata } = result
 
   if (records === undefined || columnMetadata === undefined) {
     return {
       rows: null,
-      metadata: null
+      metadata: null,
     }
   }
 
-  const metadata = columnMetadata.reduce<Metadata>((result, metadatum, index) => {
-    const key = metadatum.name || index
-    return {
-      ...result,
-      [key]: metadatum
-    }
-  }, {})
+  const metadata = columnMetadata.reduce<Metadata>(
+    (result, metadatum, index) => {
+      const key = metadatum.name || index
+      return {
+        ...result,
+        [key]: metadatum,
+      }
+    },
+    {}
+  )
 
   const rows = records.map((fieldList) => {
     return fieldList.reduce((row, field, index) => {
@@ -100,15 +125,15 @@ export const transformQueryResponse = <T = UnknownRow>(
       const value = transformFieldValue(field)
 
       if (typeof valueTransformer === 'function') {
-        const nextFn = (): TransformedValue => defaultValueTransformer(value, metadatum)
+        const nextFn = () => defaultValueTransformer(value, metadatum)
         return {
           ...row,
-          [key]: valueTransformer(value, metadatum, nextFn)
+          [key]: valueTransformer(value, metadatum, nextFn),
         }
       } else {
         return {
           ...row,
-          [key]: defaultValueTransformer(value, metadatum)
+          [key]: defaultValueTransformer(value, metadatum),
         }
       }
     }, {})
@@ -116,6 +141,6 @@ export const transformQueryResponse = <T = UnknownRow>(
 
   return {
     rows,
-    metadata
+    metadata,
   }
 }

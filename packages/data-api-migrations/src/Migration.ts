@@ -1,5 +1,13 @@
 import * as AuroraDataAPI from 'aurora-data-api'
 
+export interface MigrationOptions {
+  id: string
+  name: string
+  file: string
+  isApplied: boolean
+  isLocal: boolean
+  dataAPI: AuroraDataAPI
+}
 export class Migration {
   public readonly id: string
   public readonly name: string
@@ -8,14 +16,14 @@ export class Migration {
   public readonly isLocal: boolean
   public readonly dataAPI: AuroraDataAPI
 
-  constructor ({
+  constructor({
     id,
     name,
     file,
     isApplied,
     isLocal,
-    dataAPI
-  }) {
+    dataAPI,
+  }: MigrationOptions) {
     this.id = id
     this.name = name
     this.file = file
@@ -24,8 +32,10 @@ export class Migration {
     this.dataAPI = dataAPI
   }
 
-  public async apply (): Promise<void> {
-    if (this.isApplied) { return }
+  public async apply(): Promise<void> {
+    if (this.isApplied) {
+      return
+    }
     const { up } = await import(this.file)
     await up(this.dataAPI, this)
     await this.dataAPI.query(
@@ -35,8 +45,10 @@ export class Migration {
     )
   }
 
-  public async rollback (): Promise<void> {
-    if (!this.isApplied) { return }
+  public async rollback(): Promise<void> {
+    if (!this.isApplied) {
+      return
+    }
     const { down } = await import(this.file)
     await down(this.dataAPI, this)
     await this.dataAPI.query(

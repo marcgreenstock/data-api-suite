@@ -12,16 +12,18 @@ jest.mock('fs-extra')
 jest.mock('aurora-data-api')
 
 const tsCompilerMocks = {
-  compile: jest.fn().mockResolvedValue([
-    `${__dirname}/__fixtures__/20200107142955_createUsers.js`,
-    `${__dirname}/__fixtures__/20200116113329_createProjects.js`,
-  ]),
-  cleanup: jest.fn().mockResolvedValue(undefined)
+  compile: jest
+    .fn()
+    .mockResolvedValue([
+      `${__dirname}/__fixtures__/20200107142955_createUsers.js`,
+      `${__dirname}/__fixtures__/20200116113329_createProjects.js`,
+    ]),
+  cleanup: jest.fn().mockResolvedValue(undefined),
 }
 
 jest.mock('./TypeScriptCompiler', () => {
   return {
-    TypeScriptCompiler: jest.fn().mockImplementation(() => tsCompilerMocks)
+    TypeScriptCompiler: jest.fn().mockImplementation(() => tsCompilerMocks),
   }
 })
 
@@ -32,9 +34,9 @@ const createManager = (options?: any): DataAPIMigrations => {
   manager = new DataAPIMigrations({
     dataAPI: {
       secretArn: 'example',
-      resourceArn: 'example'
+      resourceArn: 'example',
     },
-    ...options
+    ...options,
   })
   auroraDataAPIMock = manager.dataAPI as jest.Mocked<AuroraDataAPI>
   return manager
@@ -44,7 +46,10 @@ describe('DataAPIMigrations#generateMigration', () => {
   it('writes the ts file and returns the filename', async () => {
     createManager()
     const resultPath = await manager.generateMigration('foobar')
-    const expectedPath = `${process.cwd()}/migrations/${formatDate(now, 'yyyyMMddHHmmss')}_foobar.ts`
+    const expectedPath = `${process.cwd()}/migrations/${formatDate(
+      now,
+      'yyyyMMddHHmmss'
+    )}_foobar.ts`
     expect(writeFile).toHaveBeenCalledWith(expectedPath, tsTemplate())
     expect(resultPath).toEqual(expectedPath)
   })
@@ -52,7 +57,10 @@ describe('DataAPIMigrations#generateMigration', () => {
   it('writes the js file and returns the filename', async () => {
     createManager({ typescript: false })
     const resultPath = await manager.generateMigration('foobar')
-    const expectedPath = `${process.cwd()}/migrations/${formatDate(now, 'yyyyMMddHHmmss')}_foobar.js`
+    const expectedPath = `${process.cwd()}/migrations/${formatDate(
+      now,
+      'yyyyMMddHHmmss'
+    )}_foobar.js`
     expect(writeFile).toHaveBeenCalledWith(expectedPath, jsTemplate())
     expect(resultPath).toEqual(expectedPath)
   })
@@ -61,7 +69,9 @@ describe('DataAPIMigrations#generateMigration', () => {
 describe('DataAPIMigrations#getAppliedMigrationIds', () => {
   beforeEach(() => {
     createManager()
-    auroraDataAPIMock.query = jest.fn().mockResolvedValue({ rows: [{ id: '20200107142955' }, { id: '20200116113329' }] })
+    auroraDataAPIMock.query = jest.fn().mockResolvedValue({
+      rows: [{ id: '20200107142955' }, { id: '20200116113329' }],
+    })
   })
 
   it('ensures the migration table exists', async () => {
@@ -75,7 +85,9 @@ describe('DataAPIMigrations#getAppliedMigrationIds', () => {
 
   it('makes an SQL query to fetch the list of applied migrations', async () => {
     await manager.getAppliedMigrationIds()
-    expect(auroraDataAPIMock.query).toHaveBeenCalledWith('SELECT id FROM __migrations__')
+    expect(auroraDataAPIMock.query).toHaveBeenCalledWith(
+      'SELECT id FROM __migrations__'
+    )
   })
 
   it('returns a list of applied migration ids', async () => {
@@ -98,8 +110,12 @@ describe('DataAPIMigrations#applyMigrations', () => {
 
   it('applies each migration', async () => {
     await manager.applyMigrations()
-    expect(auroraDataAPIMock.query).toHaveBeenCalledWith('CREATE TABLE users (id int, email varchar)')
-    expect(auroraDataAPIMock.query).toHaveBeenCalledWith('CREATE TABLE projects (id int, name)')
+    expect(auroraDataAPIMock.query).toHaveBeenCalledWith(
+      'CREATE TABLE users (id int, email varchar)'
+    )
+    expect(auroraDataAPIMock.query).toHaveBeenCalledWith(
+      'CREATE TABLE projects (id int, name)'
+    )
   })
 
   it('calls clean up on the compiler', async () => {
@@ -111,7 +127,9 @@ describe('DataAPIMigrations#applyMigrations', () => {
 describe('DataAPIMigrations#rollback', () => {
   beforeEach(() => {
     createManager()
-    auroraDataAPIMock.query = jest.fn().mockResolvedValue({ rows: [{ id: '20200107142955' }, { id: '20200116113329' }] })
+    auroraDataAPIMock.query = jest.fn().mockResolvedValue({
+      rows: [{ id: '20200107142955' }, { id: '20200116113329' }],
+    })
     Object.values(tsCompilerMocks).forEach((mock) => mock.mockClear())
   })
 

@@ -24,12 +24,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.644.0"
+    "aws-sdk": "^2.957.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.9.1",
-    "@types/node": "^13.9.3",
-    "typescript": "^3.8.3"
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.4.7",
+    "typescript": "^4.3.5"
   },
   "keywords": [
     "aws",

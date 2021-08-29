@@ -1,15 +1,23 @@
 import * as RDSDataService from 'aws-sdk/clients/rdsdataservice'
 import * as Errors from './Errors'
 
-type ParamValue = null | string | number | boolean | Buffer | Uint8Array | Date | CustomValue
+type ParamValue =
+  | null
+  | string
+  | number
+  | boolean
+  | Buffer
+  | Uint8Array
+  | Date
+  | CustomValue
 
 export interface CustomValue {
-  toSqlParameter (): SqlParameter;
+  toSqlParameter(): SqlParameter
 }
 export type SqlParameter = Omit<RDSDataService.SqlParameter, 'name'>
 export type QueryParam = ParamValue | SqlParameter
 export interface QueryParams {
-  [name: string]: QueryParam;
+  [name: string]: QueryParam
 }
 
 const formatISO9075 = (date: Date): string => {
@@ -24,24 +32,36 @@ const formatISO9075 = (date: Date): string => {
 }
 
 const isSqlParameter = (param: QueryParam): param is SqlParameter => {
-  const keys = ['arrayValue', 'blobValue', 'booleanValue', 'doubleValue', 'isNull', 'longValue', 'stringValue']
-  return param !== null &&
+  const keys = [
+    'arrayValue',
+    'blobValue',
+    'booleanValue',
+    'doubleValue',
+    'isNull',
+    'longValue',
+    'stringValue',
+  ]
+  return (
+    param !== null &&
     typeof param === 'object' &&
     'value' in param &&
     typeof param.value === 'object' &&
     Object.keys(param.value).some((key) => keys.includes(key))
+  )
 }
 
 const isBlob = (param: QueryParam): param is Buffer | Uint8Array => {
-  return param !== null &&
-    typeof param === 'object' && (
-      Buffer.isBuffer(param) ||
-      param instanceof Uint8Array
-    )
+  return (
+    param !== null &&
+    typeof param === 'object' &&
+    (Buffer.isBuffer(param) || param instanceof Uint8Array)
+  )
 }
 
 const isCustomValue = (param: QueryParam): param is CustomValue => {
-  return typeof param === 'object' && typeof param['toSqlParameter'] === 'function'
+  return (
+    typeof param === 'object' && typeof param['toSqlParameter'] === 'function'
+  )
 }
 
 const transformQueryParam = (value: QueryParam): SqlParameter => {
@@ -63,8 +83,8 @@ const transformQueryParam = (value: QueryParam): SqlParameter => {
         return {
           typeHint: 'TIMESTAMP',
           value: {
-            stringValue: formatISO9075(value)
-          }
+            stringValue: formatISO9075(value),
+          },
         }
       }
       break
@@ -74,7 +94,7 @@ const transformQueryParam = (value: QueryParam): SqlParameter => {
       if (Number.isInteger(value)) {
         return { value: { longValue: value } }
       } else {
-        return { value: { doubleValue: value }}
+        return { value: { doubleValue: value } }
       }
     case 'string':
       return { value: { stringValue: value } }

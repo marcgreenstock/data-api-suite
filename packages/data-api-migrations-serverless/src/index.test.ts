@@ -3,7 +3,9 @@ import DataAPIMigrationsServerless = require('.')
 import DataAPIMigrations from 'data-api-migrations'
 import * as chalk from 'chalk'
 
-const generateMigrationMock = jest.fn((fileName: string) => Promise.resolve(fileName))
+const generateMigrationMock = jest.fn((fileName: string) =>
+  Promise.resolve(fileName)
+)
 const applyMigrationsMock = jest.fn(() => Promise.resolve([1, 2]))
 const rollbackMigrationsMock = jest.fn(() => Promise.resolve([1]))
 const getAppliedMigrationIds = jest.fn(() => Promise.resolve([1, 2]))
@@ -17,19 +19,19 @@ jest.mock('data-api-migrations', () => {
         generateMigration: generateMigrationMock,
         applyMigrations: applyMigrationsMock,
         rollbackMigrations: rollbackMigrationsMock,
-        getAppliedMigrationIds: getAppliedMigrationIds
+        getAppliedMigrationIds: getAppliedMigrationIds,
       }
-    })
+    }),
   }
 })
 
 const serverless = new Serverless()
-serverless.cli = new class CLI {
-  log (message: string): null {
+serverless.cli = new (class CLI {
+  log(message: string): null {
     mockedLog(message)
     return null
   }
-}
+})()
 
 describe('migrations:create:generate', () => {
   const name = 'example'
@@ -39,32 +41,40 @@ describe('migrations:create:generate', () => {
       DataAPIMigrations: {
         production: {
           resourceArn: 'example',
-          secretArn: 'example'
-        }
-      }
+          secretArn: 'example',
+        },
+      },
     }
 
-    const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'production', name })
+    const plugin = new DataAPIMigrationsServerless(serverless, {
+      region: 'us-east-1',
+      stage: 'production',
+      name,
+    })
     await plugin.hooks['migrations:create:generate']()
   })
 
-  it ('constructs DataAPIMigrations', async () => {
+  it('constructs DataAPIMigrations', async () => {
     expect(DataAPIMigrations).toHaveBeenCalledWith({
       isLocal: false,
       typescript: true,
       migrationsFolder: './migrations',
       cwd: serverless.config.servicePath,
       dataAPI: serverless.service.custom.DataAPIMigrations.production,
-      logger: expect.any(Function)
+      logger: expect.any(Function),
     })
   })
 
-  it ('calls DataAPIMigrations#generateMigration', async () => {
+  it('calls DataAPIMigrations#generateMigration', async () => {
     expect(generateMigrationMock).toHaveBeenCalledWith(name)
   })
 
-  it ('logs the output', async () => {
-    expect(mockedLog).toHaveBeenCalledWith(`${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(name)} created.`)
+  it('logs the output', async () => {
+    expect(mockedLog).toHaveBeenCalledWith(
+      `${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(
+        name
+      )} created.`
+    )
   })
 })
 
@@ -76,33 +86,44 @@ describe('migrations:apply:exec', () => {
         local: {
           endpoint: 'http://localhost:8080',
           resourceArn: 'example',
-          secretArn: 'example'
-        }
-      }
+          secretArn: 'example',
+        },
+      },
     }
 
-    const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'local' })
+    const plugin = new DataAPIMigrationsServerless(serverless, {
+      region: 'us-east-1',
+      stage: 'local',
+    })
     await plugin.hooks['migrations:apply:exec']()
   })
 
-  it ('constructs DataAPIMigrations', async () => {
+  it('constructs DataAPIMigrations', async () => {
     expect(DataAPIMigrations).toHaveBeenCalledWith({
       isLocal: true,
       typescript: false,
       migrationsFolder: './migrations',
       cwd: serverless.config.servicePath,
       dataAPI: serverless.service.custom.DataAPIMigrations.local,
-      logger: expect.any(Function)
+      logger: expect.any(Function),
     })
   })
 
-  it ('calls DataAPIMigrations#applyMigrations', async () => {
+  it('calls DataAPIMigrations#applyMigrations', async () => {
     expect(applyMigrationsMock).toHaveBeenCalled()
   })
 
-  it ('logs the output', async () => {
-    expect(mockedLog).toHaveBeenCalledWith(`${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright('1')} applied.`)
-    expect(mockedLog).toHaveBeenCalledWith(`${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright('2')} applied.`)
+  it('logs the output', async () => {
+    expect(mockedLog).toHaveBeenCalledWith(
+      `${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(
+        '1'
+      )} applied.`
+    )
+    expect(mockedLog).toHaveBeenCalledWith(
+      `${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(
+        '2'
+      )} applied.`
+    )
   })
 })
 
@@ -114,32 +135,39 @@ describe('migrations:rollback:exec', () => {
         local: {
           endpoint: 'http://localhost:8080',
           resourceArn: 'example',
-          secretArn: 'example'
-        }
-      }
+          secretArn: 'example',
+        },
+      },
     }
 
-    const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'local' })
+    const plugin = new DataAPIMigrationsServerless(serverless, {
+      region: 'us-east-1',
+      stage: 'local',
+    })
     await plugin.hooks['migrations:rollback:exec']()
   })
 
-  it ('constructs DataAPIMigrations', async () => {
+  it('constructs DataAPIMigrations', async () => {
     expect(DataAPIMigrations).toHaveBeenCalledWith({
       isLocal: true,
       typescript: false,
       migrationsFolder: './migrations',
       cwd: serverless.config.servicePath,
       dataAPI: serverless.service.custom.DataAPIMigrations.local,
-      logger: expect.any(Function)
+      logger: expect.any(Function),
     })
   })
 
-  it ('calls DataAPIMigrations#rollbackMigrations', async () => {
+  it('calls DataAPIMigrations#rollbackMigrations', async () => {
     expect(rollbackMigrationsMock).toHaveBeenCalled()
   })
 
-  it ('logs the output', async () => {
-    expect(mockedLog).toHaveBeenCalledWith(`${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright('1')} rolled back.`)
+  it('logs the output', async () => {
+    expect(mockedLog).toHaveBeenCalledWith(
+      `${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(
+        '1'
+      )} rolled back.`
+    )
   })
 })
 
@@ -151,32 +179,43 @@ describe('migrations:status:exec', () => {
         local: {
           endpoint: 'http://localhost:8080',
           resourceArn: 'example',
-          secretArn: 'example'
-        }
-      }
+          secretArn: 'example',
+        },
+      },
     }
 
-    const plugin = new DataAPIMigrationsServerless(serverless, { region: 'us-east-1', stage: 'local' })
+    const plugin = new DataAPIMigrationsServerless(serverless, {
+      region: 'us-east-1',
+      stage: 'local',
+    })
     await plugin.hooks['migrations:status:exec']()
   })
 
-  it ('constructs DataAPIMigrations', async () => {
+  it('constructs DataAPIMigrations', async () => {
     expect(DataAPIMigrations).toHaveBeenCalledWith({
       isLocal: true,
       typescript: false,
       migrationsFolder: './migrations',
       cwd: serverless.config.servicePath,
       dataAPI: serverless.service.custom.DataAPIMigrations.local,
-      logger: expect.any(Function)
+      logger: expect.any(Function),
     })
   })
 
-  it ('calls DataAPIMigrations#getAppliedMigrationIds', async () => {
+  it('calls DataAPIMigrations#getAppliedMigrationIds', async () => {
     expect(getAppliedMigrationIds).toHaveBeenCalled()
   })
 
-  it ('logs the output', async () => {
-    expect(mockedLog).toHaveBeenCalledWith(`${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright('1')} is applied.`)
-    expect(mockedLog).toHaveBeenCalledWith(`${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright('2')} is applied.`)
+  it('logs the output', async () => {
+    expect(mockedLog).toHaveBeenCalledWith(
+      `${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(
+        '1'
+      )} is applied.`
+    )
+    expect(mockedLog).toHaveBeenCalledWith(
+      `${chalk.magentaBright('Data API Migrations:')} ${chalk.greenBright(
+        '2'
+      )} is applied.`
+    )
   })
 })

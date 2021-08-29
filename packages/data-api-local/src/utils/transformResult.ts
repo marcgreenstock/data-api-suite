@@ -22,9 +22,16 @@ const parseLongValue = (value: unknown): number => {
   }
 }
 
-const transformArray = (typeId: TypeId, array: unknown[]): RDSDataService.Types.ArrayValue => {
+const transformArray = (
+  typeId: TypeId | number,
+  array: unknown[]
+): RDSDataService.Types.ArrayValue => {
   if (Array.isArray(array[0])) {
-    return { arrayValues: array.map((value) => transformArray(typeId, value as unknown[])) }
+    return {
+      arrayValues: array.map((value) =>
+        transformArray(typeId, value as unknown[])
+      ),
+    }
   }
   switch (typeId) {
     case 1000:
@@ -32,7 +39,9 @@ const transformArray = (typeId: TypeId, array: unknown[]): RDSDataService.Types.
     case 1115:
     case 1182:
     case 1185:
-      return { stringValues: array.map((value) => parseTimestamp(value as string)) }
+      return {
+        stringValues: array.map((value) => parseTimestamp(value as string)),
+      }
     case 1005:
     case 1007:
     case 1028:
@@ -45,7 +54,10 @@ const transformArray = (typeId: TypeId, array: unknown[]): RDSDataService.Types.
   }
 }
 
-const transformValue = (field: FieldDef, value: unknown): RDSDataService.Types.Field => {
+const transformValue = (
+  field: FieldDef,
+  value: unknown
+): RDSDataService.Types.Field => {
   if (value === null) {
     return { isNull: true }
   } else {
@@ -73,7 +85,9 @@ const transformValue = (field: FieldDef, value: unknown): RDSDataService.Types.F
   }
 }
 
-export const transformResult = (result: QueryResult): RDSDataService.Types.SqlRecords => {
+export const transformResult = (
+  result: QueryResult
+): RDSDataService.Types.SqlRecords => {
   return result.rows.map((columns) => {
     return columns.map((value: unknown, index: number) => {
       const field = result.fields[index]

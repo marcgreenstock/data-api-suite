@@ -2,15 +2,22 @@ import * as AuroraDataAPI from './AuroraDataAPI'
 
 declare namespace Transaction {
   export type QueryOptions = Pick<
-  AuroraDataAPI.QueryOptions,
-    'continueAfterTimeout' | 'includeResultMetadata' | 'resultSetOptions' | 'valueTransformer'
+    AuroraDataAPI.QueryOptions,
+    | 'continueAfterTimeout'
+    | 'includeResultMetadata'
+    | 'resultSetOptions'
+    | 'valueTransformer'
   >
   export type ExecuteStatementOptions = Pick<
-  AuroraDataAPI.ExecuteStatementOptions,
-    'continueAfterTimeout' | 'includeResultMetadata' | 'parameters' | 'resultSetOptions' | 'sql'
+    AuroraDataAPI.ExecuteStatementOptions,
+    | 'continueAfterTimeout'
+    | 'includeResultMetadata'
+    | 'parameters'
+    | 'resultSetOptions'
+    | 'sql'
   >
   export type BatchExecuteStatementOptions = Pick<
-  AuroraDataAPI.BatchExecuteStatementOptions,
+    AuroraDataAPI.BatchExecuteStatementOptions,
     'parameterSets' | 'sql'
   >
 }
@@ -21,7 +28,11 @@ class Transaction {
   public readonly transactionId: string
   public readonly requestConfig: AuroraDataAPI.RequestConfig
 
-  constructor (dataApi: AuroraDataAPI, transactionId: string, requestConfig: AuroraDataAPI.RequestConfig) {
+  constructor(
+    dataApi: AuroraDataAPI,
+    transactionId: string,
+    requestConfig: AuroraDataAPI.RequestConfig
+  ) {
     this.isComplete = false
     this.dataApi = dataApi
     this.transactionId = transactionId
@@ -31,11 +42,8 @@ class Transaction {
   /**
    * Performs a commit of the transaction.
    */
-  public async commit (): Promise<AuroraDataAPI.CommitTransactionResult> {
-    const {
-      secretArn,
-      resourceArn,
-    } = this.requestConfig
+  public async commit(): Promise<AuroraDataAPI.CommitTransactionResult> {
+    const { secretArn, resourceArn } = this.requestConfig
     const result = await this.dataApi.commitTransaction(this.transactionId, {
       secretArn,
       resourceArn,
@@ -47,12 +55,9 @@ class Transaction {
   /**
    * Performs a rollback of the transaction and cancels its changes.
    */
-  public async rollback (): Promise<AuroraDataAPI.RollbackTransactionResult> {
-    const {
-      secretArn,
-      resourceArn,
-    } = this.requestConfig
-    const result =  await this.dataApi.rollbackTransaction(this.transactionId, {
+  public async rollback(): Promise<AuroraDataAPI.RollbackTransactionResult> {
+    const { secretArn, resourceArn } = this.requestConfig
+    const result = await this.dataApi.rollbackTransaction(this.transactionId, {
       secretArn,
       resourceArn,
     })
@@ -69,18 +74,13 @@ class Transaction {
    * @param [params] - `name`, `value` object with the `name` representing the `:name` placeholder in the `sql` argument and the value either a `string`, `boolean` or `number` type, or as a `RDSDataService.Field` (without `name`).
    * @param [options] - Options
    */
-  public async query<T = AuroraDataAPI.UnknownRow> (
+  public async query<T = AuroraDataAPI.UnknownRow>(
     sql: string,
     params?: AuroraDataAPI.QueryParams,
-    options?: Transaction.QueryOptions,
+    options?: Transaction.QueryOptions
   ): Promise<AuroraDataAPI.QueryResult<T>> {
     const transactionId = this.transactionId
-    const {
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-    } = this.requestConfig
+    const { database, resourceArn, schema, secretArn } = this.requestConfig
     const {
       continueAfterTimeout,
       includeResultMetadata,
@@ -88,7 +88,7 @@ class Transaction {
       valueTransformer,
     } = {
       ...this.requestConfig,
-      ...options
+      ...options,
     }
     return this.dataApi.query(sql, params, {
       continueAfterTimeout,
@@ -103,17 +103,12 @@ class Transaction {
     })
   }
 
-  public async batchQuery  (
+  public async batchQuery(
     sql: string,
-    params?: AuroraDataAPI.QueryParams[],
+    params?: AuroraDataAPI.QueryParams[]
   ): Promise<AuroraDataAPI.BatchQueryResult> {
     const transactionId = this.transactionId
-    const {
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-    } = this.requestConfig
+    const { database, resourceArn, schema, secretArn } = this.requestConfig
     return this.dataApi.batchQuery(sql, params, {
       database,
       resourceArn,
@@ -123,16 +118,11 @@ class Transaction {
     })
   }
 
-  public async executeStatement (
-    options: Transaction.ExecuteStatementOptions,
+  public async executeStatement(
+    options: Transaction.ExecuteStatementOptions
   ): Promise<AuroraDataAPI.ExecuteStatementResult> {
     const transactionId = this.transactionId
-    const {
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-    } = this.requestConfig
+    const { database, resourceArn, schema, secretArn } = this.requestConfig
     const {
       continueAfterTimeout,
       includeResultMetadata,
@@ -141,7 +131,7 @@ class Transaction {
       sql,
     } = {
       ...this.requestConfig,
-      ...options
+      ...options,
     }
     return this.dataApi.executeStatement({
       continueAfterTimeout,
@@ -157,20 +147,12 @@ class Transaction {
     })
   }
 
-  public async batchExecuteStatement (
-    options: Transaction.BatchExecuteStatementOptions,
+  public async batchExecuteStatement(
+    options: Transaction.BatchExecuteStatementOptions
   ): Promise<AuroraDataAPI.BatchExecuteStatementResult> {
     const transactionId = this.transactionId
-    const {
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-    } = this.requestConfig
-    const {
-      parameterSets,
-      sql,
-    } = {
+    const { database, resourceArn, schema, secretArn } = this.requestConfig
+    const { parameterSets, sql } = {
       ...this.requestConfig,
       ...options,
     }

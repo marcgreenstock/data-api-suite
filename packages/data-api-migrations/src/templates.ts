@@ -1,5 +1,6 @@
-export const jsTemplate = (): string => 
-`exports.up = async (dataAPI, migration) => {
+/* eslint-disable prettier/prettier */
+export const jsTemplate = (): string => `
+exports.up = async (dataAPI, migration) => {
   const transaction = await dataAPI.beginTransaction()
   try {
     await transaction.executeStatement({ sql: 'CREATE TABLE' })
@@ -20,10 +21,10 @@ exports.down = async (dataAPI, migration) => {
     throw error
   }
 }
-`
+`.trimLeft()
 
-export const tsTemplate = (): string => 
-`import { MigrationFn } from 'data-api-migrations'
+export const tsTemplate = (): string => `
+import { MigrationFn } from 'data-api-migrations'
 
 export const up: MigrationFn = async (dataAPI, migration) => {
   const t = await dataAPI.beginTransaction()
@@ -46,4 +47,4 @@ export const down: MigrationFn = async (dataAPI, migration) => {
     throw error
   }
 }
-`
+`.trimLeft()

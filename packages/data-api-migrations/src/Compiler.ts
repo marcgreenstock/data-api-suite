@@ -1,32 +1,26 @@
-export abstract class Compiler {
+export interface CompilerOptions {
+  cwd: string
+  migrationsPath: string
+  buildPath: string
+  logger: (message: string) => void
+}
+export abstract class CompilerBase {
   public readonly cwd: string
   public readonly migrationsPath: string
   public readonly buildPath: string
-  public readonly logger: Function
+  public readonly logger: (message: string) => void
 
-  constructor ({
-    cwd, 
-    migrationsPath, 
-    buildPath, 
-    logger 
-  }: {
-    cwd: string;
-    migrationsPath: string;
-    buildPath: string;
-    logger: Function;
-  }) {
+  constructor({ cwd, migrationsPath, buildPath, logger }: CompilerOptions) {
     this.cwd = cwd
     this.migrationsPath = migrationsPath
     this.buildPath = buildPath
     this.logger = logger
   }
-
-  abstract async compile (): Promise<string[]> 
-
-  abstract async cleanup (): Promise<void>
 }
 
-export type CompilerClass = typeof Compiler
+export interface Compiler {
+  compile: () => Promise<string[]>
+  cleanup: () => Promise<void>
+}
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface CompilerDerived extends CompilerClass {}
+export type CompilerClass = new (options: CompilerOptions) => Compiler

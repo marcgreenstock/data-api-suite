@@ -15,110 +15,97 @@ import {
   UnknownRow,
   ValueTransformer,
 } from './transformQueryResponse'
-import {
-  JSONValue,
-  BlobValue,
-} from './customValues'
+import { JSONValue, BlobValue } from './customValues'
 
 declare namespace AuroraDataAPI {
-  export {
-    Errors,
-    Transaction,
-    RDSDataService,
-  }
+  export { Errors, Transaction, RDSDataService }
 
-  export {
-    CustomValue,
-    QueryParam,
-    QueryParams,
-    SqlParameter,
-  }
+  export { CustomValue, QueryParam, QueryParams, SqlParameter }
 
-  export {
-    Metadata,
-    ValueTransformer,
-    UnknownRow,
-  }
+  export { Metadata, ValueTransformer, UnknownRow }
 
-  export {
-    JSONValue,
-    BlobValue,
-  }
+  export { JSONValue, BlobValue }
 
   export interface RequestConfig {
-    continueAfterTimeout?: RDSDataService.Boolean;
-    database?: RDSDataService.DbName;
-    includeResultMetadata?: RDSDataService.Boolean;
-    resourceArn: RDSDataService.Arn;
-    resultSetOptions?: RDSDataService.ResultSetOptions;
-    schema?: RDSDataService.DbName;
-    secretArn: RDSDataService.Arn;
+    continueAfterTimeout?: RDSDataService.Boolean
+    database?: RDSDataService.DbName
+    includeResultMetadata?: RDSDataService.Boolean
+    resourceArn: RDSDataService.Arn
+    resultSetOptions?: RDSDataService.ResultSetOptions
+    schema?: RDSDataService.DbName
+    secretArn: RDSDataService.Arn
   }
 
   export interface TransformOptions {
-    valueTransformer?: ValueTransformer;
+    valueTransformer?: ValueTransformer
   }
 
-  export type ClientConfig = Omit<RDSDataService.ClientConfiguration, 'apiVersion'>
+  export type ClientConfig = Omit<
+    RDSDataService.ClientConfiguration,
+    'apiVersion'
+  >
 
   export type Config = RequestConfig & TransformOptions & ClientConfig
 
   export interface BeginTransactionOptions {
-    database?: RDSDataService.DbName;
-    resourceArn?: RDSDataService.Arn;
-    schema?: RDSDataService.DbName;
-    secretArn?: RDSDataService.Arn;
+    database?: RDSDataService.DbName
+    resourceArn?: RDSDataService.Arn
+    schema?: RDSDataService.DbName
+    secretArn?: RDSDataService.Arn
   }
 
   export type BeginTransactionResult = Transaction
 
   export interface CommitTransactionOptions {
-    resourceArn?: RDSDataService.Arn;
-    secretArn?: RDSDataService.Arn;
+    resourceArn?: RDSDataService.Arn
+    secretArn?: RDSDataService.Arn
   }
 
   export type CommitTransactionResult = RDSDataService.CommitTransactionResponse
 
   export type RollbackTransactionOptions = CommitTransactionOptions
 
-  export type RollbackTransactionResult = RDSDataService.RollbackTransactionResponse
+  export type RollbackTransactionResult =
+    RDSDataService.RollbackTransactionResponse
 
   export interface QueryOptions extends TransformOptions {
-    continueAfterTimeout?: RDSDataService.Boolean;
-    database?: RDSDataService.DbName;
-    includeResultMetadata?: RDSDataService.Boolean;
-    resourceArn?: RDSDataService.Arn;
-    resultSetOptions?: RDSDataService.ResultSetOptions;
-    schema?: RDSDataService.DbName;
-    secretArn?: RDSDataService.Arn;
-    transactionId?: RDSDataService.Id;
+    continueAfterTimeout?: RDSDataService.Boolean
+    database?: RDSDataService.DbName
+    includeResultMetadata?: RDSDataService.Boolean
+    resourceArn?: RDSDataService.Arn
+    resultSetOptions?: RDSDataService.ResultSetOptions
+    schema?: RDSDataService.DbName
+    secretArn?: RDSDataService.Arn
+    transactionId?: RDSDataService.Id
   }
 
-  export type QueryResult<T = UnknownRow> = TransformedQueryResult<T> & RDSDataService.ExecuteStatementResponse
+  export type QueryResult<T = UnknownRow> = TransformedQueryResult<T> &
+    RDSDataService.ExecuteStatementResponse
 
   export interface BatchQueryOptions {
-    database?: RDSDataService.DbName;
-    resourceArn?: RDSDataService.Arn;
-    schema?: RDSDataService.DbName;
-    secretArn?: RDSDataService.Arn;
-    transactionId?: RDSDataService.Id;
+    database?: RDSDataService.DbName
+    resourceArn?: RDSDataService.Arn
+    schema?: RDSDataService.DbName
+    secretArn?: RDSDataService.Arn
+    transactionId?: RDSDataService.Id
   }
 
   export type BatchQueryResult = RDSDataService.BatchExecuteStatementResponse
 
   export interface ExecuteStatementOptions extends QueryOptions {
-    sql: RDSDataService.SqlStatement;
-    parameters?: RDSDataService.SqlParametersList;
+    sql: RDSDataService.SqlStatement
+    parameters?: RDSDataService.SqlParametersList
   }
 
   export type ExecuteStatementResult = RDSDataService.ExecuteStatementResponse
 
   export interface BatchExecuteStatementOptions extends BatchQueryOptions {
-    sql: RDSDataService.SqlStatement;
-    parameterSets?: RDSDataService.SqlParameterSets;
+    sql: RDSDataService.SqlStatement
+    parameterSets?: RDSDataService.SqlParameterSets
   }
 
-  export type BatchExecuteStatementResult = RDSDataService.BatchExecuteStatementResponse
+  export type BatchExecuteStatementResult =
+    RDSDataService.BatchExecuteStatementResponse
 }
 
 class AuroraDataAPI {
@@ -126,7 +113,7 @@ class AuroraDataAPI {
   public readonly client: RDSDataService
   public readonly requestConfig: AuroraDataAPI.RequestConfig
 
-  constructor (config: AuroraDataAPI.Config) {
+  constructor(config: AuroraDataAPI.Config) {
     const defaults = {
       includeResultMetadata: true,
     }
@@ -158,28 +145,25 @@ class AuroraDataAPI {
     }
     this.client = new RDSDataService({
       ...clientConfig,
-      apiVersion: '2018-08-01'
+      apiVersion: '2018-08-01',
     })
   }
 
-  public async beginTransaction (
-    options?: AuroraDataAPI.BeginTransactionOptions,
+  public async beginTransaction(
+    options?: AuroraDataAPI.BeginTransactionOptions
   ): Promise<AuroraDataAPI.BeginTransactionResult> {
-    const {
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-    } = {
+    const { database, resourceArn, schema, secretArn } = {
       ...this.requestConfig,
       ...options,
     }
-    const { transactionId } = await this.client.beginTransaction({
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-    }).promise()
+    const { transactionId } = await this.client
+      .beginTransaction({
+        database,
+        resourceArn,
+        schema,
+        secretArn,
+      })
+      .promise()
     if (transactionId === undefined) {
       throw new Error('transactionId missing from response')
     }
@@ -191,54 +175,49 @@ class AuroraDataAPI {
     })
   }
 
-  public async commitTransaction (
+  public async commitTransaction(
     transactionId: string,
-    options?: AuroraDataAPI.CommitTransactionOptions,
+    options?: AuroraDataAPI.CommitTransactionOptions
   ): Promise<AuroraDataAPI.CommitTransactionResult> {
-    const {
-      resourceArn,
-      secretArn,
-    } = {
+    const { resourceArn, secretArn } = {
       ...this.requestConfig,
       ...options,
     }
-    return this.client.commitTransaction({
-      resourceArn,
-      secretArn,
-      transactionId,
-    }).promise()
+    return this.client
+      .commitTransaction({
+        resourceArn,
+        secretArn,
+        transactionId,
+      })
+      .promise()
   }
 
-  public async rollbackTransaction (
+  public async rollbackTransaction(
     transactionId: string,
-    options?: AuroraDataAPI.RollbackTransactionOptions,
+    options?: AuroraDataAPI.RollbackTransactionOptions
   ): Promise<AuroraDataAPI.CommitTransactionResult> {
-    const {
-      resourceArn,
-      secretArn,
-    } = {
+    const { resourceArn, secretArn } = {
       ...this.requestConfig,
       ...options,
     }
-    return this.client.rollbackTransaction({
-      resourceArn,
-      secretArn,
-      transactionId,
-    }).promise()
+    return this.client
+      .rollbackTransaction({
+        resourceArn,
+        secretArn,
+        transactionId,
+      })
+      .promise()
   }
 
-  public async query<T = UnknownRow> (
+  public async query<T = UnknownRow>(
     sql: string,
     params?: AuroraDataAPI.QueryParams,
-    options?: AuroraDataAPI.QueryOptions,
+    options?: AuroraDataAPI.QueryOptions
   ): Promise<AuroraDataAPI.QueryResult<T>> {
-    const {
-      valueTransformer,
-      ...executeStatementOptions
-    } = {
+    const { valueTransformer, ...executeStatementOptions } = {
       ...this.transformOptions,
       ...this.requestConfig,
-      ...options
+      ...options,
     }
     const parameters = params && transformQueryParams(params)
     const result = await this.executeStatement({
@@ -247,7 +226,9 @@ class AuroraDataAPI {
       parameters,
     })
 
-    const transformedResult = result.columnMetadata && transformQueryResponse<T>(result, valueTransformer)
+    const transformedResult =
+      result.columnMetadata &&
+      transformQueryResponse<T>(result, valueTransformer)
     return {
       ...result,
       ...transformedResult,
@@ -255,7 +236,7 @@ class AuroraDataAPI {
   }
 
   public async executeStatement(
-    options: AuroraDataAPI.ExecuteStatementOptions,
+    options: AuroraDataAPI.ExecuteStatementOptions
   ): Promise<AuroraDataAPI.ExecuteStatementResult> {
     const {
       parameters,
@@ -272,24 +253,26 @@ class AuroraDataAPI {
       ...this.requestConfig,
       ...options,
     }
-    return this.client.executeStatement({
-      parameters,
-      continueAfterTimeout,
-      database,
-      includeResultMetadata,
-      resourceArn,
-      resultSetOptions,
-      schema,
-      secretArn,
-      sql,
-      transactionId,
-    }).promise()
+    return this.client
+      .executeStatement({
+        parameters,
+        continueAfterTimeout,
+        database,
+        includeResultMetadata,
+        resourceArn,
+        resultSetOptions,
+        schema,
+        secretArn,
+        sql,
+        transactionId,
+      })
+      .promise()
   }
 
-  public async batchQuery (
+  public async batchQuery(
     sql: string,
     params?: AuroraDataAPI.QueryParams[],
-    options?: AuroraDataAPI.BatchQueryOptions,
+    options?: AuroraDataAPI.BatchQueryOptions
   ): Promise<AuroraDataAPI.BatchQueryResult> {
     const parameterSets = params?.map(transformQueryParams)
     return this.batchExecuteStatement({
@@ -300,7 +283,7 @@ class AuroraDataAPI {
   }
 
   public async batchExecuteStatement(
-    options: AuroraDataAPI.BatchExecuteStatementOptions,
+    options: AuroraDataAPI.BatchExecuteStatementOptions
   ): Promise<AuroraDataAPI.BatchExecuteStatementResult> {
     const {
       parameterSets,
@@ -314,15 +297,17 @@ class AuroraDataAPI {
       ...this.requestConfig,
       ...options,
     }
-    return this.client.batchExecuteStatement({
-      parameterSets,
-      database,
-      resourceArn,
-      schema,
-      secretArn,
-      sql,
-      transactionId,
-    }).promise()
+    return this.client
+      .batchExecuteStatement({
+        parameterSets,
+        database,
+        resourceArn,
+        schema,
+        secretArn,
+        sql,
+        transactionId,
+      })
+      .promise()
   }
 }
 
@@ -330,7 +315,7 @@ Object.assign(AuroraDataAPI, {
   Errors,
   Transaction,
   JSONValue,
-  BlobValue
+  BlobValue,
 })
 
 export = AuroraDataAPI

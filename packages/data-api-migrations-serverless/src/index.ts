@@ -1,12 +1,10 @@
 import * as Serverless from 'serverless'
 import * as Plugin from 'serverless/classes/Plugin'
 import * as chalk from 'chalk'
-import DataAPIMigrations, {
-  DataAPIMigrationsConfig
-} from 'data-api-migrations'
+import DataAPIMigrations, { DataAPIMigrationsConfig } from 'data-api-migrations'
 
 interface Options extends Serverless.Options {
-  name?: string;
+  name?: string
 }
 
 class DataAPIMigrationsServerless implements Plugin {
@@ -16,7 +14,7 @@ class DataAPIMigrationsServerless implements Plugin {
   protected serverless: Serverless
   protected stage: string
 
-  constructor (serverless: Serverless, options: Options) {
+  constructor(serverless: Serverless, options: Options) {
     this.serverless = serverless
     this.options = options
 
@@ -24,12 +22,13 @@ class DataAPIMigrationsServerless implements Plugin {
       stage: {
         usage: 'The stage e.g. (local, dev, staging, prod, etc.)',
         required: false,
-        default: 'local'
-      }
+        default: 'local',
+      },
     }
 
     this.stage = options.stage || 'local'
-    const lifecycleEvents = this.stage === 'local' ? ['init', 'exec', 'end'] : ['exec']
+    const lifecycleEvents =
+      this.stage === 'local' ? ['init', 'exec', 'end'] : ['exec']
 
     this.commands = {
       migrations: {
@@ -41,96 +40,103 @@ class DataAPIMigrationsServerless implements Plugin {
             lifecycleEvents: ['generate'],
             options: {
               name: {
-                usage: 'Name of the migration e.g. sls migration create --name createUsersTable',
+                usage:
+                  'Name of the migration e.g. sls migration create --name createUsersTable',
                 required: true,
-                shortcut: 'n'
-              }
-            }
+                shortcut: 'n',
+              },
+            },
           },
           apply: {
             usage: 'Apply all pending migrations.',
             lifecycleEvents,
             options: {
-              ...commonOptions
-            }
+              ...commonOptions,
+            },
           },
           rollback: {
             usage: 'Rollback the most recent (applied) migration.',
             lifecycleEvents,
             options: {
-              ...commonOptions
-            }
+              ...commonOptions,
+            },
           },
           status: {
             usage: 'List the migrations that have been applied.',
             lifecycleEvents,
             options: {
-              ...commonOptions
-            }
-          }
-        }
-      }
+              ...commonOptions,
+            },
+          },
+        },
+      },
     }
 
     this.hooks = {
       'migrations:create:generate': this.generateMigrationFile.bind(this),
       'migrations:apply:exec': this.applyMigrations.bind(this),
       'migrations:rollback:exec': this.rollbackMigrations.bind(this),
-      'migrations:status:exec': this.fetchMigrationStatus.bind(this)
+      'migrations:status:exec': this.fetchMigrationStatus.bind(this),
     }
   }
 
-  private manager (): DataAPIMigrations {
+  private manager(): DataAPIMigrations {
     return new DataAPIMigrations({
       isLocal: this.stage === 'local',
       cwd: this.serverless.config.servicePath,
       logger: this.log.bind(this),
-      ...this.config
+      ...this.config,
     })
   }
 
-  private async generateMigrationFile (): Promise<void> {
+  private async generateMigrationFile(): Promise<void> {
     const fileName = await this.manager().generateMigration(this.options.name)
     this.log(`${chalk.greenBright(fileName)} created.`)
   }
 
-  private async applyMigrations (): Promise<void> {
+  private async applyMigrations(): Promise<void> {
     const ids = await this.manager().applyMigrations()
     ids.forEach((id) => this.log(`${chalk.greenBright(id)} applied.`))
   }
 
-  private async rollbackMigrations (): Promise<void> {
+  private async rollbackMigrations(): Promise<void> {
     const ids = await this.manager().rollbackMigrations()
     ids.forEach((id) => this.log(`${chalk.greenBright(id)} rolled back.`))
   }
 
-  private async fetchMigrationStatus (): Promise<void> {
+  private async fetchMigrationStatus(): Promise<void> {
     const ids = await this.manager().getAppliedMigrationIds()
     ids.forEach((id) => this.log(`${chalk.greenBright(id)} is applied.`))
   }
 
-  private get config (): DataAPIMigrationsConfig {
+  private get config(): DataAPIMigrationsConfig {
     const baseConfig = this.serverless.service.custom['DataAPIMigrations']
     if (baseConfig === undefined) {
-      throw new Error('"custom"."DataAPIMigrations" is missing from serverless.yml')
+      throw new Error(
+        '"custom"."DataAPIMigrations" is missing from serverless.yml'
+      )
     }
     const {
       migrationsFolder = './migrations',
       typescript = true,
-      [this.stage]: dataAPI
+      [this.stage]: dataAPI,
     } = baseConfig
     if (dataAPI === undefined) {
-      throw new Error(`"custom"."DataAPIMigrations"."${this.stage}" is missing from serverless.yml`)
+      throw new Error(
+        `"custom"."DataAPIMigrations"."${this.stage}" is missing from serverless.yml`
+      )
     }
     return {
       migrationsFolder,
       typescript,
-      dataAPI
+      dataAPI,
     }
   }
 
-  private log (message: string): void {
-    this.serverless.cli.log(`${chalk.magentaBright('Data API Migrations:')} ${message}`)
+  private log(message: string): void {
+    this.serverless.cli.log(
+      `${chalk.magentaBright('Data API Migrations:')} ${message}`
+    )
   }
 }
 
