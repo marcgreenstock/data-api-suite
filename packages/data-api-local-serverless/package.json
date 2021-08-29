@@ -1,6 +1,6 @@
 {
   "name": "data-api-local-serverless",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.4",
   "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
   "homepage": "https://github.com/marcgreenstock/data-api-suite/tree/master/packages/data-api-local-serverless",
   "repository": {
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "chalk": "^3.0.0",
-    "data-api-local": "^1.0.0-alpha.2"
+    "data-api-local": "1.0.0-alpha.4"
   },
   "peerDependencies": {
     "serverless-offline": "^5.x"
