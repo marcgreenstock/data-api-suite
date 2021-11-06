@@ -17,8 +17,10 @@ test('transformResult', () => {
       8,
       4.2,
       8.4,
+      '42.2',
       now.toISOString(),
       now.toISOString(),
+      now.toISOString().substring(0, 10),
       [true, false],
       [now.toISOString(), now.toISOString()],
       [1, 2],
@@ -98,6 +100,14 @@ test('transformResult', () => {
       name: 'value',
       format: 'TEXT'
     }, {
+      dataTypeID: types.builtins.NUMERIC,
+      tableID: 0,
+      columnID: 0,
+      dataTypeModifier: -1,
+      dataTypeSize: -1,
+      name: 'value',
+      format: 'TEXT'
+    }, {
       dataTypeID: types.builtins.TIMESTAMP,
       tableID: 0,
       columnID: 0,
@@ -107,6 +117,14 @@ test('transformResult', () => {
       format: 'TEXT'
     }, {
       dataTypeID: types.builtins.TIMESTAMPTZ,
+      tableID: 0,
+      columnID: 0,
+      dataTypeModifier: -1,
+      dataTypeSize: -1,
+      name: 'value',
+      format: 'TEXT'
+    }, {
+      dataTypeID: types.builtins.DATE,
       tableID: 0,
       columnID: 0,
       dataTypeModifier: -1,
@@ -166,8 +184,10 @@ test('transformResult', () => {
     { longValue: 8 },
     { doubleValue: 4.2 },
     { doubleValue: 8.4 },
+    { stringValue: '42.2' },
     { stringValue: now.toISOString() },
     { stringValue: now.toISOString() },
+    { stringValue: now.toISOString().substring(0, 10) },
     { arrayValue: {
       booleanValues: [true, false]
     }},
