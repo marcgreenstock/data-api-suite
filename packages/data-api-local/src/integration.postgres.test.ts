@@ -341,6 +341,52 @@ describe('#executeStatement', () => {
   })
 })
 
+describe('updates', () => {
+  let id: number = 0;
+  beforeEach(async () => {
+    const now = new Date()
+    const results = await executeStatement(`
+      INSERT INTO "users" ("email", "createdAt", "updatedAt")
+        VALUES (:email, :createdAt, :updatedAt)
+        RETURNING id
+    `, {
+      parameters: [{
+        name: 'email',
+        value: {
+          stringValue: 'example@example.com'
+        }
+      }, {
+        name: 'createdAt',
+        typeHint: 'TIMESTAMP',
+        value: {
+          stringValue: now.toISOString()
+        }
+      }, {
+        name: 'updatedAt',
+        typeHint: 'TIMESTAMP',
+        value: {
+          stringValue: now.toISOString()
+        }
+      }]
+    });
+    id = results.records![0][0].longValue
+  })
+
+  test('update', async () => {
+    const result = await executeStatement('UPDATE "users" SET email = email WHERE id = :id', {
+      parameters: [{ name: 'id', value: { longValue: id }}]
+    })
+    expect(result.numberOfRecordsUpdated).toEqual(1)
+  })
+
+  test('delete', async () => {
+    const result = await executeStatement('DELETE FROM "users" WHERE id = :id', {
+      parameters: [{ name: 'id', value: { longValue: id }}]
+    })
+    expect(result.numberOfRecordsUpdated).toEqual(1)
+  })
+})
+
 describe('#batchExecuteStatement', () => {
   const sql = `
     INSERT INTO "users" ("email", "createdAt", "updatedAt")
@@ -371,7 +417,7 @@ describe('#batchExecuteStatement', () => {
     }
   }])
 
-  describe('error handeling', () => {
+  describe('error handling', () => {
     test('empty sql', async () => {
       try {
         await batchExecuteStatement('')

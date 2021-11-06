@@ -125,7 +125,7 @@ export class PostgresClient implements Client {
     return {
       columnMetadata: includeResultMetadata ? await this.buildColumnMetadata(result.fields) : undefined,
       records: transformResult(result),
-      numberOfRecordsUpdated: result.command === 'UPDATE' ? result.rowCount : 0
+      numberOfRecordsUpdated: result.command === 'UPDATE' || result.command === 'DELETE' ? result.rowCount : 0
     }
   }
 
