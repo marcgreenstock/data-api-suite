@@ -198,7 +198,8 @@ describe('#executeStatement', () => {
         '12345.67'::float8 AS "float8Value",
         '12345.67'::numeric(10, 2) AS "numericValue",
         'helloWorld'::varchar AS "varcharValue",
-        json_build_object('foo', 1, 'bar', 2) as "jsonValue"
+        json_build_object('foo', 1, 'bar', 2) as "jsonValue",
+        '2021-01-01'::date AS "dateValue"
     `)
     expect(result).toMatchObject({
       numberOfRecordsUpdated: 0,
@@ -211,7 +212,8 @@ describe('#executeStatement', () => {
         { doubleValue: 12345.67 },
         { stringValue: '12345.67' },
         { stringValue: 'helloWorld' },
-        { stringValue: '{"foo":1,"bar":2}' }
+        { stringValue: '{"foo":1,"bar":2}' },
+        { stringValue: '2021-01-01' },
       ]],
       columnMetadata: [{
         ...metadataDefaults,
@@ -288,6 +290,15 @@ describe('#executeStatement', () => {
         name: 'jsonValue',
         label: 'jsonValue',
         typeName: 'json'
+      }, {
+        ...metadataDefaults,
+        isCaseSensitive: true,
+        precision: 2147483647,
+        scale: 0,
+        type: 1082,
+        name: 'dateValue',
+        label: 'dateValue',
+        typeName: 'date'
       }]
     })
   })
