@@ -1,6 +1,6 @@
 {
   "name": "data-api-migrations-serverless",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Serverless plugin to start an Aurora Serverless Data API emulator for local development.",
   "homepage": "https://github.com/marcgreenstock/data-api-suite/tree/master/packages/data-api-migrations-serverless",
   "repository": {
@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^3.0.0",
-    "data-api-migrations": "^1.0.0-alpha.3"
+    "data-api-migrations": "^1.0.0-alpha.4"
   },
   "devDependencies": {
     "@types/jest": "^24.9.1",
