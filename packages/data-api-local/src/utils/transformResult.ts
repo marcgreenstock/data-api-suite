@@ -14,6 +14,10 @@ const parseTimestamp = (value: string): string => {
   return new Date(value).toISOString()
 }
 
+const parseDate = (value: string): string => {
+  return new Date(value).toISOString().substring(0, 10) // 2021-01-01
+}
+
 const parseLongValue = (value: unknown): number => {
   if (typeof value === 'string') {
     return parseInt(value)
@@ -67,6 +71,8 @@ const transformValue = (field: FieldDef, value: unknown): RDSDataService.Types.F
       case types.builtins.TIMESTAMP:
       case types.builtins.TIMESTAMPTZ:
         return { stringValue: parseTimestamp(value.toString()) }
+      case types.builtins.DATE:
+        return { stringValue: parseDate(value.toString()) }
       default:
         return { stringValue: transformStringValue(value) }
     }
